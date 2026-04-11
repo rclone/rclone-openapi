@@ -33,7 +33,8 @@
   "scripts": {
     "gen:json": "npx @redocly/cli bundle openapi.yaml -o openapi.json --ext json",
     "gen:types": "openapi-typescript openapi.yaml -o types.d.ts",
-    "gen": "npm run gen:json && npm run gen:types",
+    "gen:bodies": "node scripts/add-request-bodies.mjs",
+    "gen": "npm run gen:bodies && npm run gen:json && npm run gen:types",
     "bump": "npm version patch --no-git-tag-version",
     "pub": "npm run gen && npm publish"
   },

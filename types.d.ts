@@ -2083,6 +2083,1062 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        RcNoopRequest: {
+            /** @description Additional arbitrary parameters allowed. */
+            params?: {
+                [key: string]: unknown;
+            };
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsCleanupRequest: {
+            /** @description Remote name or path to clean up, for example `drive:`. */
+            fs: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsCopyfileRequest: {
+            /** @description Source remote name or path, such as `drive:` or `/` for the local filesystem. */
+            srcFs: string;
+            /** @description Path to the source object within `srcFs`, for example `dir/file.txt`. */
+            srcRemote: string;
+            /** @description Destination remote name or path, such as `drive2:` or `/` for local filesystem. */
+            dstFs: string;
+            /** @description Target path within `dstFs` where the file should be written. */
+            dstRemote: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsCopyurlRequest: {
+            /** @description Remote name or path that will receive the downloaded file, e.g. `drive:`. */
+            fs: string;
+            /** @description Destination path within `fs` where the fetched object will be stored. */
+            remote: string;
+            /** @description Source URL to fetch the object from. */
+            url: string;
+            /** @description Set to true to derive the destination filename from the URL. */
+            autoFilename?: boolean;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsDeleteRequest: {
+            /** @description Remote name or path whose contents should be removed. */
+            fs: string;
+            /** @description JSON encoded config overrides applied for this call only. */
+            _config?: string;
+            /** @description JSON encoded filter overrides applied for this call only. */
+            _filter?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsDeletefileRequest: {
+            /** @description Remote name or path that contains the file to delete. */
+            fs: string;
+            /** @description Exact path to the file within `fs` that should be deleted. */
+            remote: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsFsinfoRequest: {
+            /** @description Remote name or path to inspect, e.g. `drive:`. */
+            fs: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsHashsumRequest: {
+            /** @description Remote name or path to hash, such as `drive:` or `/`. */
+            fs: string;
+            /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
+            hashType: string;
+            /** @description Set to true to force reading the data instead of using remote checksums. */
+            download?: boolean;
+            /** @description Set to true to emit hash values in base64 rather than hexadecimal. */
+            base64?: boolean;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsHashsumfileRequest: {
+            /** @description Remote name or path containing the file to hash. */
+            fs: string;
+            /** @description Path to the specific file within `fs` to hash. */
+            remote: string;
+            /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
+            hashType: string;
+            /** @description Set to true to force reading the data instead of using remote checksums. */
+            download?: boolean;
+            /** @description Set to true to emit the hash value in base64 rather than hexadecimal. */
+            base64?: boolean;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsMovefileRequest: {
+            /** @description Source remote name or path containing the file to move. */
+            srcFs: string;
+            /** @description Path to the source object within `srcFs`. */
+            srcRemote: string;
+            /** @description Destination remote name or path where the file will be moved. */
+            dstFs: string;
+            /** @description Destination path within `dstFs` for the moved object. */
+            dstRemote: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsPubliclinkRequest: {
+            /** @description Remote name or path hosting the object for which to manage a public link. */
+            fs: string;
+            /** @description Path within `fs` to the object for which to create or remove a public link. */
+            remote: string;
+            /** @description Set to true to remove an existing public link instead of creating one. */
+            unlink?: boolean;
+            /** @description Optional expiration time for the public link, formatted as supported by the backend. */
+            expire?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsRmdirsRequest: {
+            /** @description Remote name or path to scan for empty directories. */
+            fs: string;
+            /** @description Path within `fs` whose empty subdirectories should be removed. */
+            remote: string;
+            /** @description Set to true to preserve the top-level directory even if empty. */
+            leaveRoot?: boolean;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsSettierRequest: {
+            /** @description Remote name or path whose storage class tier should be changed. */
+            fs: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsSettierfileRequest: {
+            /** @description Remote name or path that contains the object whose tier should change. */
+            fs: string;
+            /** @description Path within `fs` to the object whose storage class tier should be updated. */
+            remote: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsSizeRequest: {
+            /** @description Remote name or path to measure aggregate size information for. */
+            fs: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CoreBwlimitRequest: {
+            /** @description Bandwidth limit to apply, for example `off`, `5M`, or a schedule string. */
+            rate?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CoreCommandRequest: {
+            /** @description Name of the rclone command to execute, for example `ls` or `lsf`. */
+            command: string;
+            /** @description Optional positional arguments for the command. Repeat to supply multiple values. */
+            arg?: string[];
+            /** @description Optional command options encoded as a JSON string. */
+            opt?: string;
+            /** @description Controls how output is returned; accepts `COMBINED_OUTPUT`, `STREAM`, `STREAM_ONLY_STDOUT`, or `STREAM_ONLY_STDERR`. */
+            returnType?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CoreDuRequest: {
+            /** @description Local directory path to report disk usage for. Defaults to the rclone cache directory when omitted. */
+            dir?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CoreGcRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CoreGroupListRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CoreMemstatsRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CoreObscureRequest: {
+            /** @description Plain-text string to obscure for storage in the config file. */
+            clear: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CorePidRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CoreQuitRequest: {
+            /** @description Optional exit code to use when terminating the rclone process. */
+            exitCode?: number;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CoreStatsDeleteRequest: {
+            /** @description Stats group identifier to remove. */
+            group: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CoreStatsResetRequest: {
+            /** @description Stats group identifier whose counters should be reset. Leave unset to reset all groups. */
+            group?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CoreTransferredRequest: {
+            /** @description Stats group identifier to filter the completed transfer list. Leave unset for all groups. */
+            group?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        DebugSetBlockProfileRateRequest: {
+            /** @description Sampling interval in nanoseconds for blocking profile collection; use 1 to capture all events. */
+            rate: number;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        DebugSetGcPercentRequest: {
+            /** @description Target percentage of newly allocated data to trigger garbage collection. */
+            "gc-percent": number;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        DebugSetMutexProfileFractionRequest: {
+            /** @description Sampling fraction for mutex contention profiling; set to 0 to disable. */
+            rate: number;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        DebugSetSoftMemoryLimitRequest: {
+            /** @description Soft memory limit for the Go runtime in bytes. */
+            "mem-limit": number;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        FscacheClearRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        FscacheEntriesRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        MountListmountsRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        MountMountRequest: {
+            /** @description Remote path to mount, such as `drive:` or `remote:subdir`. */
+            fs: string;
+            /** @description Absolute local path where the remote should be mounted. */
+            mountPoint: string;
+            /** @description Optional mount implementation to use (`mount`, `cmount`, or `mount2`). */
+            mountType?: string;
+            /** @description Mount options encoded as JSON, matching flags accepted by `rclone mount`. */
+            mountOpt?: string;
+            /** @description VFS options encoded as JSON, matching flags accepted by `rclone mount`. */
+            vfsOpt?: string;
+            /** @description JSON encoded config overrides applied for this call only. */
+            _config?: string;
+            /** @description JSON encoded filter overrides applied for this call only. */
+            _filter?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        MountTypesRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        MountUnmountRequest: {
+            /** @description Local mount point path to unmount. */
+            mountPoint: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        MountUnmountallRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        RcNoopAuthRequest: {
+            /** @description Additional arbitrary parameters allowed. */
+            params?: {
+                [key: string]: unknown;
+            };
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        RcErrorRequest: {
+            /** @description Additional arbitrary parameters allowed. */
+            params?: {
+                [key: string]: unknown;
+            };
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        RcListRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        BackendCommandRequest: {
+            /** @description Backend-specific command to invoke. */
+            command: string;
+            /** @description Remote name or path the backend command should target. */
+            fs?: string;
+            /** @description Optional positional arguments for the backend command. */
+            arg?: string[];
+            /** @description Backend command options encoded as a JSON string. */
+            opt?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CacheExpireRequest: {
+            /** @description Remote path to expire from the cache, e.g. `remote:path/to/dir`. */
+            remote: string;
+            /** @description Set to true to drop cached chunk data along with directory entries. */
+            withData?: boolean;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CacheFetchRequest: {
+            /** @description Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch. */
+            chunks?: string;
+            /** @description Additional arbitrary parameters allowed. */
+            params?: {
+                [key: string]: unknown;
+            };
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CacheStatsRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ConfigCreateRequest: {
+            /** @description Name of the new remote configuration. */
+            name: string;
+            /** @description JSON object of configuration key/value pairs required for the remote. */
+            parameters: string;
+            /** @description Backend type identifier, such as `drive`, `s3`, or `dropbox`. */
+            type: string;
+            /** @description Optional JSON object controlling interactive behaviour (e.g. `obscure`, `continue`). */
+            opt?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ConfigDeleteRequest: {
+            /** @description Name of the remote configuration to delete. */
+            name: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ConfigDumpRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ConfigGetRequest: {
+            /** @description Name of the remote configuration to fetch. */
+            name: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ConfigListremotesRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ConfigPasswordRequest: {
+            /** @description Name of the remote whose secrets should be updated. */
+            name: string;
+            /** @description JSON object of password answers, typically including `pass`. */
+            parameters: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ConfigPathsRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ConfigProvidersRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ConfigSetpathRequest: {
+            /** @description Absolute path to the `rclone.conf` file that rclone should use. */
+            path: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ConfigUnlockRequest: {
+            /** @description Password used to unlock an encrypted config file. */
+            configPassword: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ConfigUpdateRequest: {
+            /** @description Name of the remote configuration to update. */
+            name: string;
+            /** @description JSON object of configuration key/value pairs to apply to the remote. */
+            parameters: string;
+            /** @description Optional JSON object controlling update behaviour (e.g. `obscure`, `continue`). */
+            opt?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CoreVersionRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        CoreStatsRequest: {
+            /** @description Stats group identifier to return a snapshot for. Leave unset to include all groups. */
+            group?: string;
+            /** @description When true, omit the `transferring` and `checking` arrays from the response. */
+            short?: boolean;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        JobListRequest: {
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        JobStatusRequest: {
+            /** @description Numeric identifier of the job to query, as returned from an async call. */
+            jobid: number;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        JobStopRequest: {
+            /** @description Numeric identifier of the job to cancel. */
+            jobid: number;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        JobStopgroupRequest: {
+            /** @description Stats group name whose active jobs should be stopped. */
+            group: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsListRequest: {
+            /** @description Remote name or path to list, for example `drive:`. */
+            fs: string;
+            /** @description Directory path within `fs` to list; leave empty to target the root. */
+            remote: string;
+            /** @description Optional JSON-encoded object of listing flags (e.g. `{ "recurse": true, "showHash": true }`). */
+            opt?: string;
+            /** @description Set to true to list directories recursively. */
+            recurse?: boolean;
+            /** @description Set to true to omit modification times for faster listings on some backends. */
+            noModTime?: boolean;
+            /** @description Set to true to include encrypted names when using crypt remotes. */
+            showEncrypted?: boolean;
+            /** @description Set to true to include original backend identifiers where available. */
+            showOrigIDs?: boolean;
+            /** @description Set to true to include hash digests for each entry. */
+            showHash?: boolean;
+            /** @description Set to true to omit MIME type detection. */
+            noMimeType?: boolean;
+            /** @description Set to true to return only directory entries. */
+            dirsOnly?: boolean;
+            /** @description Set to true to return only file entries. */
+            filesOnly?: boolean;
+            /** @description Set to true to include backend-provided metadata maps. */
+            metadata?: boolean;
+            /** @description Specify one or more hash algorithms to include when `showHash` is true (e.g. `md5`). */
+            hashTypes?: string[];
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsStatRequest: {
+            /** @description Remote name or path that contains the item to inspect. */
+            fs: string;
+            /** @description Path to the file or directory within `fs` to describe. */
+            remote: string;
+            /** @description Optional JSON object of listing flags, matching those accepted by `operations/list`. */
+            opt?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsAboutRequest: {
+            /** @description Remote name or path to query for capacity information. */
+            fs: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsPurgeRequest: {
+            /** @description Remote name or path from which to remove all contents. */
+            fs: string;
+            /** @description Path within `fs` whose contents should be purged. */
+            remote: string;
+            /** @description JSON encoded config overrides applied for this call only. */
+            _config?: string;
+            /** @description JSON encoded filter overrides applied for this call only. */
+            _filter?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsMkdirRequest: {
+            /** @description Remote name or path in which to create a directory. */
+            fs: string;
+            /** @description Directory path within `fs` to create. */
+            remote: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsRmdirRequest: {
+            /** @description Remote name or path containing the directory to remove. */
+            fs: string;
+            /** @description Directory path within `fs` to delete. */
+            remote: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OperationsCheckRequest: {
+            /** @description Source remote name or path to verify, e.g. `drive:`. */
+            srcFs: string;
+            /** @description Destination remote name or path that should match the source. */
+            dstFs: string;
+            /** @description Set to true to read file contents during comparison instead of relying on hashes. */
+            download?: boolean;
+            /** @description Hash name to expect in the supplied SUM file, such as `md5`. */
+            checkFileHash?: string;
+            /** @description Remote containing the checksum SUM file when using `checkFileHash`. */
+            checkFileFs?: string;
+            /** @description Path within `checkFileFs` to the checksum SUM file. */
+            checkFileRemote?: string;
+            /** @description Set to true to only ensure that source files exist on the destination. */
+            oneWay?: boolean;
+            /** @description Set to true to include a combined summary report in the response. */
+            combined?: boolean;
+            /** @description Set to true to report files missing from the source. */
+            missingOnSrc?: boolean;
+            /** @description Set to true to report files missing from the destination. */
+            missingOnDst?: boolean;
+            /** @description Set to true to include matching files in the report. */
+            match?: boolean;
+            /** @description Set to true to include differing files in the report. */
+            differ?: boolean;
+            /** @description Set to true to include entries that encountered errors. */
+            error?: boolean;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        SyncSyncRequest: {
+            /** @description Source remote path to sync from, e.g. `drive:src`. */
+            srcFs: string;
+            /** @description Destination remote path to sync to, e.g. `drive:dst`. */
+            dstFs: string;
+            /** @description Set to true to create empty source directories on the destination. */
+            createEmptySrcDirs?: boolean;
+            /** @description JSON encoded config overrides applied for this call only. */
+            _config?: string;
+            /** @description JSON encoded filter overrides applied for this call only. */
+            _filter?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        SyncCopyRequest: {
+            /** @description Source remote path to copy from. */
+            srcFs: string;
+            /** @description Destination remote path to copy to. */
+            dstFs: string;
+            /** @description Set to true to replicate empty source directories on the destination. */
+            createEmptySrcDirs?: boolean;
+            /** @description JSON encoded config overrides applied for this call only. */
+            _config?: string;
+            /** @description JSON encoded filter overrides applied for this call only. */
+            _filter?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        SyncMoveRequest: {
+            /** @description Source remote path whose contents will be moved. */
+            srcFs: string;
+            /** @description Destination remote path that will receive moved files. */
+            dstFs: string;
+            /** @description Set to true to create empty source directories on the destination. */
+            createEmptySrcDirs?: boolean;
+            /** @description Set to true to delete empty directories from the source after the move completes. */
+            deleteEmptySrcDirs?: boolean;
+            /** @description JSON encoded config overrides applied for this call only. */
+            _config?: string;
+            /** @description JSON encoded filter overrides applied for this call only. */
+            _filter?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        SyncBisyncRequest: {
+            /** @description First remote directory, e.g. `drive:path1`. */
+            path1: string;
+            /** @description Second remote directory, e.g. `drive:path2`. */
+            path2: string;
+            /** @description Set to true to simulate the bisync run without making changes. */
+            dryRun?: boolean;
+            /** @description Set to true to perform a one-time resync, rebuilding bisync history. */
+            resync?: boolean;
+            /** @description Set to true to abort if `RCLONE_TEST` files are missing on either side. */
+            checkAccess?: boolean;
+            /** @description Override the access-check sentinel filename; defaults to `RCLONE_TEST`. */
+            checkFilename?: string;
+            /** @description Abort the run if deletions exceed this percentage (default 50). */
+            maxDelete?: number;
+            /** @description Set to true to bypass the `maxDelete` safety check. */
+            force?: boolean;
+            /** @description Controls final listing comparison; leave true for normal verification or set false to skip. */
+            checkSync?: boolean;
+            /** @description Set to true to mirror empty directories between the two paths. */
+            createEmptySrcDirs?: boolean;
+            /** @description Set to true to remove empty directories during cleanup. */
+            removeEmptyDirs?: boolean;
+            /** @description Path to an rclone filters file applied to both paths. */
+            filtersFile?: string;
+            /** @description Set to true to ignore checksum differences when comparing listings. */
+            ignoreListingChecksum?: boolean;
+            /** @description Set to true to allow retrying after certain recoverable errors. */
+            resilient?: boolean;
+            /** @description Directory path used to store bisync working files. */
+            workdir?: string;
+            /** @description Backup directory on the first remote for changed files. */
+            backupdir1?: string;
+            /** @description Backup directory on the second remote for changed files. */
+            backupdir2?: string;
+            /** @description Set to true to keep bisync working files after completion. */
+            noCleanup?: boolean;
+            /** @description JSON encoded config overrides applied for this call only. */
+            _config?: string;
+            /** @description JSON encoded filter overrides applied for this call only. */
+            _filter?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OptionsBlocksRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OptionsGetRequest: {
+            /** @description Optional comma-separated list of option block names to return. */
+            blocks?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OptionsInfoRequest: {
+            /** @description Optional comma-separated list of option block names to describe. */
+            blocks?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        OptionsSetRequest: {
+            /** @description Overrides for the `dlna` option block. */
+            dlna?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `filter` option block. */
+            filter?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `ftp` option block. */
+            ftp?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `main` option block. */
+            main?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `http` option block. */
+            http?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `log` option block. */
+            log?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `mount` option block. */
+            mount?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `nfs` option block. */
+            nfs?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `proxy` option block. */
+            proxy?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `rc` option block. */
+            rc?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `restic` option block. */
+            restic?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `s3` option block. */
+            s3?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `sftp` option block. */
+            sftp?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `vfs` option block. */
+            vfs?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Overrides for the `webdav` option block. */
+            webdav?: {
+                [key: string]: string | number | boolean | unknown[] | {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        OptionsLocalRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ServeListRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ServeStartRequest: {
+            /** @description Type of server to start (e.g. `http`, `webdav`, `ftp`, `sftp`). */
+            type: string;
+            /** @description Remote path that will be served. */
+            fs: string;
+            /** @description Address and port to bind the server to, such as `:5572` or `localhost:8080`. */
+            addr: string;
+            /** @description Additional arbitrary parameters allowed. */
+            params?: {
+                [key: string]: unknown;
+            };
+            /** @description JSON encoded config overrides applied for this call only. */
+            _config?: string;
+            /** @description JSON encoded filter overrides applied for this call only. */
+            _filter?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ServeStopRequest: {
+            /** @description Identifier of the running serve instance returned by `serve/start`. */
+            id: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ServeStopallRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        ServeTypesRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        VfsForgetRequest: {
+            /** @description Optional VFS identifier to target; required when more than one VFS is active. */
+            fs?: string;
+            /** @description Additional arbitrary parameters allowed. */
+            params?: {
+                [key: string]: unknown;
+            };
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        VfsListRequest: {
+            /** @description Optional VFS identifier; omit to list all active VFS instances. */
+            fs?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        VfsPollIntervalRequest: {
+            /** @description Optional VFS identifier whose poll interval should be queried or modified. */
+            fs?: string;
+            /** @description Duration string (e.g. `5m`) to set as the new poll interval. */
+            interval?: string;
+            /** @description Duration to wait for the poll interval change to take effect; `0` waits indefinitely. */
+            timeout?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        VfsQueueRequest: {
+            /** @description Optional VFS identifier whose upload queue should be inspected. */
+            fs?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        VfsQueueSetExpiryRequest: {
+            /** @description Optional VFS identifier for the queued item. */
+            fs?: string;
+            /** @description Queue item ID as returned by `vfs/queue`. */
+            id: number;
+            /** @description New eligibility time in seconds (may be negative for immediate upload). */
+            expiry: number;
+            /** @description Set to true to treat `expiry` as relative to the current value. */
+            relative?: boolean;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        VfsRefreshRequest: {
+            /** @description Optional VFS identifier whose directory cache should be refreshed. */
+            fs?: string;
+            /** @description Set to true to refresh entire directory trees. */
+            recursive?: boolean;
+            /** @description Additional arbitrary parameters allowed. */
+            params?: {
+                [key: string]: unknown;
+            };
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        VfsStatsRequest: {
+            /** @description Optional VFS identifier whose statistics should be returned. */
+            fs?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        PluginsctlAddPluginRequest: {
+            /** @description Repository URL of the plugin to install. */
+            url: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        PluginsctlGetPluginsForTypeRequest: {
+            /** @description MIME type to match when listing plugins. */
+            type?: string;
+            /** @description Filter results by plugin type (e.g. `test`). */
+            pluginType?: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        PluginsctlListPluginsRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        PluginsctlListTestPluginsRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        PluginsctlRemovePluginRequest: {
+            /** @description Name of the plugin to uninstall. */
+            name: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
+        PluginsctlRemoveTestPluginRequest: {
+            /** @description Name of the test plugin to uninstall. */
+            name: string;
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
     };
     responses: {
         /** @description Any error response (HTTP 4xx/5xx) */
@@ -2121,7 +3177,9 @@ export interface components {
                 [name: string]: unknown;
             };
             content: {
-                "application/json": Record<string, never>;
+                "application/json": {
+                    [key: string]: unknown;
+                };
             };
         };
         /** @description Response for sync operations, containing job ID if async. */
@@ -3161,7 +4219,9 @@ export interface components {
         /** @description Assign the request to a custom stats group. */
         GlobalGroupParam: string;
         /** @description Additional arbitrary parameters allowed. */
-        Rc_NoopPostAdditionalParam: Record<string, never>;
+        Rc_NoopPostAdditionalParam: {
+            [key: string]: unknown;
+        };
         /** @description Do this many commands concurrently. Defaults to --transfers if not set. */
         Job_BatchPostConcurrencyParam: number;
         /** @description List of inputs to the commands with an extra _path parameter. */
@@ -3292,9 +4352,13 @@ export interface components {
         /** @description Local mount point path to unmount. */
         Mount_UnmountPostMountPointParam: string;
         /** @description Additional arbitrary parameters allowed. */
-        Rc_NoopauthPostAdditionalParam: Record<string, never>;
+        Rc_NoopauthPostAdditionalParam: {
+            [key: string]: unknown;
+        };
         /** @description Additional arbitrary parameters allowed. */
-        Rc_ErrorPostAdditionalParam: Record<string, never>;
+        Rc_ErrorPostAdditionalParam: {
+            [key: string]: unknown;
+        };
         /** @description Backend-specific command to invoke. */
         Backend_CommandPostCommandParam: string;
         /** @description Remote name or path the backend command should target. */
@@ -3310,7 +4374,9 @@ export interface components {
         /** @description Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch. */
         Cache_FetchPostChunksParam: string;
         /** @description Additional arbitrary parameters allowed. */
-        Cache_FetchPostAdditionalParam: Record<string, never>;
+        Cache_FetchPostAdditionalParam: {
+            [key: string]: unknown;
+        };
         /** @description Name of the new remote configuration. */
         Config_CreatePostNameParam: string;
         /** @description JSON object of configuration key/value pairs required for the remote. */
@@ -3576,13 +4642,17 @@ export interface components {
         /** @description Address and port to bind the server to, such as `:5572` or `localhost:8080`. */
         Serve_StartPostAddrParam: string;
         /** @description Additional arbitrary parameters allowed. */
-        Serve_StartPostAdditionalParam: Record<string, never>;
+        Serve_StartPostAdditionalParam: {
+            [key: string]: unknown;
+        };
         /** @description Identifier of the running serve instance returned by `serve/start`. */
         Serve_StopPostIdParam: string;
         /** @description Optional VFS identifier to target; required when more than one VFS is active. */
         Vfs_ForgetPostFsParam: string;
         /** @description Additional arbitrary parameters allowed. */
-        Vfs_ForgetPostAdditionalParam: Record<string, never>;
+        Vfs_ForgetPostAdditionalParam: {
+            [key: string]: unknown;
+        };
         /** @description Optional VFS identifier; omit to list all active VFS instances. */
         Vfs_ListPostFsParam: string;
         /** @description Optional VFS identifier whose poll interval should be queried or modified. */
@@ -3606,7 +4676,9 @@ export interface components {
         /** @description Set to true to refresh entire directory trees. */
         Vfs_RefreshPostRecursiveParam: boolean;
         /** @description Additional arbitrary parameters allowed. */
-        Vfs_RefreshPostAdditionalParam: Record<string, never>;
+        Vfs_RefreshPostAdditionalParam: {
+            [key: string]: unknown;
+        };
         /** @description Optional VFS identifier whose statistics should be returned. */
         Vfs_StatsPostFsParam: string;
         /** @description Repository URL of the plugin to install. */
@@ -3638,7 +4710,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RcNoopRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["RcNoopResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3659,7 +4735,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsCleanupRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3686,7 +4766,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsCopyfileRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3713,7 +4797,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsCopyurlRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3738,7 +4826,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsDeleteRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3761,7 +4853,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsDeletefileRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3782,7 +4878,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsFsinfoRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["OperationsFsinfoResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3809,7 +4909,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsHashsumRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["OperationsHashsumResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3838,7 +4942,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsHashsumfileRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["OperationsHashsumfileResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3865,7 +4973,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsMovefileRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3892,7 +5004,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsPubliclinkRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["OperationsPubliclinkResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3917,7 +5033,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsRmdirsRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3938,7 +5058,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsSettierRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3961,7 +5085,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsSettierfileRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3982,7 +5110,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsSizeRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["OperationsSizeResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4003,7 +5135,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreBwlimitRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["CoreBwlimitResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4030,7 +5166,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreCommandRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["CoreCommandResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4051,7 +5191,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreDuRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["CoreDuResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4070,7 +5214,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreGcRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4089,7 +5237,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreGroupListRequest"];
+            };
+        };
         responses: {
             /** @description Names of stats groups. */
             200: {
@@ -4118,7 +5270,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreMemstatsRequest"];
+            };
+        };
         responses: {
             /** @description Memory statistics fields from the Go runtime. */
             200: {
@@ -4149,7 +5305,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreObscureRequest"];
+            };
+        };
         responses: {
             /** @description Obscured string result. */
             200: {
@@ -4178,7 +5338,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CorePidRequest"];
+            };
+        };
         responses: {
             /** @description Process ID payload. */
             200: {
@@ -4209,7 +5373,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreQuitRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4230,7 +5398,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreStatsDeleteRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4251,7 +5423,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreStatsResetRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4272,7 +5448,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreTransferredRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["CoreTransferredResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4293,7 +5473,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["DebugSetBlockProfileRateRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4314,7 +5498,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["DebugSetGcPercentRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["DebugSetGcPercentResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4335,7 +5523,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["DebugSetMutexProfileFractionRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["DebugSetMutexProfileFractionResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4356,7 +5548,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["DebugSetSoftMemoryLimitRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["DebugSetSoftMemoryLimitResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4375,7 +5571,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["FscacheClearRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4394,7 +5594,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["FscacheEntriesRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["FscacheEntriesResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4413,7 +5617,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["MountListmountsRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["MountListmountsResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4446,7 +5654,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["MountMountRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4465,7 +5677,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["MountTypesRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["MountTypesResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4486,7 +5702,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["MountUnmountRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4505,7 +5725,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["MountUnmountallRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4524,7 +5748,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RcNoopAuthRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["RcNoopResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4543,7 +5771,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RcErrorRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4562,7 +5794,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RcListRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["RcListResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4589,7 +5825,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["BackendCommandRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["BackendCommandResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4612,7 +5852,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CacheExpireRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4635,7 +5879,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CacheFetchRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4654,7 +5902,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CacheStatsRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4681,7 +5933,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ConfigCreateRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4702,7 +5958,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ConfigDeleteRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4721,7 +5981,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ConfigDumpRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["ConfigDumpResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4742,7 +6006,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ConfigGetRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["ConfigGetResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4761,7 +6029,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ConfigListremotesRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["ConfigListremotesResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4784,7 +6056,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ConfigPasswordRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4803,7 +6079,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ConfigPathsRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["ConfigPathsResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4822,7 +6102,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ConfigProvidersRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["ConfigProvidersResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4843,7 +6127,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ConfigSetpathRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4864,7 +6152,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ConfigUnlockRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4889,7 +6181,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ConfigUpdateRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4908,7 +6204,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreVersionRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["CoreVersionResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4931,7 +6231,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreStatsRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["CoreStatsResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4973,7 +6277,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["JobListRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["JobListResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4992,7 +6300,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["JobStatusRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["JobStatusResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5011,7 +6323,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["JobStopRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5030,7 +6346,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["JobStopgroupRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5075,7 +6395,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsListRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["OperationsListResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5100,7 +6424,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsStatRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["OperationsStatResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5121,7 +6449,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsAboutRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["OperationsAboutResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5176,7 +6508,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsPurgeRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5199,7 +6535,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsMkdirRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5222,7 +6562,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsRmdirRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5267,7 +6611,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OperationsCheckRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["OperationsCheckResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5296,7 +6644,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SyncSyncRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["SyncJobResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5325,7 +6677,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SyncCopyRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["SyncJobResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5356,7 +6712,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SyncMoveRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["SyncJobResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5415,7 +6775,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SyncBisyncRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["SyncJobResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5434,7 +6798,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OptionsBlocksRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["OptionsBlocksResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5455,7 +6823,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OptionsGetRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["OptionsGetResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5476,7 +6848,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OptionsInfoRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["OptionsInfoResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5525,7 +6901,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OptionsSetRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5544,7 +6924,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OptionsLocalRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["OptionsLocalResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5563,7 +6947,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ServeListRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["ServeListResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5594,7 +6982,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ServeStartRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["ServeStartResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5615,7 +7007,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ServeStopRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5634,7 +7030,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ServeStopallRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5653,7 +7053,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ServeTypesRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5676,7 +7080,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["VfsForgetRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["VfsForgetResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5697,7 +7105,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["VfsListRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["VfsListResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5722,7 +7134,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["VfsPollIntervalRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["VfsPollIntervalResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5743,7 +7159,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["VfsQueueRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["VfsQueueResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5770,7 +7190,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["VfsQueueSetExpiryRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5795,7 +7219,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["VfsRefreshRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["VfsRefreshResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5816,7 +7244,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["VfsStatsRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["VfsStatsResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5837,7 +7269,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PluginsctlAddPluginRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5860,7 +7296,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PluginsctlGetPluginsForTypeRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["PluginsctlGetPluginsForTypeResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5879,7 +7319,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PluginsctlListPluginsRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["PluginsctlListPluginsResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5898,7 +7342,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PluginsctlListTestPluginsRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["PluginsctlListTestPluginsResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5919,7 +7367,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PluginsctlRemovePluginRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5940,7 +7392,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PluginsctlRemoveTestPluginRequest"];
+            };
+        };
         responses: {
             200: components["responses"]["EmptyResponse"];
             "4XX": components["responses"]["RcError"];

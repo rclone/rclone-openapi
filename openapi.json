@@ -33,6 +33,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcNoopRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/RcNoopResponse"
@@ -63,6 +72,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsCleanupRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -102,6 +120,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsCopyfileRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -141,6 +168,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsCopyurlRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -177,6 +213,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsDeleteRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -210,6 +255,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsDeletefileRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -240,6 +294,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsFsinfoRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/OperationsFsinfoResponse"
@@ -279,6 +342,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsHashsumRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/OperationsHashsumResponse"
@@ -321,6 +393,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsHashsumfileRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/OperationsHashsumfileResponse"
@@ -360,6 +441,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsMovefileRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -399,6 +489,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsPubliclinkRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/OperationsPubliclinkResponse"
@@ -435,6 +534,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsRmdirsRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -465,6 +573,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsSettierRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -498,6 +615,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsSettierfileRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -528,6 +654,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsSizeRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/OperationsSizeResponse"
@@ -558,6 +693,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreBwlimitRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/CoreBwlimitResponse"
@@ -597,6 +741,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreCommandRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/CoreCommandResponse"
@@ -627,6 +780,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreDuRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/CoreDuResponse"
@@ -654,6 +816,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreGcRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -681,6 +852,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreGroupListRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Names of stats groups.",
@@ -726,6 +906,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreMemstatsRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Memory statistics fields from the Go runtime.",
@@ -766,6 +955,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreObscureRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Obscured string result.",
@@ -808,6 +1006,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorePidRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Process ID payload.",
@@ -853,6 +1060,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreQuitRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -883,6 +1099,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreStatsDeleteRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -913,6 +1138,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreStatsResetRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -943,6 +1177,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreTransferredRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/CoreTransferredResponse"
@@ -971,6 +1214,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DebugSetBlockProfileRateRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -999,6 +1251,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DebugSetGcPercentRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/DebugSetGcPercentResponse"
@@ -1027,6 +1288,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DebugSetMutexProfileFractionRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/DebugSetMutexProfileFractionResponse"
@@ -1055,6 +1325,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DebugSetSoftMemoryLimitRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/DebugSetSoftMemoryLimitResponse"
@@ -1080,6 +1359,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FscacheClearRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -1105,6 +1393,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FscacheEntriesRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/FscacheEntriesResponse"
@@ -1130,6 +1427,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MountListmountsRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/MountListmountsResponse"
@@ -1176,6 +1482,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MountMountRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -1201,6 +1516,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MountTypesRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/MountTypesResponse"
@@ -1229,6 +1553,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MountUnmountRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -1254,6 +1587,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MountUnmountallRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -1281,6 +1623,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcNoopAuthRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/RcNoopResponse"
@@ -1308,6 +1659,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcErrorRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyResponse"
@@ -1335,6 +1695,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcListRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/RcListResponse"
@@ -1374,6 +1743,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackendCommandRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/BackendCommandResponse"
@@ -1407,6 +1785,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CacheExpireRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyResponse"
@@ -1440,6 +1827,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CacheFetchRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyResponse"
@@ -1467,6 +1863,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CacheStatsRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyResponse"
@@ -1506,6 +1911,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigCreateRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -1536,6 +1950,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigDeleteRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyResponse"
@@ -1563,6 +1986,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigDumpRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/ConfigDumpResponse"
@@ -1593,6 +2025,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigGetRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/ConfigGetResponse"
@@ -1620,6 +2061,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigListremotesRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/ConfigListremotesResponse"
@@ -1653,6 +2103,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigPasswordRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyResponse"
@@ -1680,6 +2139,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigPathsRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/ConfigPathsResponse"
@@ -1707,6 +2175,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigProvidersRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/ConfigProvidersResponse"
@@ -1737,6 +2214,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigSetpathRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyResponse"
@@ -1767,6 +2253,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigUnlockRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyResponse"
@@ -1803,6 +2298,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigUpdateRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -1830,6 +2334,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreVersionRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/CoreVersionResponse"
@@ -1863,6 +2376,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreStatsRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/CoreStatsResponse"
@@ -1926,6 +2448,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobListRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/JobListResponse"
@@ -1953,6 +2484,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobStatusRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/JobStatusResponse"
@@ -1980,6 +2520,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobStopRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -2007,6 +2556,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobStopgroupRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -2073,6 +2631,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsListRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/OperationsListResponse"
@@ -2109,6 +2676,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsStatRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/OperationsStatResponse"
@@ -2139,6 +2715,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsAboutRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/OperationsAboutResponse"
@@ -2221,6 +2806,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsPurgeRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -2254,6 +2848,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsMkdirRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -2287,6 +2890,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsRmdirRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -2353,6 +2965,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationsCheckRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/OperationsCheckResponse"
@@ -2395,6 +3016,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncSyncRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/SyncJobResponse"
@@ -2437,6 +3067,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncCopyRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/SyncJobResponse"
@@ -2482,6 +3121,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncMoveRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/SyncJobResponse"
@@ -2569,6 +3217,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncBisyncRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/SyncJobResponse"
@@ -2596,6 +3253,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OptionsBlocksRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/OptionsBlocksResponse"
@@ -2626,6 +3292,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OptionsGetRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/OptionsGetResponse"
@@ -2656,6 +3331,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OptionsInfoRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/OptionsInfoResponse"
@@ -2729,6 +3413,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OptionsSetRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -2756,6 +3449,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OptionsLocalRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/OptionsLocalResponse"
@@ -2783,6 +3485,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServeListRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/ServeListResponse"
@@ -2828,6 +3539,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServeStartRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/ServeStartResponse"
@@ -2858,6 +3578,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServeStopRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -2885,6 +3614,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServeStopallRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -2912,6 +3650,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServeTypesRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyResponse"
@@ -2945,6 +3692,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VfsForgetRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/VfsForgetResponse"
@@ -2975,6 +3731,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VfsListRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/VfsListResponse"
@@ -3011,6 +3776,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VfsPollIntervalRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/VfsPollIntervalResponse"
@@ -3041,6 +3815,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VfsQueueRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/VfsQueueResponse"
@@ -3080,6 +3863,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VfsQueueSetExpiryRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -3116,6 +3908,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VfsRefreshRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/VfsRefreshResponse"
@@ -3146,6 +3947,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VfsStatsRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/VfsStatsResponse"
@@ -3176,6 +3986,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PluginsctlAddPluginRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
@@ -3209,6 +4028,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PluginsctlGetPluginsForTypeRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/PluginsctlGetPluginsForTypeResponse"
@@ -3236,6 +4064,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PluginsctlListPluginsRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/PluginsctlListPluginsResponse"
@@ -3263,6 +4100,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PluginsctlListTestPluginsRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/PluginsctlListTestPluginsResponse"
@@ -3293,6 +4139,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PluginsctlRemovePluginRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyResponse"
@@ -3323,6 +4178,15 @@
             "$ref": "#/components/parameters/GlobalAsyncParam"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PluginsctlRemoveTestPluginRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "$ref": "#/components/responses/EmptyResponse"
@@ -3377,7 +4241,8 @@
         "in": "query",
         "description": "Additional arbitrary parameters allowed.",
         "schema": {
-          "type": "object"
+          "type": "object",
+          "additionalProperties": true
         },
         "style": "form",
         "explode": true
@@ -3940,7 +4805,8 @@
         "in": "query",
         "description": "Additional arbitrary parameters allowed.",
         "schema": {
-          "type": "object"
+          "type": "object",
+          "additionalProperties": true
         },
         "style": "form",
         "explode": true
@@ -3950,7 +4816,8 @@
         "in": "query",
         "description": "Additional arbitrary parameters allowed.",
         "schema": {
-          "type": "object"
+          "type": "object",
+          "additionalProperties": true
         },
         "style": "form",
         "explode": true
@@ -4023,7 +4890,8 @@
         "in": "query",
         "description": "Additional arbitrary parameters allowed.",
         "schema": {
-          "type": "object"
+          "type": "object",
+          "additionalProperties": true
         },
         "style": "form",
         "explode": true
@@ -5284,7 +6152,8 @@
         "in": "query",
         "description": "Additional arbitrary parameters allowed.",
         "schema": {
-          "type": "object"
+          "type": "object",
+          "additionalProperties": true
         },
         "style": "form",
         "explode": true
@@ -5311,7 +6180,8 @@
         "in": "query",
         "description": "Additional arbitrary parameters allowed.",
         "schema": {
-          "type": "object"
+          "type": "object",
+          "additionalProperties": true
         },
         "style": "form",
         "explode": true
@@ -5411,7 +6281,8 @@
         "in": "query",
         "description": "Additional arbitrary parameters allowed.",
         "schema": {
-          "type": "object"
+          "type": "object",
+          "additionalProperties": true
         },
         "style": "form",
         "explode": true
@@ -5512,7 +6383,7 @@
           "application/json": {
             "schema": {
               "type": "object",
-              "properties": {}
+              "additionalProperties": true
             }
           }
         }
@@ -8419,6 +9290,2628 @@
           }
         },
         "additionalProperties": true
+      },
+      "RcNoopRequest": {
+        "type": "object",
+        "properties": {
+          "params": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Additional arbitrary parameters allowed."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "OperationsCleanupRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path to clean up, for example `drive:`."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs"
+        ]
+      },
+      "OperationsCopyfileRequest": {
+        "type": "object",
+        "properties": {
+          "srcFs": {
+            "type": "string",
+            "description": "Source remote name or path, such as `drive:` or `/` for the local filesystem."
+          },
+          "srcRemote": {
+            "type": "string",
+            "description": "Path to the source object within `srcFs`, for example `dir/file.txt`."
+          },
+          "dstFs": {
+            "type": "string",
+            "description": "Destination remote name or path, such as `drive2:` or `/` for local filesystem."
+          },
+          "dstRemote": {
+            "type": "string",
+            "description": "Target path within `dstFs` where the file should be written."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "srcFs",
+          "srcRemote",
+          "dstFs",
+          "dstRemote"
+        ]
+      },
+      "OperationsCopyurlRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path that will receive the downloaded file, e.g. `drive:`."
+          },
+          "remote": {
+            "type": "string",
+            "description": "Destination path within `fs` where the fetched object will be stored."
+          },
+          "url": {
+            "type": "string",
+            "description": "Source URL to fetch the object from."
+          },
+          "autoFilename": {
+            "type": "boolean",
+            "description": "Set to true to derive the destination filename from the URL."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs",
+          "remote",
+          "url"
+        ]
+      },
+      "OperationsDeleteRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path whose contents should be removed."
+          },
+          "_config": {
+            "type": "string",
+            "description": "JSON encoded config overrides applied for this call only."
+          },
+          "_filter": {
+            "type": "string",
+            "description": "JSON encoded filter overrides applied for this call only."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs"
+        ]
+      },
+      "OperationsDeletefileRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path that contains the file to delete."
+          },
+          "remote": {
+            "type": "string",
+            "description": "Exact path to the file within `fs` that should be deleted."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs",
+          "remote"
+        ]
+      },
+      "OperationsFsinfoRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path to inspect, e.g. `drive:`."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs"
+        ]
+      },
+      "OperationsHashsumRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path to hash, such as `drive:` or `/`."
+          },
+          "hashType": {
+            "type": "string",
+            "description": "Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name."
+          },
+          "download": {
+            "type": "boolean",
+            "description": "Set to true to force reading the data instead of using remote checksums."
+          },
+          "base64": {
+            "type": "boolean",
+            "description": "Set to true to emit hash values in base64 rather than hexadecimal."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs",
+          "hashType"
+        ]
+      },
+      "OperationsHashsumfileRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path containing the file to hash."
+          },
+          "remote": {
+            "type": "string",
+            "description": "Path to the specific file within `fs` to hash."
+          },
+          "hashType": {
+            "type": "string",
+            "description": "Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name."
+          },
+          "download": {
+            "type": "boolean",
+            "description": "Set to true to force reading the data instead of using remote checksums."
+          },
+          "base64": {
+            "type": "boolean",
+            "description": "Set to true to emit the hash value in base64 rather than hexadecimal."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs",
+          "remote",
+          "hashType"
+        ]
+      },
+      "OperationsMovefileRequest": {
+        "type": "object",
+        "properties": {
+          "srcFs": {
+            "type": "string",
+            "description": "Source remote name or path containing the file to move."
+          },
+          "srcRemote": {
+            "type": "string",
+            "description": "Path to the source object within `srcFs`."
+          },
+          "dstFs": {
+            "type": "string",
+            "description": "Destination remote name or path where the file will be moved."
+          },
+          "dstRemote": {
+            "type": "string",
+            "description": "Destination path within `dstFs` for the moved object."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "srcFs",
+          "srcRemote",
+          "dstFs",
+          "dstRemote"
+        ]
+      },
+      "OperationsPubliclinkRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path hosting the object for which to manage a public link."
+          },
+          "remote": {
+            "type": "string",
+            "description": "Path within `fs` to the object for which to create or remove a public link."
+          },
+          "unlink": {
+            "type": "boolean",
+            "description": "Set to true to remove an existing public link instead of creating one."
+          },
+          "expire": {
+            "type": "string",
+            "description": "Optional expiration time for the public link, formatted as supported by the backend."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs",
+          "remote"
+        ]
+      },
+      "OperationsRmdirsRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path to scan for empty directories."
+          },
+          "remote": {
+            "type": "string",
+            "description": "Path within `fs` whose empty subdirectories should be removed."
+          },
+          "leaveRoot": {
+            "type": "boolean",
+            "description": "Set to true to preserve the top-level directory even if empty."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs",
+          "remote"
+        ]
+      },
+      "OperationsSettierRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path whose storage class tier should be changed."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs"
+        ]
+      },
+      "OperationsSettierfileRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path that contains the object whose tier should change."
+          },
+          "remote": {
+            "type": "string",
+            "description": "Path within `fs` to the object whose storage class tier should be updated."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs",
+          "remote"
+        ]
+      },
+      "OperationsSizeRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path to measure aggregate size information for."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs"
+        ]
+      },
+      "CoreBwlimitRequest": {
+        "type": "object",
+        "properties": {
+          "rate": {
+            "type": "string",
+            "description": "Bandwidth limit to apply, for example `off`, `5M`, or a schedule string."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "CoreCommandRequest": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "Name of the rclone command to execute, for example `ls` or `lsf`."
+          },
+          "arg": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Optional positional arguments for the command. Repeat to supply multiple values."
+          },
+          "opt": {
+            "type": "string",
+            "description": "Optional command options encoded as a JSON string."
+          },
+          "returnType": {
+            "type": "string",
+            "description": "Controls how output is returned; accepts `COMBINED_OUTPUT`, `STREAM`, `STREAM_ONLY_STDOUT`, or `STREAM_ONLY_STDERR`."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "command"
+        ]
+      },
+      "CoreDuRequest": {
+        "type": "object",
+        "properties": {
+          "dir": {
+            "type": "string",
+            "description": "Local directory path to report disk usage for. Defaults to the rclone cache directory when omitted."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "CoreGcRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "CoreGroupListRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "CoreMemstatsRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "CoreObscureRequest": {
+        "type": "object",
+        "properties": {
+          "clear": {
+            "type": "string",
+            "description": "Plain-text string to obscure for storage in the config file."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "clear"
+        ]
+      },
+      "CorePidRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "CoreQuitRequest": {
+        "type": "object",
+        "properties": {
+          "exitCode": {
+            "type": "integer",
+            "description": "Optional exit code to use when terminating the rclone process."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "CoreStatsDeleteRequest": {
+        "type": "object",
+        "properties": {
+          "group": {
+            "type": "string",
+            "description": "Stats group identifier to remove."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "group"
+        ]
+      },
+      "CoreStatsResetRequest": {
+        "type": "object",
+        "properties": {
+          "group": {
+            "type": "string",
+            "description": "Stats group identifier whose counters should be reset. Leave unset to reset all groups."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "CoreTransferredRequest": {
+        "type": "object",
+        "properties": {
+          "group": {
+            "type": "string",
+            "description": "Stats group identifier to filter the completed transfer list. Leave unset for all groups."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "DebugSetBlockProfileRateRequest": {
+        "type": "object",
+        "properties": {
+          "rate": {
+            "type": "integer",
+            "description": "Sampling interval in nanoseconds for blocking profile collection; use 1 to capture all events."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "rate"
+        ]
+      },
+      "DebugSetGcPercentRequest": {
+        "type": "object",
+        "properties": {
+          "gc-percent": {
+            "type": "integer",
+            "description": "Target percentage of newly allocated data to trigger garbage collection."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "gc-percent"
+        ]
+      },
+      "DebugSetMutexProfileFractionRequest": {
+        "type": "object",
+        "properties": {
+          "rate": {
+            "type": "integer",
+            "description": "Sampling fraction for mutex contention profiling; set to 0 to disable."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "rate"
+        ]
+      },
+      "DebugSetSoftMemoryLimitRequest": {
+        "type": "object",
+        "properties": {
+          "mem-limit": {
+            "type": "integer",
+            "description": "Soft memory limit for the Go runtime in bytes."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "mem-limit"
+        ]
+      },
+      "FscacheClearRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "FscacheEntriesRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "MountListmountsRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "MountMountRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote path to mount, such as `drive:` or `remote:subdir`."
+          },
+          "mountPoint": {
+            "type": "string",
+            "description": "Absolute local path where the remote should be mounted."
+          },
+          "mountType": {
+            "type": "string",
+            "description": "Optional mount implementation to use (`mount`, `cmount`, or `mount2`)."
+          },
+          "mountOpt": {
+            "type": "string",
+            "description": "Mount options encoded as JSON, matching flags accepted by `rclone mount`."
+          },
+          "vfsOpt": {
+            "type": "string",
+            "description": "VFS options encoded as JSON, matching flags accepted by `rclone mount`."
+          },
+          "_config": {
+            "type": "string",
+            "description": "JSON encoded config overrides applied for this call only."
+          },
+          "_filter": {
+            "type": "string",
+            "description": "JSON encoded filter overrides applied for this call only."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs",
+          "mountPoint"
+        ]
+      },
+      "MountTypesRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "MountUnmountRequest": {
+        "type": "object",
+        "properties": {
+          "mountPoint": {
+            "type": "string",
+            "description": "Local mount point path to unmount."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "mountPoint"
+        ]
+      },
+      "MountUnmountallRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "RcNoopAuthRequest": {
+        "type": "object",
+        "properties": {
+          "params": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Additional arbitrary parameters allowed."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "RcErrorRequest": {
+        "type": "object",
+        "properties": {
+          "params": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Additional arbitrary parameters allowed."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "RcListRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "BackendCommandRequest": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "Backend-specific command to invoke."
+          },
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path the backend command should target."
+          },
+          "arg": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Optional positional arguments for the backend command."
+          },
+          "opt": {
+            "type": "string",
+            "description": "Backend command options encoded as a JSON string."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "command"
+        ]
+      },
+      "CacheExpireRequest": {
+        "type": "object",
+        "properties": {
+          "remote": {
+            "type": "string",
+            "description": "Remote path to expire from the cache, e.g. `remote:path/to/dir`."
+          },
+          "withData": {
+            "type": "boolean",
+            "description": "Set to true to drop cached chunk data along with directory entries."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "remote"
+        ]
+      },
+      "CacheFetchRequest": {
+        "type": "object",
+        "properties": {
+          "chunks": {
+            "type": "string",
+            "description": "Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch."
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Additional arbitrary parameters allowed."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "CacheStatsRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "ConfigCreateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the new remote configuration."
+          },
+          "parameters": {
+            "type": "string",
+            "description": "JSON object of configuration key/value pairs required for the remote."
+          },
+          "type": {
+            "type": "string",
+            "description": "Backend type identifier, such as `drive`, `s3`, or `dropbox`."
+          },
+          "opt": {
+            "type": "string",
+            "description": "Optional JSON object controlling interactive behaviour (e.g. `obscure`, `continue`)."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "name",
+          "parameters",
+          "type"
+        ]
+      },
+      "ConfigDeleteRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the remote configuration to delete."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ConfigDumpRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "ConfigGetRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the remote configuration to fetch."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ConfigListremotesRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "ConfigPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the remote whose secrets should be updated."
+          },
+          "parameters": {
+            "type": "string",
+            "description": "JSON object of password answers, typically including `pass`."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "name",
+          "parameters"
+        ]
+      },
+      "ConfigPathsRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "ConfigProvidersRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "ConfigSetpathRequest": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute path to the `rclone.conf` file that rclone should use."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      },
+      "ConfigUnlockRequest": {
+        "type": "object",
+        "properties": {
+          "configPassword": {
+            "type": "string",
+            "description": "Password used to unlock an encrypted config file."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "configPassword"
+        ]
+      },
+      "ConfigUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the remote configuration to update."
+          },
+          "parameters": {
+            "type": "string",
+            "description": "JSON object of configuration key/value pairs to apply to the remote."
+          },
+          "opt": {
+            "type": "string",
+            "description": "Optional JSON object controlling update behaviour (e.g. `obscure`, `continue`)."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "name",
+          "parameters"
+        ]
+      },
+      "CoreVersionRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "CoreStatsRequest": {
+        "type": "object",
+        "properties": {
+          "group": {
+            "type": "string",
+            "description": "Stats group identifier to return a snapshot for. Leave unset to include all groups."
+          },
+          "short": {
+            "type": "boolean",
+            "description": "When true, omit the `transferring` and `checking` arrays from the response."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "JobListRequest": {
+        "type": "object",
+        "properties": {
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "JobStatusRequest": {
+        "type": "object",
+        "properties": {
+          "jobid": {
+            "type": "number",
+            "description": "Numeric identifier of the job to query, as returned from an async call."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "jobid"
+        ]
+      },
+      "JobStopRequest": {
+        "type": "object",
+        "properties": {
+          "jobid": {
+            "type": "number",
+            "description": "Numeric identifier of the job to cancel."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "jobid"
+        ]
+      },
+      "JobStopgroupRequest": {
+        "type": "object",
+        "properties": {
+          "group": {
+            "type": "string",
+            "description": "Stats group name whose active jobs should be stopped."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "group"
+        ]
+      },
+      "OperationsListRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path to list, for example `drive:`."
+          },
+          "remote": {
+            "type": "string",
+            "description": "Directory path within `fs` to list; leave empty to target the root."
+          },
+          "opt": {
+            "type": "string",
+            "description": "Optional JSON-encoded object of listing flags (e.g. `{ \"recurse\": true, \"showHash\": true }`)."
+          },
+          "recurse": {
+            "type": "boolean",
+            "description": "Set to true to list directories recursively."
+          },
+          "noModTime": {
+            "type": "boolean",
+            "description": "Set to true to omit modification times for faster listings on some backends."
+          },
+          "showEncrypted": {
+            "type": "boolean",
+            "description": "Set to true to include encrypted names when using crypt remotes."
+          },
+          "showOrigIDs": {
+            "type": "boolean",
+            "description": "Set to true to include original backend identifiers where available."
+          },
+          "showHash": {
+            "type": "boolean",
+            "description": "Set to true to include hash digests for each entry."
+          },
+          "noMimeType": {
+            "type": "boolean",
+            "description": "Set to true to omit MIME type detection."
+          },
+          "dirsOnly": {
+            "type": "boolean",
+            "description": "Set to true to return only directory entries."
+          },
+          "filesOnly": {
+            "type": "boolean",
+            "description": "Set to true to return only file entries."
+          },
+          "metadata": {
+            "type": "boolean",
+            "description": "Set to true to include backend-provided metadata maps."
+          },
+          "hashTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Specify one or more hash algorithms to include when `showHash` is true (e.g. `md5`)."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs",
+          "remote"
+        ]
+      },
+      "OperationsStatRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path that contains the item to inspect."
+          },
+          "remote": {
+            "type": "string",
+            "description": "Path to the file or directory within `fs` to describe."
+          },
+          "opt": {
+            "type": "string",
+            "description": "Optional JSON object of listing flags, matching those accepted by `operations/list`."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs",
+          "remote"
+        ]
+      },
+      "OperationsAboutRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path to query for capacity information."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs"
+        ]
+      },
+      "OperationsPurgeRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path from which to remove all contents."
+          },
+          "remote": {
+            "type": "string",
+            "description": "Path within `fs` whose contents should be purged."
+          },
+          "_config": {
+            "type": "string",
+            "description": "JSON encoded config overrides applied for this call only."
+          },
+          "_filter": {
+            "type": "string",
+            "description": "JSON encoded filter overrides applied for this call only."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs",
+          "remote"
+        ]
+      },
+      "OperationsMkdirRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path in which to create a directory."
+          },
+          "remote": {
+            "type": "string",
+            "description": "Directory path within `fs` to create."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs",
+          "remote"
+        ]
+      },
+      "OperationsRmdirRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Remote name or path containing the directory to remove."
+          },
+          "remote": {
+            "type": "string",
+            "description": "Directory path within `fs` to delete."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "fs",
+          "remote"
+        ]
+      },
+      "OperationsCheckRequest": {
+        "type": "object",
+        "properties": {
+          "srcFs": {
+            "type": "string",
+            "description": "Source remote name or path to verify, e.g. `drive:`."
+          },
+          "dstFs": {
+            "type": "string",
+            "description": "Destination remote name or path that should match the source."
+          },
+          "download": {
+            "type": "boolean",
+            "description": "Set to true to read file contents during comparison instead of relying on hashes."
+          },
+          "checkFileHash": {
+            "type": "string",
+            "description": "Hash name to expect in the supplied SUM file, such as `md5`."
+          },
+          "checkFileFs": {
+            "type": "string",
+            "description": "Remote containing the checksum SUM file when using `checkFileHash`."
+          },
+          "checkFileRemote": {
+            "type": "string",
+            "description": "Path within `checkFileFs` to the checksum SUM file."
+          },
+          "oneWay": {
+            "type": "boolean",
+            "description": "Set to true to only ensure that source files exist on the destination."
+          },
+          "combined": {
+            "type": "boolean",
+            "description": "Set to true to include a combined summary report in the response."
+          },
+          "missingOnSrc": {
+            "type": "boolean",
+            "description": "Set to true to report files missing from the source."
+          },
+          "missingOnDst": {
+            "type": "boolean",
+            "description": "Set to true to report files missing from the destination."
+          },
+          "match": {
+            "type": "boolean",
+            "description": "Set to true to include matching files in the report."
+          },
+          "differ": {
+            "type": "boolean",
+            "description": "Set to true to include differing files in the report."
+          },
+          "error": {
+            "type": "boolean",
+            "description": "Set to true to include entries that encountered errors."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "srcFs",
+          "dstFs"
+        ]
+      },
+      "SyncSyncRequest": {
+        "type": "object",
+        "properties": {
+          "srcFs": {
+            "type": "string",
+            "description": "Source remote path to sync from, e.g. `drive:src`."
+          },
+          "dstFs": {
+            "type": "string",
+            "description": "Destination remote path to sync to, e.g. `drive:dst`."
+          },
+          "createEmptySrcDirs": {
+            "type": "boolean",
+            "description": "Set to true to create empty source directories on the destination."
+          },
+          "_config": {
+            "type": "string",
+            "description": "JSON encoded config overrides applied for this call only."
+          },
+          "_filter": {
+            "type": "string",
+            "description": "JSON encoded filter overrides applied for this call only."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "srcFs",
+          "dstFs"
+        ]
+      },
+      "SyncCopyRequest": {
+        "type": "object",
+        "properties": {
+          "srcFs": {
+            "type": "string",
+            "description": "Source remote path to copy from."
+          },
+          "dstFs": {
+            "type": "string",
+            "description": "Destination remote path to copy to."
+          },
+          "createEmptySrcDirs": {
+            "type": "boolean",
+            "description": "Set to true to replicate empty source directories on the destination."
+          },
+          "_config": {
+            "type": "string",
+            "description": "JSON encoded config overrides applied for this call only."
+          },
+          "_filter": {
+            "type": "string",
+            "description": "JSON encoded filter overrides applied for this call only."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "srcFs",
+          "dstFs"
+        ]
+      },
+      "SyncMoveRequest": {
+        "type": "object",
+        "properties": {
+          "srcFs": {
+            "type": "string",
+            "description": "Source remote path whose contents will be moved."
+          },
+          "dstFs": {
+            "type": "string",
+            "description": "Destination remote path that will receive moved files."
+          },
+          "createEmptySrcDirs": {
+            "type": "boolean",
+            "description": "Set to true to create empty source directories on the destination."
+          },
+          "deleteEmptySrcDirs": {
+            "type": "boolean",
+            "description": "Set to true to delete empty directories from the source after the move completes."
+          },
+          "_config": {
+            "type": "string",
+            "description": "JSON encoded config overrides applied for this call only."
+          },
+          "_filter": {
+            "type": "string",
+            "description": "JSON encoded filter overrides applied for this call only."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "srcFs",
+          "dstFs"
+        ]
+      },
+      "SyncBisyncRequest": {
+        "type": "object",
+        "properties": {
+          "path1": {
+            "type": "string",
+            "description": "First remote directory, e.g. `drive:path1`."
+          },
+          "path2": {
+            "type": "string",
+            "description": "Second remote directory, e.g. `drive:path2`."
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "Set to true to simulate the bisync run without making changes."
+          },
+          "resync": {
+            "type": "boolean",
+            "description": "Set to true to perform a one-time resync, rebuilding bisync history."
+          },
+          "checkAccess": {
+            "type": "boolean",
+            "description": "Set to true to abort if `RCLONE_TEST` files are missing on either side."
+          },
+          "checkFilename": {
+            "type": "string",
+            "description": "Override the access-check sentinel filename; defaults to `RCLONE_TEST`."
+          },
+          "maxDelete": {
+            "type": "number",
+            "description": "Abort the run if deletions exceed this percentage (default 50)."
+          },
+          "force": {
+            "type": "boolean",
+            "description": "Set to true to bypass the `maxDelete` safety check."
+          },
+          "checkSync": {
+            "type": "boolean",
+            "description": "Controls final listing comparison; leave true for normal verification or set false to skip."
+          },
+          "createEmptySrcDirs": {
+            "type": "boolean",
+            "description": "Set to true to mirror empty directories between the two paths."
+          },
+          "removeEmptyDirs": {
+            "type": "boolean",
+            "description": "Set to true to remove empty directories during cleanup."
+          },
+          "filtersFile": {
+            "type": "string",
+            "description": "Path to an rclone filters file applied to both paths."
+          },
+          "ignoreListingChecksum": {
+            "type": "boolean",
+            "description": "Set to true to ignore checksum differences when comparing listings."
+          },
+          "resilient": {
+            "type": "boolean",
+            "description": "Set to true to allow retrying after certain recoverable errors."
+          },
+          "workdir": {
+            "type": "string",
+            "description": "Directory path used to store bisync working files."
+          },
+          "backupdir1": {
+            "type": "string",
+            "description": "Backup directory on the first remote for changed files."
+          },
+          "backupdir2": {
+            "type": "string",
+            "description": "Backup directory on the second remote for changed files."
+          },
+          "noCleanup": {
+            "type": "boolean",
+            "description": "Set to true to keep bisync working files after completion."
+          },
+          "_config": {
+            "type": "string",
+            "description": "JSON encoded config overrides applied for this call only."
+          },
+          "_filter": {
+            "type": "string",
+            "description": "JSON encoded filter overrides applied for this call only."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "path1",
+          "path2"
+        ]
+      },
+      "OptionsBlocksRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "OptionsGetRequest": {
+        "type": "object",
+        "properties": {
+          "blocks": {
+            "type": "string",
+            "description": "Optional comma-separated list of option block names to return."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "OptionsInfoRequest": {
+        "type": "object",
+        "properties": {
+          "blocks": {
+            "type": "string",
+            "description": "Optional comma-separated list of option block names to describe."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "OptionsSetRequest": {
+        "type": "object",
+        "properties": {
+          "dlna": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `dlna` option block."
+          },
+          "filter": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `filter` option block."
+          },
+          "ftp": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `ftp` option block."
+          },
+          "main": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `main` option block."
+          },
+          "http": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `http` option block."
+          },
+          "log": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `log` option block."
+          },
+          "mount": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `mount` option block."
+          },
+          "nfs": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `nfs` option block."
+          },
+          "proxy": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `proxy` option block."
+          },
+          "rc": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `rc` option block."
+          },
+          "restic": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `restic` option block."
+          },
+          "s3": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `s3` option block."
+          },
+          "sftp": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `sftp` option block."
+          },
+          "vfs": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `vfs` option block."
+          },
+          "webdav": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array",
+                  "items": {}
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              ]
+            },
+            "description": "Overrides for the `webdav` option block."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "additionalProperties": true
+      },
+      "OptionsLocalRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "ServeListRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "ServeStartRequest": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of server to start (e.g. `http`, `webdav`, `ftp`, `sftp`)."
+          },
+          "fs": {
+            "type": "string",
+            "description": "Remote path that will be served."
+          },
+          "addr": {
+            "type": "string",
+            "description": "Address and port to bind the server to, such as `:5572` or `localhost:8080`."
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Additional arbitrary parameters allowed."
+          },
+          "_config": {
+            "type": "string",
+            "description": "JSON encoded config overrides applied for this call only."
+          },
+          "_filter": {
+            "type": "string",
+            "description": "JSON encoded filter overrides applied for this call only."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "type",
+          "fs",
+          "addr"
+        ]
+      },
+      "ServeStopRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifier of the running serve instance returned by `serve/start`."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "ServeStopallRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "ServeTypesRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "VfsForgetRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Optional VFS identifier to target; required when more than one VFS is active."
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Additional arbitrary parameters allowed."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "VfsListRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Optional VFS identifier; omit to list all active VFS instances."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "VfsPollIntervalRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Optional VFS identifier whose poll interval should be queried or modified."
+          },
+          "interval": {
+            "type": "string",
+            "description": "Duration string (e.g. `5m`) to set as the new poll interval."
+          },
+          "timeout": {
+            "type": "string",
+            "description": "Duration to wait for the poll interval change to take effect; `0` waits indefinitely."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "VfsQueueRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Optional VFS identifier whose upload queue should be inspected."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "VfsQueueSetExpiryRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Optional VFS identifier for the queued item."
+          },
+          "id": {
+            "type": "integer",
+            "description": "Queue item ID as returned by `vfs/queue`."
+          },
+          "expiry": {
+            "type": "number",
+            "description": "New eligibility time in seconds (may be negative for immediate upload)."
+          },
+          "relative": {
+            "type": "boolean",
+            "description": "Set to true to treat `expiry` as relative to the current value."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "id",
+          "expiry"
+        ]
+      },
+      "VfsRefreshRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Optional VFS identifier whose directory cache should be refreshed."
+          },
+          "recursive": {
+            "type": "boolean",
+            "description": "Set to true to refresh entire directory trees."
+          },
+          "params": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Additional arbitrary parameters allowed."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "VfsStatsRequest": {
+        "type": "object",
+        "properties": {
+          "fs": {
+            "type": "string",
+            "description": "Optional VFS identifier whose statistics should be returned."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "PluginsctlAddPluginRequest": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Repository URL of the plugin to install."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "PluginsctlGetPluginsForTypeRequest": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "MIME type to match when listing plugins."
+          },
+          "pluginType": {
+            "type": "string",
+            "description": "Filter results by plugin type (e.g. `test`)."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "PluginsctlListPluginsRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "PluginsctlListTestPluginsRequest": {
+        "type": "object",
+        "properties": {
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "PluginsctlRemovePluginRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the plugin to uninstall."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "PluginsctlRemoveTestPluginRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the test plugin to uninstall."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        },
+        "required": [
+          "name"
+        ]
       }
     }
   }
