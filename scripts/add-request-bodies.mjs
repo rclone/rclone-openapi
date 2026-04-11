@@ -14,11 +14,28 @@ function ucfirst(s) {
     return s[0].toUpperCase() + s.slice(1)
 }
 
+// --- Step 1: Simplify deepObject param schemas (options/set blocks) ---
+// Replace strict oneOf additionalProperties with plain `true` so body types
+// accept Record<string, unknown> from consumers.
+
+let simplifiedDeepObjects = 0
+for (const param of Object.values(doc.components.parameters)) {
+    if (
+        param.style === 'deepObject' &&
+        param.schema?.type === 'object' &&
+        typeof param.schema?.additionalProperties === 'object'
+    ) {
+        param.schema.additionalProperties = true
+        simplifiedDeepObjects++
+    }
+}
+
+// --- Step 2: Generate requestBody schemas for each endpoint ---
+// Body schemas mirror the query params. The `required` list on the body
+// preserves which fields are mandatory, while query params are made
+// optional (step 3) so callers can use body OR query.
+
 let addedCount = 0
-let fixedAdditionalParams = 0
-
-// --- Step 1: Add requestBody schemas to endpoints ---
-
 for (const [path, item] of Object.entries(doc.paths)) {
     if (SKIP_PATHS.has(path)) continue
     const op = item.post
@@ -32,19 +49,18 @@ for (const [path, item] of Object.entries(doc.paths)) {
         if (!paramRef.$ref) continue
         const paramDef = resolveRef(paramRef.$ref)
 
-        // AdditionalParam: bare object with no properties — marks body as open-ended
+        // AdditionalParam: object with no named properties — marks body as open-ended
         const isAdditional =
             paramDef.name === 'params' &&
             paramDef.schema?.type === 'object' &&
-            !paramDef.schema?.properties &&
-            !paramDef.schema?.additionalProperties
+            !paramDef.schema?.properties
 
         if (isAdditional) {
             openEnded = true
-            continue // don't add as a named property
+            continue
         }
 
-        // Clone schema to avoid shared YAML anchor references
+        // Clone schema to avoid shared references
         const propSchema = JSON.parse(JSON.stringify(paramDef.schema))
         if (paramDef.description) propSchema.description = paramDef.description
         props[paramDef.name] = propSchema
@@ -59,9 +75,10 @@ for (const [path, item] of Object.entries(doc.paths)) {
 
     doc.components.schemas[schemaName] = schema
 
-    // Insert requestBody right after parameters for clean ordering
+    // Insert requestBody after parameters, skipping any stale requestBody from prior run
     const rebuilt = {}
     for (const [key, val] of Object.entries(op)) {
+        if (key === 'requestBody') continue
         rebuilt[key] = val
         if (key === 'parameters') {
             rebuilt.requestBody = {
@@ -77,8 +94,21 @@ for (const [path, item] of Object.entries(doc.paths)) {
     addedCount++
 }
 
-// --- Step 2: Fix AdditionalParam definitions ---
+// --- Step 3: Make all query params optional ---
+// rclone accepts params in body OR query, so query params should never
+// be required — the body schema enforces required fields instead.
 
+let madeOptional = 0
+for (const param of Object.values(doc.components.parameters)) {
+    if (param.in === 'query' && param.required === true) {
+        delete param.required
+        madeOptional++
+    }
+}
+
+// --- Step 4: Fix AdditionalParam definitions ---
+
+let fixedAdditionalParams = 0
 for (const [name, param] of Object.entries(doc.components.parameters)) {
     if (
         name.endsWith('AdditionalParam') &&
@@ -90,14 +120,15 @@ for (const [name, param] of Object.entries(doc.components.parameters)) {
     }
 }
 
-// --- Step 3: Fix EmptyObjectResponse ---
+// --- Step 5: Fix EmptyObjectResponse ---
 
-const emptySchema =
-    doc.components.responses.EmptyObjectResponse?.content?.['application/json']
-        ?.schema
-if (emptySchema) {
-    delete emptySchema.properties
-    emptySchema.additionalProperties = true
+const emptyResp =
+    doc.components.responses.EmptyObjectResponse?.content?.['application/json']?.schema
+if (emptyResp && !emptyResp.properties?.jobid) {
+    emptyResp.properties = {
+        jobid: { type: 'integer', description: 'Job ID returned when _async=true.' },
+    }
+    emptyResp.additionalProperties = true
 }
 
 // --- Write ---
@@ -105,5 +136,7 @@ if (emptySchema) {
 writeFileSync('openapi.yaml', stringify(doc, { lineWidth: 0 }))
 
 console.log(`Added requestBody to ${addedCount} endpoints`)
+console.log(`Made ${madeOptional} query params optional`)
+console.log(`Simplified ${simplifiedDeepObjects} deepObject schemas`)
 console.log(`Fixed ${fixedAdditionalParams} AdditionalParam definitions`)
 console.log('Fixed EmptyObjectResponse')
