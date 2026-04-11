@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Rclone RC API",
-    "version": "1.73.0",
+    "version": "1.73.4",
     "description": "Full OpenAPI specification for the Rclone RC API.",
     "contact": {
       "name": "GitHub Repository",
