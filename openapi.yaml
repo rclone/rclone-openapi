@@ -1993,7 +1993,7 @@ paths:
               $ref: "#/components/schemas/ServeTypesRequest"
       responses:
         "200":
-          $ref: "#/components/responses/EmptyResponse"
+          $ref: "#/components/responses/ServeTypesResponse"
         4XX:
           $ref: "#/components/responses/RcError"
         5XX:
@@ -2354,56 +2354,48 @@ components:
       description: Remote name or path to clean up, for example `drive:`.
       schema:
         type: string
-      required: true
     Operations_CopyfilePostSrcFsParam:
       name: srcFs
       in: query
       description: Source remote name or path, such as `drive:` or `/` for the local filesystem.
       schema:
         type: string
-      required: true
     Operations_CopyfilePostSrcRemoteParam:
       name: srcRemote
       in: query
       description: Path to the source object within `srcFs`, for example `dir/file.txt`.
       schema:
         type: string
-      required: true
     Operations_CopyfilePostDstFsParam:
       name: dstFs
       in: query
       description: Destination remote name or path, such as `drive2:` or `/` for local filesystem.
       schema:
         type: string
-      required: true
     Operations_CopyfilePostDstRemoteParam:
       name: dstRemote
       in: query
       description: Target path within `dstFs` where the file should be written.
       schema:
         type: string
-      required: true
     Operations_CopyurlPostFsParam:
       name: fs
       in: query
       description: Remote name or path that will receive the downloaded file, e.g. `drive:`.
       schema:
         type: string
-      required: true
     Operations_CopyurlPostRemoteParam:
       name: remote
       in: query
       description: Destination path within `fs` where the fetched object will be stored.
       schema:
         type: string
-      required: true
     Operations_CopyurlPostUrlParam:
       name: url
       in: query
       description: Source URL to fetch the object from.
       schema:
         type: string
-      required: true
     Operations_CopyurlPostAutoFilenameParam:
       name: autoFilename
       in: query
@@ -2416,42 +2408,36 @@ components:
       description: Remote name or path whose contents should be removed.
       schema:
         type: string
-      required: true
     Operations_DeletefilePostFsParam:
       name: fs
       in: query
       description: Remote name or path that contains the file to delete.
       schema:
         type: string
-      required: true
     Operations_DeletefilePostRemoteParam:
       name: remote
       in: query
       description: Exact path to the file within `fs` that should be deleted.
       schema:
         type: string
-      required: true
     Operations_FsinfoPostFsParam:
       name: fs
       in: query
       description: Remote name or path to inspect, e.g. `drive:`.
       schema:
         type: string
-      required: true
     Operations_HashsumPostFsParam:
       name: fs
       in: query
       description: Remote name or path to hash, such as `drive:` or `/`.
       schema:
         type: string
-      required: true
     Operations_HashsumPostHashTypeParam:
       name: hashType
       in: query
       description: Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name.
       schema:
         type: string
-      required: true
     Operations_HashsumPostDownloadParam:
       name: download
       in: query
@@ -2470,21 +2456,18 @@ components:
       description: Remote name or path containing the file to hash.
       schema:
         type: string
-      required: true
     Operations_HashsumfilePostRemoteParam:
       name: remote
       in: query
       description: Path to the specific file within `fs` to hash.
       schema:
         type: string
-      required: true
     Operations_HashsumfilePostHashTypeParam:
       name: hashType
       in: query
       description: Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name.
       schema:
         type: string
-      required: true
     Operations_HashsumfilePostDownloadParam:
       name: download
       in: query
@@ -2503,42 +2486,36 @@ components:
       description: Source remote name or path containing the file to move.
       schema:
         type: string
-      required: true
     Operations_MovefilePostSrcRemoteParam:
       name: srcRemote
       in: query
       description: Path to the source object within `srcFs`.
       schema:
         type: string
-      required: true
     Operations_MovefilePostDstFsParam:
       name: dstFs
       in: query
       description: Destination remote name or path where the file will be moved.
       schema:
         type: string
-      required: true
     Operations_MovefilePostDstRemoteParam:
       name: dstRemote
       in: query
       description: Destination path within `dstFs` for the moved object.
       schema:
         type: string
-      required: true
     Operations_PubliclinkPostFsParam:
       name: fs
       in: query
       description: Remote name or path hosting the object for which to manage a public link.
       schema:
         type: string
-      required: true
     Operations_PubliclinkPostRemoteParam:
       name: remote
       in: query
       description: Path within `fs` to the object for which to create or remove a public link.
       schema:
         type: string
-      required: true
     Operations_PubliclinkPostUnlinkParam:
       name: unlink
       in: query
@@ -2557,14 +2534,12 @@ components:
       description: Remote name or path to scan for empty directories.
       schema:
         type: string
-      required: true
     Operations_RmdirsPostRemoteParam:
       name: remote
       in: query
       description: Path within `fs` whose empty subdirectories should be removed.
       schema:
         type: string
-      required: true
     Operations_RmdirsPostLeaveRootParam:
       name: leaveRoot
       in: query
@@ -2577,28 +2552,24 @@ components:
       description: Remote name or path whose storage class tier should be changed.
       schema:
         type: string
-      required: true
     Operations_SettierfilePostFsParam:
       name: fs
       in: query
       description: Remote name or path that contains the object whose tier should change.
       schema:
         type: string
-      required: true
     Operations_SettierfilePostRemoteParam:
       name: remote
       in: query
       description: Path within `fs` to the object whose storage class tier should be updated.
       schema:
         type: string
-      required: true
     Operations_SizePostFsParam:
       name: fs
       in: query
       description: Remote name or path to measure aggregate size information for.
       schema:
         type: string
-      required: true
     Core_BwlimitPostRateParam:
       name: rate
       in: query
@@ -2611,7 +2582,6 @@ components:
       description: Name of the rclone command to execute, for example `ls` or `lsf`.
       schema:
         type: string
-      required: true
     Core_CommandPostArgParam:
       name: arg
       in: query
@@ -2646,7 +2616,6 @@ components:
       description: Plain-text string to obscure for storage in the config file.
       schema:
         type: string
-      required: true
     Core_QuitPostExitCodeParam:
       name: exitCode
       in: query
@@ -2659,7 +2628,6 @@ components:
       description: Stats group identifier to remove.
       schema:
         type: string
-      required: true
     Core_StatsPostGroupParam:
       name: group
       in: query
@@ -2690,42 +2658,36 @@ components:
       description: Sampling interval in nanoseconds for blocking profile collection; use 1 to capture all events.
       schema:
         type: integer
-      required: true
     Debug_SetGcPercentPostGcPercentParam:
       name: gc-percent
       in: query
       description: Target percentage of newly allocated data to trigger garbage collection.
       schema:
         type: integer
-      required: true
     Debug_SetMutexProfileFractionPostRateParam:
       name: rate
       in: query
       description: Sampling fraction for mutex contention profiling; set to 0 to disable.
       schema:
         type: integer
-      required: true
     Debug_SetSoftMemoryLimitPostMemLimitParam:
       name: mem-limit
       in: query
       description: Soft memory limit for the Go runtime in bytes.
       schema:
         type: integer
-      required: true
     Mount_MountPostFsParam:
       name: fs
       in: query
       description: Remote path to mount, such as `drive:` or `remote:subdir`.
       schema:
         type: string
-      required: true
     Mount_MountPostMountPointParam:
       name: mountPoint
       in: query
       description: Absolute local path where the remote should be mounted.
       schema:
         type: string
-      required: true
     Mount_MountPostMountTypeParam:
       name: mountType
       in: query
@@ -2750,7 +2712,6 @@ components:
       description: Local mount point path to unmount.
       schema:
         type: string
-      required: true
     Rc_NoopauthPostAdditionalParam:
       name: params
       in: query
@@ -2775,7 +2736,6 @@ components:
       description: Backend-specific command to invoke.
       schema:
         type: string
-      required: true
     Backend_CommandPostFsParam:
       name: fs
       in: query
@@ -2804,7 +2764,6 @@ components:
       description: Remote path to expire from the cache, e.g. `remote:path/to/dir`.
       schema:
         type: string
-      required: true
     Cache_ExpirePostWithDataParam:
       name: withData
       in: query
@@ -2832,21 +2791,18 @@ components:
       description: Name of the new remote configuration.
       schema:
         type: string
-      required: true
     Config_CreatePostParametersParam:
       name: parameters
       in: query
       description: JSON object of configuration key/value pairs required for the remote.
       schema:
         type: string
-      required: true
     Config_CreatePostTypeParam:
       name: type
       in: query
       description: Backend type identifier, such as `drive`, `s3`, or `dropbox`.
       schema:
         type: string
-      required: true
     Config_CreatePostOptParam:
       name: opt
       in: query
@@ -2859,56 +2815,48 @@ components:
       description: Name of the remote configuration to delete.
       schema:
         type: string
-      required: true
     Config_GetPostNameParam:
       name: name
       in: query
       description: Name of the remote configuration to fetch.
       schema:
         type: string
-      required: true
     Config_PasswordPostNameParam:
       name: name
       in: query
       description: Name of the remote whose secrets should be updated.
       schema:
         type: string
-      required: true
     Config_PasswordPostParametersParam:
       name: parameters
       in: query
       description: JSON object of password answers, typically including `pass`.
       schema:
         type: string
-      required: true
     Config_SetpathPostPathParam:
       name: path
       in: query
       description: Absolute path to the `rclone.conf` file that rclone should use.
       schema:
         type: string
-      required: true
     Config_UnlockPostConfigPasswordParam:
       name: configPassword
       in: query
       description: Password used to unlock an encrypted config file.
       schema:
         type: string
-      required: true
     Config_UpdatePostNameParam:
       name: name
       in: query
       description: Name of the remote configuration to update.
       schema:
         type: string
-      required: true
     Config_UpdatePostParametersParam:
       name: parameters
       in: query
       description: JSON object of configuration key/value pairs to apply to the remote.
       schema:
         type: string
-      required: true
     Config_UpdatePostOptParam:
       name: opt
       in: query
@@ -2921,35 +2869,30 @@ components:
       description: Numeric identifier of the job to query, as returned from an async call.
       schema:
         type: number
-      required: true
     Job_StopPostJobidParam:
       name: jobid
       in: query
       description: Numeric identifier of the job to cancel.
       schema:
         type: number
-      required: true
     Job_StopgroupPostGroupParam:
       name: group
       in: query
       description: Stats group name whose active jobs should be stopped.
       schema:
         type: string
-      required: true
     Operations_ListPostFsParam:
       name: fs
       in: query
       description: Remote name or path to list, for example `drive:`.
       schema:
         type: string
-      required: true
     Operations_ListPostRemoteParam:
       name: remote
       in: query
       description: Directory path within `fs` to list; leave empty to target the root.
       schema:
         type: string
-      required: true
     Operations_ListPostOptParam:
       name: opt
       in: query
@@ -3026,14 +2969,12 @@ components:
       description: Remote name or path that contains the item to inspect.
       schema:
         type: string
-      required: true
     Operations_StatPostRemoteParam:
       name: remote
       in: query
       description: Path to the file or directory within `fs` to describe.
       schema:
         type: string
-      required: true
     Operations_StatPostOptParam:
       name: opt
       in: query
@@ -3046,77 +2987,66 @@ components:
       description: Remote name or path to query for capacity information.
       schema:
         type: string
-      required: true
     Operations_PurgePostFsParam:
       name: fs
       in: query
       description: Remote name or path from which to remove all contents.
       schema:
         type: string
-      required: true
     Operations_PurgePostRemoteParam:
       name: remote
       in: query
       description: Path within `fs` whose contents should be purged.
       schema:
         type: string
-      required: true
     Operations_UploadfilePostFsParam:
       name: fs
       in: query
       description: Remote name or path where the uploaded file should be stored.
       schema:
         type: string
-      required: true
     Operations_UploadfilePostRemoteParam:
       name: remote
       in: query
       description: Destination path within `fs` for the uploaded file.
       schema:
         type: string
-      required: true
     Operations_MkdirPostFsParam:
       name: fs
       in: query
       description: Remote name or path in which to create a directory.
       schema:
         type: string
-      required: true
     Operations_MkdirPostRemoteParam:
       name: remote
       in: query
       description: Directory path within `fs` to create.
       schema:
         type: string
-      required: true
     Operations_RmdirPostFsParam:
       name: fs
       in: query
       description: Remote name or path containing the directory to remove.
       schema:
         type: string
-      required: true
     Operations_RmdirPostRemoteParam:
       name: remote
       in: query
       description: Directory path within `fs` to delete.
       schema:
         type: string
-      required: true
     Operations_CheckPostSrcFsParam:
       name: srcFs
       in: query
       description: Source remote name or path to verify, e.g. `drive:`.
       schema:
         type: string
-      required: true
     Operations_CheckPostDstFsParam:
       name: dstFs
       in: query
       description: Destination remote name or path that should match the source.
       schema:
         type: string
-      required: true
     Operations_CheckPostDownloadParam:
       name: download
       in: query
@@ -3189,14 +3119,12 @@ components:
       description: Source remote path to sync from, e.g. `drive:src`.
       schema:
         type: string
-      required: true
     Sync_SyncPostDstFsParam:
       name: dstFs
       in: query
       description: Destination remote path to sync to, e.g. `drive:dst`.
       schema:
         type: string
-      required: true
     Sync_SyncPostCreateEmptySrcDirsParam:
       name: createEmptySrcDirs
       in: query
@@ -3209,14 +3137,12 @@ components:
       description: Source remote path to copy from.
       schema:
         type: string
-      required: true
     Sync_CopyPostDstFsParam:
       name: dstFs
       in: query
       description: Destination remote path to copy to.
       schema:
         type: string
-      required: true
     Sync_CopyPostCreateEmptySrcDirsParam:
       name: createEmptySrcDirs
       in: query
@@ -3229,14 +3155,12 @@ components:
       description: Source remote path whose contents will be moved.
       schema:
         type: string
-      required: true
     Sync_MovePostDstFsParam:
       name: dstFs
       in: query
       description: Destination remote path that will receive moved files.
       schema:
         type: string
-      required: true
     Sync_MovePostCreateEmptySrcDirsParam:
       name: createEmptySrcDirs
       in: query
@@ -3255,14 +3179,12 @@ components:
       description: First remote directory, e.g. `drive:path1`.
       schema:
         type: string
-      required: true
     Sync_BisyncPostPath2Param:
       name: path2
       in: query
       description: Second remote directory, e.g. `drive:path2`.
       schema:
         type: string
-      required: true
     Sync_BisyncPostDryRunParam:
       name: dryRun
       in: query
@@ -3379,16 +3301,7 @@ components:
       explode: true
       schema: &a1
         type: object
-        additionalProperties:
-          oneOf:
-            - type: string
-            - type: number
-            - type: integer
-            - type: boolean
-            - type: array
-              items: {}
-            - type: object
-              additionalProperties: {}
+        additionalProperties: true
     Options_SetPostFilterParam:
       name: filter
       in: query
@@ -3493,21 +3406,18 @@ components:
       description: Type of server to start (e.g. `http`, `webdav`, `ftp`, `sftp`).
       schema:
         type: string
-      required: true
     Serve_StartPostFsParam:
       name: fs
       in: query
       description: Remote path that will be served.
       schema:
         type: string
-      required: true
     Serve_StartPostAddrParam:
       name: addr
       in: query
       description: Address and port to bind the server to, such as `:5572` or `localhost:8080`.
       schema:
         type: string
-      required: true
     Serve_StartPostAdditionalParam:
       name: params
       in: query
@@ -3523,7 +3433,6 @@ components:
       description: Identifier of the running serve instance returned by `serve/start`.
       schema:
         type: string
-      required: true
     Vfs_ForgetPostFsParam:
       name: fs
       in: query
@@ -3581,14 +3490,12 @@ components:
       description: Queue item ID as returned by `vfs/queue`.
       schema:
         type: integer
-      required: true
     Vfs_QueueSetExpiryPostExpiryParam:
       name: expiry
       in: query
       description: New eligibility time in seconds (may be negative for immediate upload).
       schema:
         type: number
-      required: true
     Vfs_QueueSetExpiryPostRelativeParam:
       name: relative
       in: query
@@ -3628,7 +3535,6 @@ components:
       description: Repository URL of the plugin to install.
       schema:
         type: string
-      required: true
     Pluginsctl_GetPluginsForTypePostTypeParam:
       name: type
       in: query
@@ -3647,14 +3553,12 @@ components:
       description: Name of the plugin to uninstall.
       schema:
         type: string
-      required: true
     Pluginsctl_RemoveTestPluginPostNameParam:
       name: name
       in: query
       description: Name of the test plugin to uninstall.
       schema:
         type: string
-      required: true
   responses:
     RcError:
       description: Any error response (HTTP 4xx/5xx)
@@ -3686,7 +3590,24 @@ components:
         application/json:
           schema:
             type: object
+            properties:
+              jobid:
+                type: integer
+                description: Job ID returned when _async=true.
             additionalProperties: true
+    ServeTypesResponse:
+      description: Supported rclone serve protocols.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              types:
+                type: array
+                items:
+                  type: string
+            required:
+              - types
     SyncJobResponse:
       description: Response for sync operations, containing job ID if async.
       content:
@@ -5668,13 +5589,10 @@ components:
     RcNoopRequest:
       type: object
       properties:
-        params:
-          type: object
-          additionalProperties: true
-          description: Additional arbitrary parameters allowed.
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
+      additionalProperties: true
     OperationsCleanupRequest:
       type: object
       properties:
@@ -6261,23 +6179,17 @@ components:
     RcNoopAuthRequest:
       type: object
       properties:
-        params:
-          type: object
-          additionalProperties: true
-          description: Additional arbitrary parameters allowed.
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
+      additionalProperties: true
     RcErrorRequest:
       type: object
       properties:
-        params:
-          type: object
-          additionalProperties: true
-          description: Additional arbitrary parameters allowed.
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
+      additionalProperties: true
     RcListRequest:
       type: object
       properties:
@@ -6335,16 +6247,13 @@ components:
         chunks:
           type: string
           description: Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch.
-        params:
-          type: object
-          additionalProperties: true
-          description: Additional arbitrary parameters allowed.
         _group:
           type: string
           description: Assign the request to a custom stats group.
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
+      additionalProperties: true
     CacheStatsRequest:
       type: object
       properties:
@@ -6966,198 +6875,63 @@ components:
       properties:
         dlna:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `dlna` option block.
         filter:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `filter` option block.
         ftp:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `ftp` option block.
         main:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `main` option block.
         http:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `http` option block.
         log:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `log` option block.
         mount:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `mount` option block.
         nfs:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `nfs` option block.
         proxy:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `proxy` option block.
         rc:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `rc` option block.
         restic:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `restic` option block.
         s3:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `s3` option block.
         sftp:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `sftp` option block.
         vfs:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `vfs` option block.
         webdav:
           type: object
-          additionalProperties:
-            oneOf:
-              - type: string
-              - type: number
-              - type: integer
-              - type: boolean
-              - type: array
-                items: {}
-              - type: object
-                additionalProperties: {}
+          additionalProperties: true
           description: Overrides for the `webdav` option block.
         _group:
           type: string
@@ -7196,10 +6970,6 @@ components:
         addr:
           type: string
           description: Address and port to bind the server to, such as `:5572` or `localhost:8080`.
-        params:
-          type: object
-          additionalProperties: true
-          description: Additional arbitrary parameters allowed.
         _config:
           type: string
           description: JSON encoded config overrides applied for this call only.
@@ -7216,6 +6986,7 @@ components:
         - type
         - fs
         - addr
+      additionalProperties: true
     ServeStopRequest:
       type: object
       properties:
@@ -7254,16 +7025,13 @@ components:
         fs:
           type: string
           description: Optional VFS identifier to target; required when more than one VFS is active.
-        params:
-          type: object
-          additionalProperties: true
-          description: Additional arbitrary parameters allowed.
         _group:
           type: string
           description: Assign the request to a custom stats group.
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
+      additionalProperties: true
     VfsListRequest:
       type: object
       properties:
@@ -7339,16 +7107,13 @@ components:
         recursive:
           type: boolean
           description: Set to true to refresh entire directory trees.
-        params:
-          type: object
-          additionalProperties: true
-          description: Additional arbitrary parameters allowed.
         _group:
           type: string
           description: Assign the request to a custom stats group.
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
+      additionalProperties: true
     VfsStatsRequest:
       type: object
       properties:
