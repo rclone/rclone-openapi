@@ -2069,6 +2069,14 @@ export interface components {
             speed?: number;
             /** @description Current speed in bytes per second as an exponentially weighted moving average. */
             speedAvg?: number;
+            /** @description Source remote or filesystem for this transfer. */
+            srcFs?: string;
+            /** @description Destination remote or filesystem for this transfer. */
+            dstFs?: string;
+            /** @description Source path within srcFs. */
+            srcRemote?: string;
+            /** @description Destination path within dstFs. */
+            dstRemote?: string;
         } & {
             [key: string]: unknown;
         };
@@ -2084,16 +2092,14 @@ export interface components {
             [key: string]: unknown;
         };
         RcNoopRequest: {
-            /** @description Additional arbitrary parameters allowed. */
-            params?: {
-                [key: string]: unknown;
-            };
             /** @description Run the command asynchronously. Returns a job id immediately. */
             _async?: boolean;
+        } & {
+            [key: string]: unknown;
         };
         OperationsCleanupRequest: {
             /** @description Remote name or path to clean up, for example `drive:`. */
-            fs: string;
+            fs?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2101,13 +2107,13 @@ export interface components {
         };
         OperationsCopyfileRequest: {
             /** @description Source remote name or path, such as `drive:` or `/` for the local filesystem. */
-            srcFs: string;
+            srcFs?: string;
             /** @description Path to the source object within `srcFs`, for example `dir/file.txt`. */
-            srcRemote: string;
+            srcRemote?: string;
             /** @description Destination remote name or path, such as `drive2:` or `/` for local filesystem. */
-            dstFs: string;
+            dstFs?: string;
             /** @description Target path within `dstFs` where the file should be written. */
-            dstRemote: string;
+            dstRemote?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2115,11 +2121,11 @@ export interface components {
         };
         OperationsCopyurlRequest: {
             /** @description Remote name or path that will receive the downloaded file, e.g. `drive:`. */
-            fs: string;
+            fs?: string;
             /** @description Destination path within `fs` where the fetched object will be stored. */
-            remote: string;
+            remote?: string;
             /** @description Source URL to fetch the object from. */
-            url: string;
+            url?: string;
             /** @description Set to true to derive the destination filename from the URL. */
             autoFilename?: boolean;
             /** @description Assign the request to a custom stats group. */
@@ -2129,7 +2135,7 @@ export interface components {
         };
         OperationsDeleteRequest: {
             /** @description Remote name or path whose contents should be removed. */
-            fs: string;
+            fs?: string;
             /** @description JSON encoded config overrides applied for this call only. */
             _config?: string;
             /** @description JSON encoded filter overrides applied for this call only. */
@@ -2141,9 +2147,9 @@ export interface components {
         };
         OperationsDeletefileRequest: {
             /** @description Remote name or path that contains the file to delete. */
-            fs: string;
+            fs?: string;
             /** @description Exact path to the file within `fs` that should be deleted. */
-            remote: string;
+            remote?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2151,7 +2157,7 @@ export interface components {
         };
         OperationsFsinfoRequest: {
             /** @description Remote name or path to inspect, e.g. `drive:`. */
-            fs: string;
+            fs?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2159,9 +2165,9 @@ export interface components {
         };
         OperationsHashsumRequest: {
             /** @description Remote name or path to hash, such as `drive:` or `/`. */
-            fs: string;
+            fs?: string;
             /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
-            hashType: string;
+            hashType?: string;
             /** @description Set to true to force reading the data instead of using remote checksums. */
             download?: boolean;
             /** @description Set to true to emit hash values in base64 rather than hexadecimal. */
@@ -2173,11 +2179,11 @@ export interface components {
         };
         OperationsHashsumfileRequest: {
             /** @description Remote name or path containing the file to hash. */
-            fs: string;
+            fs?: string;
             /** @description Path to the specific file within `fs` to hash. */
-            remote: string;
+            remote?: string;
             /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
-            hashType: string;
+            hashType?: string;
             /** @description Set to true to force reading the data instead of using remote checksums. */
             download?: boolean;
             /** @description Set to true to emit the hash value in base64 rather than hexadecimal. */
@@ -2189,13 +2195,13 @@ export interface components {
         };
         OperationsMovefileRequest: {
             /** @description Source remote name or path containing the file to move. */
-            srcFs: string;
+            srcFs?: string;
             /** @description Path to the source object within `srcFs`. */
-            srcRemote: string;
+            srcRemote?: string;
             /** @description Destination remote name or path where the file will be moved. */
-            dstFs: string;
+            dstFs?: string;
             /** @description Destination path within `dstFs` for the moved object. */
-            dstRemote: string;
+            dstRemote?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2203,9 +2209,9 @@ export interface components {
         };
         OperationsPubliclinkRequest: {
             /** @description Remote name or path hosting the object for which to manage a public link. */
-            fs: string;
+            fs?: string;
             /** @description Path within `fs` to the object for which to create or remove a public link. */
-            remote: string;
+            remote?: string;
             /** @description Set to true to remove an existing public link instead of creating one. */
             unlink?: boolean;
             /** @description Optional expiration time for the public link, formatted as supported by the backend. */
@@ -2217,9 +2223,9 @@ export interface components {
         };
         OperationsRmdirsRequest: {
             /** @description Remote name or path to scan for empty directories. */
-            fs: string;
+            fs?: string;
             /** @description Path within `fs` whose empty subdirectories should be removed. */
-            remote: string;
+            remote?: string;
             /** @description Set to true to preserve the top-level directory even if empty. */
             leaveRoot?: boolean;
             /** @description Assign the request to a custom stats group. */
@@ -2229,7 +2235,7 @@ export interface components {
         };
         OperationsSettierRequest: {
             /** @description Remote name or path whose storage class tier should be changed. */
-            fs: string;
+            fs?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2237,9 +2243,9 @@ export interface components {
         };
         OperationsSettierfileRequest: {
             /** @description Remote name or path that contains the object whose tier should change. */
-            fs: string;
+            fs?: string;
             /** @description Path within `fs` to the object whose storage class tier should be updated. */
-            remote: string;
+            remote?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2247,7 +2253,7 @@ export interface components {
         };
         OperationsSizeRequest: {
             /** @description Remote name or path to measure aggregate size information for. */
-            fs: string;
+            fs?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2263,7 +2269,7 @@ export interface components {
         };
         CoreCommandRequest: {
             /** @description Name of the rclone command to execute, for example `ls` or `lsf`. */
-            command: string;
+            command?: string;
             /** @description Optional positional arguments for the command. Repeat to supply multiple values. */
             arg?: string[];
             /** @description Optional command options encoded as a JSON string. */
@@ -2303,7 +2309,7 @@ export interface components {
         };
         CoreObscureRequest: {
             /** @description Plain-text string to obscure for storage in the config file. */
-            clear: string;
+            clear?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2325,7 +2331,7 @@ export interface components {
         };
         CoreStatsDeleteRequest: {
             /** @description Stats group identifier to remove. */
-            group: string;
+            group?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2349,7 +2355,7 @@ export interface components {
         };
         DebugSetBlockProfileRateRequest: {
             /** @description Sampling interval in nanoseconds for blocking profile collection; use 1 to capture all events. */
-            rate: number;
+            rate?: number;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2357,7 +2363,7 @@ export interface components {
         };
         DebugSetGcPercentRequest: {
             /** @description Target percentage of newly allocated data to trigger garbage collection. */
-            "gc-percent": number;
+            "gc-percent"?: number;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2365,7 +2371,7 @@ export interface components {
         };
         DebugSetMutexProfileFractionRequest: {
             /** @description Sampling fraction for mutex contention profiling; set to 0 to disable. */
-            rate: number;
+            rate?: number;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2373,7 +2379,7 @@ export interface components {
         };
         DebugSetSoftMemoryLimitRequest: {
             /** @description Soft memory limit for the Go runtime in bytes. */
-            "mem-limit": number;
+            "mem-limit"?: number;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2399,9 +2405,9 @@ export interface components {
         };
         MountMountRequest: {
             /** @description Remote path to mount, such as `drive:` or `remote:subdir`. */
-            fs: string;
+            fs?: string;
             /** @description Absolute local path where the remote should be mounted. */
-            mountPoint: string;
+            mountPoint?: string;
             /** @description Optional mount implementation to use (`mount`, `cmount`, or `mount2`). */
             mountType?: string;
             /** @description Mount options encoded as JSON, matching flags accepted by `rclone mount`. */
@@ -2425,7 +2431,7 @@ export interface components {
         };
         MountUnmountRequest: {
             /** @description Local mount point path to unmount. */
-            mountPoint: string;
+            mountPoint?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2438,20 +2444,16 @@ export interface components {
             _async?: boolean;
         };
         RcNoopAuthRequest: {
-            /** @description Additional arbitrary parameters allowed. */
-            params?: {
-                [key: string]: unknown;
-            };
             /** @description Run the command asynchronously. Returns a job id immediately. */
             _async?: boolean;
+        } & {
+            [key: string]: unknown;
         };
         RcErrorRequest: {
-            /** @description Additional arbitrary parameters allowed. */
-            params?: {
-                [key: string]: unknown;
-            };
             /** @description Run the command asynchronously. Returns a job id immediately. */
             _async?: boolean;
+        } & {
+            [key: string]: unknown;
         };
         RcListRequest: {
             /** @description Assign the request to a custom stats group. */
@@ -2461,7 +2463,7 @@ export interface components {
         };
         BackendCommandRequest: {
             /** @description Backend-specific command to invoke. */
-            command: string;
+            command?: string;
             /** @description Remote name or path the backend command should target. */
             fs?: string;
             /** @description Optional positional arguments for the backend command. */
@@ -2475,7 +2477,7 @@ export interface components {
         };
         CacheExpireRequest: {
             /** @description Remote path to expire from the cache, e.g. `remote:path/to/dir`. */
-            remote: string;
+            remote?: string;
             /** @description Set to true to drop cached chunk data along with directory entries. */
             withData?: boolean;
             /** @description Assign the request to a custom stats group. */
@@ -2486,14 +2488,12 @@ export interface components {
         CacheFetchRequest: {
             /** @description Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch. */
             chunks?: string;
-            /** @description Additional arbitrary parameters allowed. */
-            params?: {
-                [key: string]: unknown;
-            };
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
             _async?: boolean;
+        } & {
+            [key: string]: unknown;
         };
         CacheStatsRequest: {
             /** @description Assign the request to a custom stats group. */
@@ -2503,11 +2503,11 @@ export interface components {
         };
         ConfigCreateRequest: {
             /** @description Name of the new remote configuration. */
-            name: string;
+            name?: string;
             /** @description JSON object of configuration key/value pairs required for the remote. */
-            parameters: string;
+            parameters?: string;
             /** @description Backend type identifier, such as `drive`, `s3`, or `dropbox`. */
-            type: string;
+            type?: string;
             /** @description Optional JSON object controlling interactive behaviour (e.g. `obscure`, `continue`). */
             opt?: string;
             /** @description Assign the request to a custom stats group. */
@@ -2517,7 +2517,7 @@ export interface components {
         };
         ConfigDeleteRequest: {
             /** @description Name of the remote configuration to delete. */
-            name: string;
+            name?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2531,7 +2531,7 @@ export interface components {
         };
         ConfigGetRequest: {
             /** @description Name of the remote configuration to fetch. */
-            name: string;
+            name?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2545,9 +2545,9 @@ export interface components {
         };
         ConfigPasswordRequest: {
             /** @description Name of the remote whose secrets should be updated. */
-            name: string;
+            name?: string;
             /** @description JSON object of password answers, typically including `pass`. */
-            parameters: string;
+            parameters?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2567,7 +2567,7 @@ export interface components {
         };
         ConfigSetpathRequest: {
             /** @description Absolute path to the `rclone.conf` file that rclone should use. */
-            path: string;
+            path?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2575,7 +2575,7 @@ export interface components {
         };
         ConfigUnlockRequest: {
             /** @description Password used to unlock an encrypted config file. */
-            configPassword: string;
+            configPassword?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2583,9 +2583,9 @@ export interface components {
         };
         ConfigUpdateRequest: {
             /** @description Name of the remote configuration to update. */
-            name: string;
+            name?: string;
             /** @description JSON object of configuration key/value pairs to apply to the remote. */
-            parameters: string;
+            parameters?: string;
             /** @description Optional JSON object controlling update behaviour (e.g. `obscure`, `continue`). */
             opt?: string;
             /** @description Assign the request to a custom stats group. */
@@ -2615,27 +2615,27 @@ export interface components {
         };
         JobStatusRequest: {
             /** @description Numeric identifier of the job to query, as returned from an async call. */
-            jobid: number;
+            jobid?: number;
             /** @description Run the command asynchronously. Returns a job id immediately. */
             _async?: boolean;
         };
         JobStopRequest: {
             /** @description Numeric identifier of the job to cancel. */
-            jobid: number;
+            jobid?: number;
             /** @description Run the command asynchronously. Returns a job id immediately. */
             _async?: boolean;
         };
         JobStopgroupRequest: {
             /** @description Stats group name whose active jobs should be stopped. */
-            group: string;
+            group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
             _async?: boolean;
         };
         OperationsListRequest: {
             /** @description Remote name or path to list, for example `drive:`. */
-            fs: string;
+            fs?: string;
             /** @description Directory path within `fs` to list; leave empty to target the root. */
-            remote: string;
+            remote?: string;
             /** @description Optional JSON-encoded object of listing flags (e.g. `{ "recurse": true, "showHash": true }`). */
             opt?: string;
             /** @description Set to true to list directories recursively. */
@@ -2665,9 +2665,9 @@ export interface components {
         };
         OperationsStatRequest: {
             /** @description Remote name or path that contains the item to inspect. */
-            fs: string;
+            fs?: string;
             /** @description Path to the file or directory within `fs` to describe. */
-            remote: string;
+            remote?: string;
             /** @description Optional JSON object of listing flags, matching those accepted by `operations/list`. */
             opt?: string;
             /** @description Assign the request to a custom stats group. */
@@ -2677,7 +2677,7 @@ export interface components {
         };
         OperationsAboutRequest: {
             /** @description Remote name or path to query for capacity information. */
-            fs: string;
+            fs?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2685,9 +2685,9 @@ export interface components {
         };
         OperationsPurgeRequest: {
             /** @description Remote name or path from which to remove all contents. */
-            fs: string;
+            fs?: string;
             /** @description Path within `fs` whose contents should be purged. */
-            remote: string;
+            remote?: string;
             /** @description JSON encoded config overrides applied for this call only. */
             _config?: string;
             /** @description JSON encoded filter overrides applied for this call only. */
@@ -2699,9 +2699,9 @@ export interface components {
         };
         OperationsMkdirRequest: {
             /** @description Remote name or path in which to create a directory. */
-            fs: string;
+            fs?: string;
             /** @description Directory path within `fs` to create. */
-            remote: string;
+            remote?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2709,9 +2709,9 @@ export interface components {
         };
         OperationsRmdirRequest: {
             /** @description Remote name or path containing the directory to remove. */
-            fs: string;
+            fs?: string;
             /** @description Directory path within `fs` to delete. */
-            remote: string;
+            remote?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -2719,9 +2719,9 @@ export interface components {
         };
         OperationsCheckRequest: {
             /** @description Source remote name or path to verify, e.g. `drive:`. */
-            srcFs: string;
+            srcFs?: string;
             /** @description Destination remote name or path that should match the source. */
-            dstFs: string;
+            dstFs?: string;
             /** @description Set to true to read file contents during comparison instead of relying on hashes. */
             download?: boolean;
             /** @description Hash name to expect in the supplied SUM file, such as `md5`. */
@@ -2751,9 +2751,9 @@ export interface components {
         };
         SyncSyncRequest: {
             /** @description Source remote path to sync from, e.g. `drive:src`. */
-            srcFs: string;
+            srcFs?: string;
             /** @description Destination remote path to sync to, e.g. `drive:dst`. */
-            dstFs: string;
+            dstFs?: string;
             /** @description Set to true to create empty source directories on the destination. */
             createEmptySrcDirs?: boolean;
             /** @description JSON encoded config overrides applied for this call only. */
@@ -2767,9 +2767,9 @@ export interface components {
         };
         SyncCopyRequest: {
             /** @description Source remote path to copy from. */
-            srcFs: string;
+            srcFs?: string;
             /** @description Destination remote path to copy to. */
-            dstFs: string;
+            dstFs?: string;
             /** @description Set to true to replicate empty source directories on the destination. */
             createEmptySrcDirs?: boolean;
             /** @description JSON encoded config overrides applied for this call only. */
@@ -2783,9 +2783,9 @@ export interface components {
         };
         SyncMoveRequest: {
             /** @description Source remote path whose contents will be moved. */
-            srcFs: string;
+            srcFs?: string;
             /** @description Destination remote path that will receive moved files. */
-            dstFs: string;
+            dstFs?: string;
             /** @description Set to true to create empty source directories on the destination. */
             createEmptySrcDirs?: boolean;
             /** @description Set to true to delete empty directories from the source after the move completes. */
@@ -2801,9 +2801,9 @@ export interface components {
         };
         SyncBisyncRequest: {
             /** @description First remote directory, e.g. `drive:path1`. */
-            path1: string;
+            path1?: string;
             /** @description Second remote directory, e.g. `drive:path2`. */
-            path2: string;
+            path2?: string;
             /** @description Set to true to simulate the bisync run without making changes. */
             dryRun?: boolean;
             /** @description Set to true to perform a one-time resync, rebuilding bisync history. */
@@ -2870,93 +2870,63 @@ export interface components {
         OptionsSetRequest: {
             /** @description Overrides for the `dlna` option block. */
             dlna?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `filter` option block. */
             filter?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `ftp` option block. */
             ftp?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `main` option block. */
             main?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `http` option block. */
             http?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `log` option block. */
             log?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `mount` option block. */
             mount?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `nfs` option block. */
             nfs?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `proxy` option block. */
             proxy?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `rc` option block. */
             rc?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `restic` option block. */
             restic?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `s3` option block. */
             s3?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `sftp` option block. */
             sftp?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `vfs` option block. */
             vfs?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Overrides for the `webdav` option block. */
             webdav?: {
-                [key: string]: string | number | boolean | unknown[] | {
-                    [key: string]: unknown;
-                };
+                [key: string]: unknown;
             };
             /** @description Assign the request to a custom stats group. */
             _group?: string;
@@ -2979,15 +2949,11 @@ export interface components {
         };
         ServeStartRequest: {
             /** @description Type of server to start (e.g. `http`, `webdav`, `ftp`, `sftp`). */
-            type: string;
+            type?: string;
             /** @description Remote path that will be served. */
-            fs: string;
+            fs?: string;
             /** @description Address and port to bind the server to, such as `:5572` or `localhost:8080`. */
-            addr: string;
-            /** @description Additional arbitrary parameters allowed. */
-            params?: {
-                [key: string]: unknown;
-            };
+            addr?: string;
             /** @description JSON encoded config overrides applied for this call only. */
             _config?: string;
             /** @description JSON encoded filter overrides applied for this call only. */
@@ -2996,10 +2962,12 @@ export interface components {
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
             _async?: boolean;
+        } & {
+            [key: string]: unknown;
         };
         ServeStopRequest: {
             /** @description Identifier of the running serve instance returned by `serve/start`. */
-            id: string;
+            id?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -3020,14 +2988,12 @@ export interface components {
         VfsForgetRequest: {
             /** @description Optional VFS identifier to target; required when more than one VFS is active. */
             fs?: string;
-            /** @description Additional arbitrary parameters allowed. */
-            params?: {
-                [key: string]: unknown;
-            };
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
             _async?: boolean;
+        } & {
+            [key: string]: unknown;
         };
         VfsListRequest: {
             /** @description Optional VFS identifier; omit to list all active VFS instances. */
@@ -3061,9 +3027,9 @@ export interface components {
             /** @description Optional VFS identifier for the queued item. */
             fs?: string;
             /** @description Queue item ID as returned by `vfs/queue`. */
-            id: number;
+            id?: number;
             /** @description New eligibility time in seconds (may be negative for immediate upload). */
-            expiry: number;
+            expiry?: number;
             /** @description Set to true to treat `expiry` as relative to the current value. */
             relative?: boolean;
             /** @description Assign the request to a custom stats group. */
@@ -3076,14 +3042,12 @@ export interface components {
             fs?: string;
             /** @description Set to true to refresh entire directory trees. */
             recursive?: boolean;
-            /** @description Additional arbitrary parameters allowed. */
-            params?: {
-                [key: string]: unknown;
-            };
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
             _async?: boolean;
+        } & {
+            [key: string]: unknown;
         };
         VfsStatsRequest: {
             /** @description Optional VFS identifier whose statistics should be returned. */
@@ -3095,7 +3059,7 @@ export interface components {
         };
         PluginsctlAddPluginRequest: {
             /** @description Repository URL of the plugin to install. */
-            url: string;
+            url?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -3125,7 +3089,7 @@ export interface components {
         };
         PluginsctlRemovePluginRequest: {
             /** @description Name of the plugin to uninstall. */
-            name: string;
+            name?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -3133,7 +3097,7 @@ export interface components {
         };
         PluginsctlRemoveTestPluginRequest: {
             /** @description Name of the test plugin to uninstall. */
-            name: string;
+            name?: string;
             /** @description Assign the request to a custom stats group. */
             _group?: string;
             /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -3178,7 +3142,21 @@ export interface components {
             };
             content: {
                 "application/json": {
+                    /** @description Job ID returned when _async=true. */
+                    jobid?: number;
+                } & {
                     [key: string]: unknown;
+                };
+            };
+        };
+        /** @description Supported rclone serve protocols. */
+        ServeTypesResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    types: string[];
                 };
             };
         };
@@ -3482,11 +3460,9 @@ export interface components {
             };
             content: {
                 "application/json": {
-                    name: string;
                     type: string;
-                    provider?: string;
                 } & {
-                    [key: string]: unknown;
+                    [key: string]: string;
                 };
             };
         };
@@ -4547,93 +4523,63 @@ export interface components {
         Options_InfoPostBlocksParam: string;
         /** @description Overrides for the `dlna` option block. */
         Options_SetPostDlnaParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `filter` option block. */
         Options_SetPostFilterParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `ftp` option block. */
         Options_SetPostFtpParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `main` option block. */
         Options_SetPostMainParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `http` option block. */
         Options_SetPostHttpParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `log` option block. */
         Options_SetPostLogParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `mount` option block. */
         Options_SetPostMountParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `nfs` option block. */
         Options_SetPostNfsParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `proxy` option block. */
         Options_SetPostProxyParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `rc` option block. */
         Options_SetPostRcParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `restic` option block. */
         Options_SetPostResticParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `s3` option block. */
         Options_SetPostS3Param: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `sftp` option block. */
         Options_SetPostSftpParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `vfs` option block. */
         Options_SetPostVfsParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Overrides for the `webdav` option block. */
         Options_SetPostWebdavParam: {
-            [key: string]: string | number | boolean | unknown[] | {
-                [key: string]: unknown;
-            };
+            [key: string]: unknown;
         };
         /** @description Type of server to start (e.g. `http`, `webdav`, `ftp`, `sftp`). */
         Serve_StartPostTypeParam: string;
@@ -4723,9 +4669,9 @@ export interface operations {
     };
     operationsCleanup: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path to clean up, for example `drive:`. */
-                fs: components["parameters"]["Operations_CleanupPostFsParam"];
+                fs?: components["parameters"]["Operations_CleanupPostFsParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -4748,15 +4694,15 @@ export interface operations {
     };
     operationsCopyfile: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Source remote name or path, such as `drive:` or `/` for the local filesystem. */
-                srcFs: components["parameters"]["Operations_CopyfilePostSrcFsParam"];
+                srcFs?: components["parameters"]["Operations_CopyfilePostSrcFsParam"];
                 /** @description Path to the source object within `srcFs`, for example `dir/file.txt`. */
-                srcRemote: components["parameters"]["Operations_CopyfilePostSrcRemoteParam"];
+                srcRemote?: components["parameters"]["Operations_CopyfilePostSrcRemoteParam"];
                 /** @description Destination remote name or path, such as `drive2:` or `/` for local filesystem. */
-                dstFs: components["parameters"]["Operations_CopyfilePostDstFsParam"];
+                dstFs?: components["parameters"]["Operations_CopyfilePostDstFsParam"];
                 /** @description Target path within `dstFs` where the file should be written. */
-                dstRemote: components["parameters"]["Operations_CopyfilePostDstRemoteParam"];
+                dstRemote?: components["parameters"]["Operations_CopyfilePostDstRemoteParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -4779,13 +4725,13 @@ export interface operations {
     };
     operationsCopyurl: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path that will receive the downloaded file, e.g. `drive:`. */
-                fs: components["parameters"]["Operations_CopyurlPostFsParam"];
+                fs?: components["parameters"]["Operations_CopyurlPostFsParam"];
                 /** @description Destination path within `fs` where the fetched object will be stored. */
-                remote: components["parameters"]["Operations_CopyurlPostRemoteParam"];
+                remote?: components["parameters"]["Operations_CopyurlPostRemoteParam"];
                 /** @description Source URL to fetch the object from. */
-                url: components["parameters"]["Operations_CopyurlPostUrlParam"];
+                url?: components["parameters"]["Operations_CopyurlPostUrlParam"];
                 /** @description Set to true to derive the destination filename from the URL. */
                 autoFilename?: components["parameters"]["Operations_CopyurlPostAutoFilenameParam"];
                 /** @description Assign the request to a custom stats group. */
@@ -4810,9 +4756,9 @@ export interface operations {
     };
     operationsDelete: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path whose contents should be removed. */
-                fs: components["parameters"]["Operations_DeletePostFsParam"];
+                fs?: components["parameters"]["Operations_DeletePostFsParam"];
                 /** @description JSON encoded config overrides applied for this call only. */
                 _config?: components["parameters"]["GlobalConfigParam"];
                 /** @description JSON encoded filter overrides applied for this call only. */
@@ -4839,11 +4785,11 @@ export interface operations {
     };
     operationsDeletefile: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path that contains the file to delete. */
-                fs: components["parameters"]["Operations_DeletefilePostFsParam"];
+                fs?: components["parameters"]["Operations_DeletefilePostFsParam"];
                 /** @description Exact path to the file within `fs` that should be deleted. */
-                remote: components["parameters"]["Operations_DeletefilePostRemoteParam"];
+                remote?: components["parameters"]["Operations_DeletefilePostRemoteParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -4866,9 +4812,9 @@ export interface operations {
     };
     operationsFsinfo: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path to inspect, e.g. `drive:`. */
-                fs: components["parameters"]["Operations_FsinfoPostFsParam"];
+                fs?: components["parameters"]["Operations_FsinfoPostFsParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -4891,11 +4837,11 @@ export interface operations {
     };
     operationsHashsum: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path to hash, such as `drive:` or `/`. */
-                fs: components["parameters"]["Operations_HashsumPostFsParam"];
+                fs?: components["parameters"]["Operations_HashsumPostFsParam"];
                 /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
-                hashType: components["parameters"]["Operations_HashsumPostHashTypeParam"];
+                hashType?: components["parameters"]["Operations_HashsumPostHashTypeParam"];
                 /** @description Set to true to force reading the data instead of using remote checksums. */
                 download?: components["parameters"]["Operations_HashsumPostDownloadParam"];
                 /** @description Set to true to emit hash values in base64 rather than hexadecimal. */
@@ -4922,13 +4868,13 @@ export interface operations {
     };
     operationsHashsumfile: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path containing the file to hash. */
-                fs: components["parameters"]["Operations_HashsumfilePostFsParam"];
+                fs?: components["parameters"]["Operations_HashsumfilePostFsParam"];
                 /** @description Path to the specific file within `fs` to hash. */
-                remote: components["parameters"]["Operations_HashsumfilePostRemoteParam"];
+                remote?: components["parameters"]["Operations_HashsumfilePostRemoteParam"];
                 /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
-                hashType: components["parameters"]["Operations_HashsumfilePostHashTypeParam"];
+                hashType?: components["parameters"]["Operations_HashsumfilePostHashTypeParam"];
                 /** @description Set to true to force reading the data instead of using remote checksums. */
                 download?: components["parameters"]["Operations_HashsumfilePostDownloadParam"];
                 /** @description Set to true to emit the hash value in base64 rather than hexadecimal. */
@@ -4955,15 +4901,15 @@ export interface operations {
     };
     operationsMovefile: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Source remote name or path containing the file to move. */
-                srcFs: components["parameters"]["Operations_MovefilePostSrcFsParam"];
+                srcFs?: components["parameters"]["Operations_MovefilePostSrcFsParam"];
                 /** @description Path to the source object within `srcFs`. */
-                srcRemote: components["parameters"]["Operations_MovefilePostSrcRemoteParam"];
+                srcRemote?: components["parameters"]["Operations_MovefilePostSrcRemoteParam"];
                 /** @description Destination remote name or path where the file will be moved. */
-                dstFs: components["parameters"]["Operations_MovefilePostDstFsParam"];
+                dstFs?: components["parameters"]["Operations_MovefilePostDstFsParam"];
                 /** @description Destination path within `dstFs` for the moved object. */
-                dstRemote: components["parameters"]["Operations_MovefilePostDstRemoteParam"];
+                dstRemote?: components["parameters"]["Operations_MovefilePostDstRemoteParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -4986,11 +4932,11 @@ export interface operations {
     };
     operationsPubliclink: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path hosting the object for which to manage a public link. */
-                fs: components["parameters"]["Operations_PubliclinkPostFsParam"];
+                fs?: components["parameters"]["Operations_PubliclinkPostFsParam"];
                 /** @description Path within `fs` to the object for which to create or remove a public link. */
-                remote: components["parameters"]["Operations_PubliclinkPostRemoteParam"];
+                remote?: components["parameters"]["Operations_PubliclinkPostRemoteParam"];
                 /** @description Set to true to remove an existing public link instead of creating one. */
                 unlink?: components["parameters"]["Operations_PubliclinkPostUnlinkParam"];
                 /** @description Optional expiration time for the public link, formatted as supported by the backend. */
@@ -5017,11 +4963,11 @@ export interface operations {
     };
     operationsRmdirs: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path to scan for empty directories. */
-                fs: components["parameters"]["Operations_RmdirsPostFsParam"];
+                fs?: components["parameters"]["Operations_RmdirsPostFsParam"];
                 /** @description Path within `fs` whose empty subdirectories should be removed. */
-                remote: components["parameters"]["Operations_RmdirsPostRemoteParam"];
+                remote?: components["parameters"]["Operations_RmdirsPostRemoteParam"];
                 /** @description Set to true to preserve the top-level directory even if empty. */
                 leaveRoot?: components["parameters"]["Operations_RmdirsPostLeaveRootParam"];
                 /** @description Assign the request to a custom stats group. */
@@ -5046,9 +4992,9 @@ export interface operations {
     };
     operationsSettier: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path whose storage class tier should be changed. */
-                fs: components["parameters"]["Operations_SettierPostFsParam"];
+                fs?: components["parameters"]["Operations_SettierPostFsParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -5071,11 +5017,11 @@ export interface operations {
     };
     operationsSettierfile: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path that contains the object whose tier should change. */
-                fs: components["parameters"]["Operations_SettierfilePostFsParam"];
+                fs?: components["parameters"]["Operations_SettierfilePostFsParam"];
                 /** @description Path within `fs` to the object whose storage class tier should be updated. */
-                remote: components["parameters"]["Operations_SettierfilePostRemoteParam"];
+                remote?: components["parameters"]["Operations_SettierfilePostRemoteParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -5098,9 +5044,9 @@ export interface operations {
     };
     operationsSize: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path to measure aggregate size information for. */
-                fs: components["parameters"]["Operations_SizePostFsParam"];
+                fs?: components["parameters"]["Operations_SizePostFsParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -5148,9 +5094,9 @@ export interface operations {
     };
     coreCommand: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Name of the rclone command to execute, for example `ls` or `lsf`. */
-                command: components["parameters"]["Core_CommandPostCommandParam"];
+                command?: components["parameters"]["Core_CommandPostCommandParam"];
                 /** @description Optional positional arguments for the command. Repeat to supply multiple values. */
                 arg?: components["parameters"]["Core_CommandPostArgParam"];
                 /** @description Optional command options encoded as a JSON string. */
@@ -5293,9 +5239,9 @@ export interface operations {
     };
     coreObscure: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Plain-text string to obscure for storage in the config file. */
-                clear: components["parameters"]["Core_ObscurePostClearParam"];
+                clear?: components["parameters"]["Core_ObscurePostClearParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -5386,9 +5332,9 @@ export interface operations {
     };
     coreStatsDelete: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Stats group identifier to remove. */
-                group: components["parameters"]["Core_StatsDeletePostGroupParam"];
+                group?: components["parameters"]["Core_StatsDeletePostGroupParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -5461,9 +5407,9 @@ export interface operations {
     };
     debugSetBlockProfileRate: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Sampling interval in nanoseconds for blocking profile collection; use 1 to capture all events. */
-                rate: components["parameters"]["Debug_SetBlockProfileRatePostRateParam"];
+                rate?: components["parameters"]["Debug_SetBlockProfileRatePostRateParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -5486,9 +5432,9 @@ export interface operations {
     };
     debugSetGcPercent: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Target percentage of newly allocated data to trigger garbage collection. */
-                "gc-percent": components["parameters"]["Debug_SetGcPercentPostGcPercentParam"];
+                "gc-percent"?: components["parameters"]["Debug_SetGcPercentPostGcPercentParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -5511,9 +5457,9 @@ export interface operations {
     };
     debugSetMutexProfileFraction: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Sampling fraction for mutex contention profiling; set to 0 to disable. */
-                rate: components["parameters"]["Debug_SetMutexProfileFractionPostRateParam"];
+                rate?: components["parameters"]["Debug_SetMutexProfileFractionPostRateParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -5536,9 +5482,9 @@ export interface operations {
     };
     debugSetSoftMemoryLimit: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Soft memory limit for the Go runtime in bytes. */
-                "mem-limit": components["parameters"]["Debug_SetSoftMemoryLimitPostMemLimitParam"];
+                "mem-limit"?: components["parameters"]["Debug_SetSoftMemoryLimitPostMemLimitParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -5630,11 +5576,11 @@ export interface operations {
     };
     mountMount: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote path to mount, such as `drive:` or `remote:subdir`. */
-                fs: components["parameters"]["Mount_MountPostFsParam"];
+                fs?: components["parameters"]["Mount_MountPostFsParam"];
                 /** @description Absolute local path where the remote should be mounted. */
-                mountPoint: components["parameters"]["Mount_MountPostMountPointParam"];
+                mountPoint?: components["parameters"]["Mount_MountPostMountPointParam"];
                 /** @description Optional mount implementation to use (`mount`, `cmount`, or `mount2`). */
                 mountType?: components["parameters"]["Mount_MountPostMountTypeParam"];
                 /** @description Mount options encoded as JSON, matching flags accepted by `rclone mount`. */
@@ -5690,9 +5636,9 @@ export interface operations {
     };
     mountUnmount: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Local mount point path to unmount. */
-                mountPoint: components["parameters"]["Mount_UnmountPostMountPointParam"];
+                mountPoint?: components["parameters"]["Mount_UnmountPostMountPointParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -5807,9 +5753,9 @@ export interface operations {
     };
     backendCommand: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Backend-specific command to invoke. */
-                command: components["parameters"]["Backend_CommandPostCommandParam"];
+                command?: components["parameters"]["Backend_CommandPostCommandParam"];
                 /** @description Remote name or path the backend command should target. */
                 fs?: components["parameters"]["Backend_CommandPostFsParam"];
                 /** @description Optional positional arguments for the backend command. */
@@ -5838,9 +5784,9 @@ export interface operations {
     };
     cacheExpire: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote path to expire from the cache, e.g. `remote:path/to/dir`. */
-                remote: components["parameters"]["Cache_ExpirePostRemoteParam"];
+                remote?: components["parameters"]["Cache_ExpirePostRemoteParam"];
                 /** @description Set to true to drop cached chunk data along with directory entries. */
                 withData?: components["parameters"]["Cache_ExpirePostWithDataParam"];
                 /** @description Assign the request to a custom stats group. */
@@ -5915,13 +5861,13 @@ export interface operations {
     };
     configCreate: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Name of the new remote configuration. */
-                name: components["parameters"]["Config_CreatePostNameParam"];
+                name?: components["parameters"]["Config_CreatePostNameParam"];
                 /** @description JSON object of configuration key/value pairs required for the remote. */
-                parameters: components["parameters"]["Config_CreatePostParametersParam"];
+                parameters?: components["parameters"]["Config_CreatePostParametersParam"];
                 /** @description Backend type identifier, such as `drive`, `s3`, or `dropbox`. */
-                type: components["parameters"]["Config_CreatePostTypeParam"];
+                type?: components["parameters"]["Config_CreatePostTypeParam"];
                 /** @description Optional JSON object controlling interactive behaviour (e.g. `obscure`, `continue`). */
                 opt?: components["parameters"]["Config_CreatePostOptParam"];
                 /** @description Assign the request to a custom stats group. */
@@ -5946,9 +5892,9 @@ export interface operations {
     };
     configDelete: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Name of the remote configuration to delete. */
-                name: components["parameters"]["Config_DeletePostNameParam"];
+                name?: components["parameters"]["Config_DeletePostNameParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -5994,9 +5940,9 @@ export interface operations {
     };
     configGet: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Name of the remote configuration to fetch. */
-                name: components["parameters"]["Config_GetPostNameParam"];
+                name?: components["parameters"]["Config_GetPostNameParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -6042,11 +5988,11 @@ export interface operations {
     };
     configPassword: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Name of the remote whose secrets should be updated. */
-                name: components["parameters"]["Config_PasswordPostNameParam"];
+                name?: components["parameters"]["Config_PasswordPostNameParam"];
                 /** @description JSON object of password answers, typically including `pass`. */
-                parameters: components["parameters"]["Config_PasswordPostParametersParam"];
+                parameters?: components["parameters"]["Config_PasswordPostParametersParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -6115,9 +6061,9 @@ export interface operations {
     };
     configSetpath: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Absolute path to the `rclone.conf` file that rclone should use. */
-                path: components["parameters"]["Config_SetpathPostPathParam"];
+                path?: components["parameters"]["Config_SetpathPostPathParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -6140,9 +6086,9 @@ export interface operations {
     };
     configUnlock: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Password used to unlock an encrypted config file. */
-                configPassword: components["parameters"]["Config_UnlockPostConfigPasswordParam"];
+                configPassword?: components["parameters"]["Config_UnlockPostConfigPasswordParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -6165,11 +6111,11 @@ export interface operations {
     };
     configUpdate: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Name of the remote configuration to update. */
-                name: components["parameters"]["Config_UpdatePostNameParam"];
+                name?: components["parameters"]["Config_UpdatePostNameParam"];
                 /** @description JSON object of configuration key/value pairs to apply to the remote. */
-                parameters: components["parameters"]["Config_UpdatePostParametersParam"];
+                parameters?: components["parameters"]["Config_UpdatePostParametersParam"];
                 /** @description Optional JSON object controlling update behaviour (e.g. `obscure`, `continue`). */
                 opt?: components["parameters"]["Config_UpdatePostOptParam"];
                 /** @description Assign the request to a custom stats group. */
@@ -6290,9 +6236,9 @@ export interface operations {
     };
     jobStatus: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Numeric identifier of the job to query, as returned from an async call. */
-                jobid: components["parameters"]["Job_StatusPostJobidParam"];
+                jobid?: components["parameters"]["Job_StatusPostJobidParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
@@ -6313,9 +6259,9 @@ export interface operations {
     };
     jobStop: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Numeric identifier of the job to cancel. */
-                jobid: components["parameters"]["Job_StopPostJobidParam"];
+                jobid?: components["parameters"]["Job_StopPostJobidParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
@@ -6336,9 +6282,9 @@ export interface operations {
     };
     jobStopgroup: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Stats group name whose active jobs should be stopped. */
-                group: components["parameters"]["Job_StopgroupPostGroupParam"];
+                group?: components["parameters"]["Job_StopgroupPostGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
@@ -6359,11 +6305,11 @@ export interface operations {
     };
     operationsList: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path to list, for example `drive:`. */
-                fs: components["parameters"]["Operations_ListPostFsParam"];
+                fs?: components["parameters"]["Operations_ListPostFsParam"];
                 /** @description Directory path within `fs` to list; leave empty to target the root. */
-                remote: components["parameters"]["Operations_ListPostRemoteParam"];
+                remote?: components["parameters"]["Operations_ListPostRemoteParam"];
                 /** @description Optional JSON-encoded object of listing flags (e.g. `{ "recurse": true, "showHash": true }`). */
                 opt?: components["parameters"]["Operations_ListPostOptParam"];
                 /** @description Set to true to list directories recursively. */
@@ -6408,11 +6354,11 @@ export interface operations {
     };
     operationsStat: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path that contains the item to inspect. */
-                fs: components["parameters"]["Operations_StatPostFsParam"];
+                fs?: components["parameters"]["Operations_StatPostFsParam"];
                 /** @description Path to the file or directory within `fs` to describe. */
-                remote: components["parameters"]["Operations_StatPostRemoteParam"];
+                remote?: components["parameters"]["Operations_StatPostRemoteParam"];
                 /** @description Optional JSON object of listing flags, matching those accepted by `operations/list`. */
                 opt?: components["parameters"]["Operations_StatPostOptParam"];
                 /** @description Assign the request to a custom stats group. */
@@ -6437,9 +6383,9 @@ export interface operations {
     };
     operationsAbout: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path to query for capacity information. */
-                fs: components["parameters"]["Operations_AboutPostFsParam"];
+                fs?: components["parameters"]["Operations_AboutPostFsParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -6462,11 +6408,11 @@ export interface operations {
     };
     operationsUploadfile: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path where the uploaded file should be stored. */
-                fs: components["parameters"]["Operations_UploadfilePostFsParam"];
+                fs?: components["parameters"]["Operations_UploadfilePostFsParam"];
                 /** @description Destination path within `fs` for the uploaded file. */
-                remote: components["parameters"]["Operations_UploadfilePostRemoteParam"];
+                remote?: components["parameters"]["Operations_UploadfilePostRemoteParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -6490,11 +6436,11 @@ export interface operations {
     };
     operationsPurge: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path from which to remove all contents. */
-                fs: components["parameters"]["Operations_PurgePostFsParam"];
+                fs?: components["parameters"]["Operations_PurgePostFsParam"];
                 /** @description Path within `fs` whose contents should be purged. */
-                remote: components["parameters"]["Operations_PurgePostRemoteParam"];
+                remote?: components["parameters"]["Operations_PurgePostRemoteParam"];
                 /** @description JSON encoded config overrides applied for this call only. */
                 _config?: components["parameters"]["GlobalConfigParam"];
                 /** @description JSON encoded filter overrides applied for this call only. */
@@ -6521,11 +6467,11 @@ export interface operations {
     };
     operationsMkdir: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path in which to create a directory. */
-                fs: components["parameters"]["Operations_MkdirPostFsParam"];
+                fs?: components["parameters"]["Operations_MkdirPostFsParam"];
                 /** @description Directory path within `fs` to create. */
-                remote: components["parameters"]["Operations_MkdirPostRemoteParam"];
+                remote?: components["parameters"]["Operations_MkdirPostRemoteParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -6548,11 +6494,11 @@ export interface operations {
     };
     operationsRmdir: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Remote name or path containing the directory to remove. */
-                fs: components["parameters"]["Operations_RmdirPostFsParam"];
+                fs?: components["parameters"]["Operations_RmdirPostFsParam"];
                 /** @description Directory path within `fs` to delete. */
-                remote: components["parameters"]["Operations_RmdirPostRemoteParam"];
+                remote?: components["parameters"]["Operations_RmdirPostRemoteParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -6575,11 +6521,11 @@ export interface operations {
     };
     operationsCheck: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Source remote name or path to verify, e.g. `drive:`. */
-                srcFs: components["parameters"]["Operations_CheckPostSrcFsParam"];
+                srcFs?: components["parameters"]["Operations_CheckPostSrcFsParam"];
                 /** @description Destination remote name or path that should match the source. */
-                dstFs: components["parameters"]["Operations_CheckPostDstFsParam"];
+                dstFs?: components["parameters"]["Operations_CheckPostDstFsParam"];
                 /** @description Set to true to read file contents during comparison instead of relying on hashes. */
                 download?: components["parameters"]["Operations_CheckPostDownloadParam"];
                 /** @description Hash name to expect in the supplied SUM file, such as `md5`. */
@@ -6624,11 +6570,11 @@ export interface operations {
     };
     syncSync: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Source remote path to sync from, e.g. `drive:src`. */
-                srcFs: components["parameters"]["Sync_SyncPostSrcFsParam"];
+                srcFs?: components["parameters"]["Sync_SyncPostSrcFsParam"];
                 /** @description Destination remote path to sync to, e.g. `drive:dst`. */
-                dstFs: components["parameters"]["Sync_SyncPostDstFsParam"];
+                dstFs?: components["parameters"]["Sync_SyncPostDstFsParam"];
                 /** @description Set to true to create empty source directories on the destination. */
                 createEmptySrcDirs?: components["parameters"]["Sync_SyncPostCreateEmptySrcDirsParam"];
                 /** @description JSON encoded config overrides applied for this call only. */
@@ -6657,11 +6603,11 @@ export interface operations {
     };
     syncCopy: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Source remote path to copy from. */
-                srcFs: components["parameters"]["Sync_CopyPostSrcFsParam"];
+                srcFs?: components["parameters"]["Sync_CopyPostSrcFsParam"];
                 /** @description Destination remote path to copy to. */
-                dstFs: components["parameters"]["Sync_CopyPostDstFsParam"];
+                dstFs?: components["parameters"]["Sync_CopyPostDstFsParam"];
                 /** @description Set to true to replicate empty source directories on the destination. */
                 createEmptySrcDirs?: components["parameters"]["Sync_CopyPostCreateEmptySrcDirsParam"];
                 /** @description JSON encoded config overrides applied for this call only. */
@@ -6690,11 +6636,11 @@ export interface operations {
     };
     syncMove: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Source remote path whose contents will be moved. */
-                srcFs: components["parameters"]["Sync_MovePostSrcFsParam"];
+                srcFs?: components["parameters"]["Sync_MovePostSrcFsParam"];
                 /** @description Destination remote path that will receive moved files. */
-                dstFs: components["parameters"]["Sync_MovePostDstFsParam"];
+                dstFs?: components["parameters"]["Sync_MovePostDstFsParam"];
                 /** @description Set to true to create empty source directories on the destination. */
                 createEmptySrcDirs?: components["parameters"]["Sync_MovePostCreateEmptySrcDirsParam"];
                 /** @description Set to true to delete empty directories from the source after the move completes. */
@@ -6725,11 +6671,11 @@ export interface operations {
     };
     syncBisync: {
         parameters: {
-            query: {
+            query?: {
                 /** @description First remote directory, e.g. `drive:path1`. */
-                path1: components["parameters"]["Sync_BisyncPostPath1Param"];
+                path1?: components["parameters"]["Sync_BisyncPostPath1Param"];
                 /** @description Second remote directory, e.g. `drive:path2`. */
-                path2: components["parameters"]["Sync_BisyncPostPath2Param"];
+                path2?: components["parameters"]["Sync_BisyncPostPath2Param"];
                 /** @description Set to true to simulate the bisync run without making changes. */
                 dryRun?: components["parameters"]["Sync_BisyncPostDryRunParam"];
                 /** @description Set to true to perform a one-time resync, rebuilding bisync history. */
@@ -6960,13 +6906,13 @@ export interface operations {
     };
     serveStart: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Type of server to start (e.g. `http`, `webdav`, `ftp`, `sftp`). */
-                type: components["parameters"]["Serve_StartPostTypeParam"];
+                type?: components["parameters"]["Serve_StartPostTypeParam"];
                 /** @description Remote path that will be served. */
-                fs: components["parameters"]["Serve_StartPostFsParam"];
+                fs?: components["parameters"]["Serve_StartPostFsParam"];
                 /** @description Address and port to bind the server to, such as `:5572` or `localhost:8080`. */
-                addr: components["parameters"]["Serve_StartPostAddrParam"];
+                addr?: components["parameters"]["Serve_StartPostAddrParam"];
                 /** @description Additional arbitrary parameters allowed. */
                 params?: components["parameters"]["Serve_StartPostAdditionalParam"];
                 /** @description JSON encoded config overrides applied for this call only. */
@@ -6995,9 +6941,9 @@ export interface operations {
     };
     serveStop: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Identifier of the running serve instance returned by `serve/start`. */
-                id: components["parameters"]["Serve_StopPostIdParam"];
+                id?: components["parameters"]["Serve_StopPostIdParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -7059,7 +7005,7 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyResponse"];
+            200: components["responses"]["ServeTypesResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7172,13 +7118,13 @@ export interface operations {
     };
     vfsQueueSetExpiry: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Optional VFS identifier for the queued item. */
                 fs?: components["parameters"]["Vfs_QueueSetExpiryPostFsParam"];
                 /** @description Queue item ID as returned by `vfs/queue`. */
-                id: components["parameters"]["Vfs_QueueSetExpiryPostIdParam"];
+                id?: components["parameters"]["Vfs_QueueSetExpiryPostIdParam"];
                 /** @description New eligibility time in seconds (may be negative for immediate upload). */
-                expiry: components["parameters"]["Vfs_QueueSetExpiryPostExpiryParam"];
+                expiry?: components["parameters"]["Vfs_QueueSetExpiryPostExpiryParam"];
                 /** @description Set to true to treat `expiry` as relative to the current value. */
                 relative?: components["parameters"]["Vfs_QueueSetExpiryPostRelativeParam"];
                 /** @description Assign the request to a custom stats group. */
@@ -7257,9 +7203,9 @@ export interface operations {
     };
     pluginsctlAddPlugin: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Repository URL of the plugin to install. */
-                url: components["parameters"]["Pluginsctl_AddPluginPostUrlParam"];
+                url?: components["parameters"]["Pluginsctl_AddPluginPostUrlParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -7355,9 +7301,9 @@ export interface operations {
     };
     pluginsctlRemovePlugin: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Name of the plugin to uninstall. */
-                name: components["parameters"]["Pluginsctl_RemovePluginPostNameParam"];
+                name?: components["parameters"]["Pluginsctl_RemovePluginPostNameParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */
@@ -7380,9 +7326,9 @@ export interface operations {
     };
     pluginsctlRemoveTestPlugin: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Name of the test plugin to uninstall. */
-                name: components["parameters"]["Pluginsctl_RemoveTestPluginPostNameParam"];
+                name?: components["parameters"]["Pluginsctl_RemoveTestPluginPostNameParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
                 /** @description Run the command asynchronously. Returns a job id immediately. */

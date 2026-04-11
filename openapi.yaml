@@ -3985,16 +3985,12 @@ components:
           schema:
             type: object
             required:
-              - name
               - type
             properties:
-              name:
-                type: string
               type:
                 type: string
-              provider:
-                type: string
-            additionalProperties: true
+            additionalProperties:
+              type: string
     ConfigListremotesResponse:
       description: Names of configured remotes.
       content:
@@ -5571,6 +5567,18 @@ components:
         speedAvg:
           type: number
           description: Current speed in bytes per second as an exponentially weighted moving average.
+        srcFs:
+          type: string
+          description: Source remote or filesystem for this transfer.
+        dstFs:
+          type: string
+          description: Destination remote or filesystem for this transfer.
+        srcRemote:
+          type: string
+          description: Source path within srcFs.
+        dstRemote:
+          type: string
+          description: Destination path within dstFs.
       additionalProperties: true
     CoreStatsChecking:
       type: object
@@ -5605,8 +5613,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
     OperationsCopyfileRequest:
       type: object
       properties:
@@ -5628,11 +5634,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - srcFs
-        - srcRemote
-        - dstFs
-        - dstRemote
     OperationsCopyurlRequest:
       type: object
       properties:
@@ -5654,10 +5655,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
-        - remote
-        - url
     OperationsDeleteRequest:
       type: object
       properties:
@@ -5676,8 +5673,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
     OperationsDeletefileRequest:
       type: object
       properties:
@@ -5693,9 +5688,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
-        - remote
     OperationsFsinfoRequest:
       type: object
       properties:
@@ -5708,8 +5700,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
     OperationsHashsumRequest:
       type: object
       properties:
@@ -5731,9 +5721,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
-        - hashType
     OperationsHashsumfileRequest:
       type: object
       properties:
@@ -5758,10 +5745,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
-        - remote
-        - hashType
     OperationsMovefileRequest:
       type: object
       properties:
@@ -5783,11 +5766,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - srcFs
-        - srcRemote
-        - dstFs
-        - dstRemote
     OperationsPubliclinkRequest:
       type: object
       properties:
@@ -5809,9 +5787,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
-        - remote
     OperationsRmdirsRequest:
       type: object
       properties:
@@ -5830,9 +5805,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
-        - remote
     OperationsSettierRequest:
       type: object
       properties:
@@ -5845,8 +5817,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
     OperationsSettierfileRequest:
       type: object
       properties:
@@ -5862,9 +5832,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
-        - remote
     OperationsSizeRequest:
       type: object
       properties:
@@ -5877,8 +5844,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
     CoreBwlimitRequest:
       type: object
       properties:
@@ -5914,8 +5879,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - command
     CoreDuRequest:
       type: object
       properties:
@@ -5967,8 +5930,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - clear
     CorePidRequest:
       type: object
       properties:
@@ -6002,8 +5963,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - group
     CoreStatsResetRequest:
       type: object
       properties:
@@ -6040,8 +5999,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - rate
     DebugSetGcPercentRequest:
       type: object
       properties:
@@ -6054,8 +6011,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - gc-percent
     DebugSetMutexProfileFractionRequest:
       type: object
       properties:
@@ -6068,8 +6023,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - rate
     DebugSetSoftMemoryLimitRequest:
       type: object
       properties:
@@ -6082,8 +6035,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - mem-limit
     FscacheClearRequest:
       type: object
       properties:
@@ -6141,9 +6092,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
-        - mountPoint
     MountTypesRequest:
       type: object
       properties:
@@ -6165,8 +6113,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - mountPoint
     MountUnmountallRequest:
       type: object
       properties:
@@ -6222,8 +6168,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - command
     CacheExpireRequest:
       type: object
       properties:
@@ -6239,8 +6183,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - remote
     CacheFetchRequest:
       type: object
       properties:
@@ -6284,10 +6226,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - name
-        - parameters
-        - type
     ConfigDeleteRequest:
       type: object
       properties:
@@ -6300,8 +6238,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - name
     ConfigDumpRequest:
       type: object
       properties:
@@ -6323,8 +6259,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - name
     ConfigListremotesRequest:
       type: object
       properties:
@@ -6349,9 +6283,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - name
-        - parameters
     ConfigPathsRequest:
       type: object
       properties:
@@ -6382,8 +6313,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - path
     ConfigUnlockRequest:
       type: object
       properties:
@@ -6396,8 +6325,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - configPassword
     ConfigUpdateRequest:
       type: object
       properties:
@@ -6416,9 +6343,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - name
-        - parameters
     CoreVersionRequest:
       type: object
       properties:
@@ -6458,8 +6382,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - jobid
     JobStopRequest:
       type: object
       properties:
@@ -6469,8 +6391,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - jobid
     JobStopgroupRequest:
       type: object
       properties:
@@ -6480,8 +6400,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - group
     OperationsListRequest:
       type: object
       properties:
@@ -6532,9 +6450,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
-        - remote
     OperationsStatRequest:
       type: object
       properties:
@@ -6553,9 +6468,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
-        - remote
     OperationsAboutRequest:
       type: object
       properties:
@@ -6568,8 +6480,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
     OperationsPurgeRequest:
       type: object
       properties:
@@ -6591,9 +6501,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
-        - remote
     OperationsMkdirRequest:
       type: object
       properties:
@@ -6609,9 +6516,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
-        - remote
     OperationsRmdirRequest:
       type: object
       properties:
@@ -6627,9 +6531,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - fs
-        - remote
     OperationsCheckRequest:
       type: object
       properties:
@@ -6678,9 +6579,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - srcFs
-        - dstFs
     SyncSyncRequest:
       type: object
       properties:
@@ -6705,9 +6603,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - srcFs
-        - dstFs
     SyncCopyRequest:
       type: object
       properties:
@@ -6732,9 +6627,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - srcFs
-        - dstFs
     SyncMoveRequest:
       type: object
       properties:
@@ -6762,9 +6654,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - srcFs
-        - dstFs
     SyncBisyncRequest:
       type: object
       properties:
@@ -6834,9 +6723,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - path1
-        - path2
     OptionsBlocksRequest:
       type: object
       properties:
@@ -6982,10 +6868,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - type
-        - fs
-        - addr
       additionalProperties: true
     ServeStopRequest:
       type: object
@@ -6999,8 +6881,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - id
     ServeStopallRequest:
       type: object
       properties:
@@ -7095,9 +6975,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - id
-        - expiry
     VfsRefreshRequest:
       type: object
       properties:
@@ -7138,8 +7015,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - url
     PluginsctlGetPluginsForTypeRequest:
       type: object
       properties:
@@ -7185,8 +7060,6 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - name
     PluginsctlRemoveTestPluginRequest:
       type: object
       properties:
@@ -7199,5 +7072,3 @@ components:
         _async:
           type: boolean
           description: Run the command asynchronously. Returns a job id immediately.
-      required:
-        - name

@@ -3661,7 +3661,7 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyResponse"
+            "$ref": "#/components/responses/ServeTypesResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -4282,8 +4282,7 @@
         "description": "Remote name or path to clean up, for example `drive:`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_CopyfilePostSrcFsParam": {
         "name": "srcFs",
@@ -4291,8 +4290,7 @@
         "description": "Source remote name or path, such as `drive:` or `/` for the local filesystem.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_CopyfilePostSrcRemoteParam": {
         "name": "srcRemote",
@@ -4300,8 +4298,7 @@
         "description": "Path to the source object within `srcFs`, for example `dir/file.txt`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_CopyfilePostDstFsParam": {
         "name": "dstFs",
@@ -4309,8 +4306,7 @@
         "description": "Destination remote name or path, such as `drive2:` or `/` for local filesystem.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_CopyfilePostDstRemoteParam": {
         "name": "dstRemote",
@@ -4318,8 +4314,7 @@
         "description": "Target path within `dstFs` where the file should be written.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_CopyurlPostFsParam": {
         "name": "fs",
@@ -4327,8 +4322,7 @@
         "description": "Remote name or path that will receive the downloaded file, e.g. `drive:`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_CopyurlPostRemoteParam": {
         "name": "remote",
@@ -4336,8 +4330,7 @@
         "description": "Destination path within `fs` where the fetched object will be stored.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_CopyurlPostUrlParam": {
         "name": "url",
@@ -4345,8 +4338,7 @@
         "description": "Source URL to fetch the object from.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_CopyurlPostAutoFilenameParam": {
         "name": "autoFilename",
@@ -4362,8 +4354,7 @@
         "description": "Remote name or path whose contents should be removed.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_DeletefilePostFsParam": {
         "name": "fs",
@@ -4371,8 +4362,7 @@
         "description": "Remote name or path that contains the file to delete.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_DeletefilePostRemoteParam": {
         "name": "remote",
@@ -4380,8 +4370,7 @@
         "description": "Exact path to the file within `fs` that should be deleted.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_FsinfoPostFsParam": {
         "name": "fs",
@@ -4389,8 +4378,7 @@
         "description": "Remote name or path to inspect, e.g. `drive:`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_HashsumPostFsParam": {
         "name": "fs",
@@ -4398,8 +4386,7 @@
         "description": "Remote name or path to hash, such as `drive:` or `/`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_HashsumPostHashTypeParam": {
         "name": "hashType",
@@ -4407,8 +4394,7 @@
         "description": "Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_HashsumPostDownloadParam": {
         "name": "download",
@@ -4432,8 +4418,7 @@
         "description": "Remote name or path containing the file to hash.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_HashsumfilePostRemoteParam": {
         "name": "remote",
@@ -4441,8 +4426,7 @@
         "description": "Path to the specific file within `fs` to hash.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_HashsumfilePostHashTypeParam": {
         "name": "hashType",
@@ -4450,8 +4434,7 @@
         "description": "Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_HashsumfilePostDownloadParam": {
         "name": "download",
@@ -4475,8 +4458,7 @@
         "description": "Source remote name or path containing the file to move.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_MovefilePostSrcRemoteParam": {
         "name": "srcRemote",
@@ -4484,8 +4466,7 @@
         "description": "Path to the source object within `srcFs`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_MovefilePostDstFsParam": {
         "name": "dstFs",
@@ -4493,8 +4474,7 @@
         "description": "Destination remote name or path where the file will be moved.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_MovefilePostDstRemoteParam": {
         "name": "dstRemote",
@@ -4502,8 +4482,7 @@
         "description": "Destination path within `dstFs` for the moved object.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_PubliclinkPostFsParam": {
         "name": "fs",
@@ -4511,8 +4490,7 @@
         "description": "Remote name or path hosting the object for which to manage a public link.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_PubliclinkPostRemoteParam": {
         "name": "remote",
@@ -4520,8 +4498,7 @@
         "description": "Path within `fs` to the object for which to create or remove a public link.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_PubliclinkPostUnlinkParam": {
         "name": "unlink",
@@ -4545,8 +4522,7 @@
         "description": "Remote name or path to scan for empty directories.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_RmdirsPostRemoteParam": {
         "name": "remote",
@@ -4554,8 +4530,7 @@
         "description": "Path within `fs` whose empty subdirectories should be removed.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_RmdirsPostLeaveRootParam": {
         "name": "leaveRoot",
@@ -4571,8 +4546,7 @@
         "description": "Remote name or path whose storage class tier should be changed.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_SettierfilePostFsParam": {
         "name": "fs",
@@ -4580,8 +4554,7 @@
         "description": "Remote name or path that contains the object whose tier should change.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_SettierfilePostRemoteParam": {
         "name": "remote",
@@ -4589,8 +4562,7 @@
         "description": "Path within `fs` to the object whose storage class tier should be updated.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_SizePostFsParam": {
         "name": "fs",
@@ -4598,8 +4570,7 @@
         "description": "Remote name or path to measure aggregate size information for.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Core_BwlimitPostRateParam": {
         "name": "rate",
@@ -4615,8 +4586,7 @@
         "description": "Name of the rclone command to execute, for example `ls` or `lsf`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Core_CommandPostArgParam": {
         "name": "arg",
@@ -4661,8 +4631,7 @@
         "description": "Plain-text string to obscure for storage in the config file.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Core_QuitPostExitCodeParam": {
         "name": "exitCode",
@@ -4678,8 +4647,7 @@
         "description": "Stats group identifier to remove.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Core_StatsPostGroupParam": {
         "name": "group",
@@ -4719,8 +4687,7 @@
         "description": "Sampling interval in nanoseconds for blocking profile collection; use 1 to capture all events.",
         "schema": {
           "type": "integer"
-        },
-        "required": true
+        }
       },
       "Debug_SetGcPercentPostGcPercentParam": {
         "name": "gc-percent",
@@ -4728,8 +4695,7 @@
         "description": "Target percentage of newly allocated data to trigger garbage collection.",
         "schema": {
           "type": "integer"
-        },
-        "required": true
+        }
       },
       "Debug_SetMutexProfileFractionPostRateParam": {
         "name": "rate",
@@ -4737,8 +4703,7 @@
         "description": "Sampling fraction for mutex contention profiling; set to 0 to disable.",
         "schema": {
           "type": "integer"
-        },
-        "required": true
+        }
       },
       "Debug_SetSoftMemoryLimitPostMemLimitParam": {
         "name": "mem-limit",
@@ -4746,8 +4711,7 @@
         "description": "Soft memory limit for the Go runtime in bytes.",
         "schema": {
           "type": "integer"
-        },
-        "required": true
+        }
       },
       "Mount_MountPostFsParam": {
         "name": "fs",
@@ -4755,8 +4719,7 @@
         "description": "Remote path to mount, such as `drive:` or `remote:subdir`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Mount_MountPostMountPointParam": {
         "name": "mountPoint",
@@ -4764,8 +4727,7 @@
         "description": "Absolute local path where the remote should be mounted.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Mount_MountPostMountTypeParam": {
         "name": "mountType",
@@ -4797,8 +4759,7 @@
         "description": "Local mount point path to unmount.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Rc_NoopauthPostAdditionalParam": {
         "name": "params",
@@ -4828,8 +4789,7 @@
         "description": "Backend-specific command to invoke.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Backend_CommandPostFsParam": {
         "name": "fs",
@@ -4866,8 +4826,7 @@
         "description": "Remote path to expire from the cache, e.g. `remote:path/to/dir`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Cache_ExpirePostWithDataParam": {
         "name": "withData",
@@ -4902,8 +4861,7 @@
         "description": "Name of the new remote configuration.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Config_CreatePostParametersParam": {
         "name": "parameters",
@@ -4911,8 +4869,7 @@
         "description": "JSON object of configuration key/value pairs required for the remote.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Config_CreatePostTypeParam": {
         "name": "type",
@@ -4920,8 +4877,7 @@
         "description": "Backend type identifier, such as `drive`, `s3`, or `dropbox`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Config_CreatePostOptParam": {
         "name": "opt",
@@ -4937,8 +4893,7 @@
         "description": "Name of the remote configuration to delete.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Config_GetPostNameParam": {
         "name": "name",
@@ -4946,8 +4901,7 @@
         "description": "Name of the remote configuration to fetch.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Config_PasswordPostNameParam": {
         "name": "name",
@@ -4955,8 +4909,7 @@
         "description": "Name of the remote whose secrets should be updated.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Config_PasswordPostParametersParam": {
         "name": "parameters",
@@ -4964,8 +4917,7 @@
         "description": "JSON object of password answers, typically including `pass`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Config_SetpathPostPathParam": {
         "name": "path",
@@ -4973,8 +4925,7 @@
         "description": "Absolute path to the `rclone.conf` file that rclone should use.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Config_UnlockPostConfigPasswordParam": {
         "name": "configPassword",
@@ -4982,8 +4933,7 @@
         "description": "Password used to unlock an encrypted config file.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Config_UpdatePostNameParam": {
         "name": "name",
@@ -4991,8 +4941,7 @@
         "description": "Name of the remote configuration to update.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Config_UpdatePostParametersParam": {
         "name": "parameters",
@@ -5000,8 +4949,7 @@
         "description": "JSON object of configuration key/value pairs to apply to the remote.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Config_UpdatePostOptParam": {
         "name": "opt",
@@ -5017,8 +4965,7 @@
         "description": "Numeric identifier of the job to query, as returned from an async call.",
         "schema": {
           "type": "number"
-        },
-        "required": true
+        }
       },
       "Job_StopPostJobidParam": {
         "name": "jobid",
@@ -5026,8 +4973,7 @@
         "description": "Numeric identifier of the job to cancel.",
         "schema": {
           "type": "number"
-        },
-        "required": true
+        }
       },
       "Job_StopgroupPostGroupParam": {
         "name": "group",
@@ -5035,8 +4981,7 @@
         "description": "Stats group name whose active jobs should be stopped.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_ListPostFsParam": {
         "name": "fs",
@@ -5044,8 +4989,7 @@
         "description": "Remote name or path to list, for example `drive:`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_ListPostRemoteParam": {
         "name": "remote",
@@ -5053,8 +4997,7 @@
         "description": "Directory path within `fs` to list; leave empty to target the root.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_ListPostOptParam": {
         "name": "opt",
@@ -5155,8 +5098,7 @@
         "description": "Remote name or path that contains the item to inspect.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_StatPostRemoteParam": {
         "name": "remote",
@@ -5164,8 +5106,7 @@
         "description": "Path to the file or directory within `fs` to describe.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_StatPostOptParam": {
         "name": "opt",
@@ -5181,8 +5122,7 @@
         "description": "Remote name or path to query for capacity information.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_PurgePostFsParam": {
         "name": "fs",
@@ -5190,8 +5130,7 @@
         "description": "Remote name or path from which to remove all contents.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_PurgePostRemoteParam": {
         "name": "remote",
@@ -5199,8 +5138,7 @@
         "description": "Path within `fs` whose contents should be purged.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_UploadfilePostFsParam": {
         "name": "fs",
@@ -5208,8 +5146,7 @@
         "description": "Remote name or path where the uploaded file should be stored.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_UploadfilePostRemoteParam": {
         "name": "remote",
@@ -5217,8 +5154,7 @@
         "description": "Destination path within `fs` for the uploaded file.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_MkdirPostFsParam": {
         "name": "fs",
@@ -5226,8 +5162,7 @@
         "description": "Remote name or path in which to create a directory.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_MkdirPostRemoteParam": {
         "name": "remote",
@@ -5235,8 +5170,7 @@
         "description": "Directory path within `fs` to create.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_RmdirPostFsParam": {
         "name": "fs",
@@ -5244,8 +5178,7 @@
         "description": "Remote name or path containing the directory to remove.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_RmdirPostRemoteParam": {
         "name": "remote",
@@ -5253,8 +5186,7 @@
         "description": "Directory path within `fs` to delete.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_CheckPostSrcFsParam": {
         "name": "srcFs",
@@ -5262,8 +5194,7 @@
         "description": "Source remote name or path to verify, e.g. `drive:`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_CheckPostDstFsParam": {
         "name": "dstFs",
@@ -5271,8 +5202,7 @@
         "description": "Destination remote name or path that should match the source.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Operations_CheckPostDownloadParam": {
         "name": "download",
@@ -5368,8 +5298,7 @@
         "description": "Source remote path to sync from, e.g. `drive:src`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Sync_SyncPostDstFsParam": {
         "name": "dstFs",
@@ -5377,8 +5306,7 @@
         "description": "Destination remote path to sync to, e.g. `drive:dst`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Sync_SyncPostCreateEmptySrcDirsParam": {
         "name": "createEmptySrcDirs",
@@ -5394,8 +5322,7 @@
         "description": "Source remote path to copy from.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Sync_CopyPostDstFsParam": {
         "name": "dstFs",
@@ -5403,8 +5330,7 @@
         "description": "Destination remote path to copy to.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Sync_CopyPostCreateEmptySrcDirsParam": {
         "name": "createEmptySrcDirs",
@@ -5420,8 +5346,7 @@
         "description": "Source remote path whose contents will be moved.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Sync_MovePostDstFsParam": {
         "name": "dstFs",
@@ -5429,8 +5354,7 @@
         "description": "Destination remote path that will receive moved files.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Sync_MovePostCreateEmptySrcDirsParam": {
         "name": "createEmptySrcDirs",
@@ -5454,8 +5378,7 @@
         "description": "First remote directory, e.g. `drive:path1`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Sync_BisyncPostPath2Param": {
         "name": "path2",
@@ -5463,8 +5386,7 @@
         "description": "Second remote directory, e.g. `drive:path2`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Sync_BisyncPostDryRunParam": {
         "name": "dryRun",
@@ -5618,30 +5540,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostFilterParam": {
@@ -5652,30 +5551,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostFtpParam": {
@@ -5686,30 +5562,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostMainParam": {
@@ -5720,30 +5573,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostHttpParam": {
@@ -5754,30 +5584,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostLogParam": {
@@ -5788,30 +5595,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostMountParam": {
@@ -5822,30 +5606,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostNfsParam": {
@@ -5856,30 +5617,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostProxyParam": {
@@ -5890,30 +5628,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostRcParam": {
@@ -5924,30 +5639,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostResticParam": {
@@ -5958,30 +5650,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostS3Param": {
@@ -5992,30 +5661,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostSftpParam": {
@@ -6026,30 +5672,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostVfsParam": {
@@ -6060,30 +5683,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Options_SetPostWebdavParam": {
@@ -6094,30 +5694,7 @@
         "explode": true,
         "schema": {
           "type": "object",
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "type": "object",
-                "additionalProperties": {}
-              }
-            ]
-          }
+          "additionalProperties": true
         }
       },
       "Serve_StartPostTypeParam": {
@@ -6126,8 +5703,7 @@
         "description": "Type of server to start (e.g. `http`, `webdav`, `ftp`, `sftp`).",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Serve_StartPostFsParam": {
         "name": "fs",
@@ -6135,8 +5711,7 @@
         "description": "Remote path that will be served.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Serve_StartPostAddrParam": {
         "name": "addr",
@@ -6144,8 +5719,7 @@
         "description": "Address and port to bind the server to, such as `:5572` or `localhost:8080`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Serve_StartPostAdditionalParam": {
         "name": "params",
@@ -6164,8 +5738,7 @@
         "description": "Identifier of the running serve instance returned by `serve/start`.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Vfs_ForgetPostFsParam": {
         "name": "fs",
@@ -6240,8 +5813,7 @@
         "description": "Queue item ID as returned by `vfs/queue`.",
         "schema": {
           "type": "integer"
-        },
-        "required": true
+        }
       },
       "Vfs_QueueSetExpiryPostExpiryParam": {
         "name": "expiry",
@@ -6249,8 +5821,7 @@
         "description": "New eligibility time in seconds (may be negative for immediate upload).",
         "schema": {
           "type": "number"
-        },
-        "required": true
+        }
       },
       "Vfs_QueueSetExpiryPostRelativeParam": {
         "name": "relative",
@@ -6301,8 +5872,7 @@
         "description": "Repository URL of the plugin to install.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Pluginsctl_GetPluginsForTypePostTypeParam": {
         "name": "type",
@@ -6326,8 +5896,7 @@
         "description": "Name of the plugin to uninstall.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       },
       "Pluginsctl_RemoveTestPluginPostNameParam": {
         "name": "name",
@@ -6335,8 +5904,7 @@
         "description": "Name of the test plugin to uninstall.",
         "schema": {
           "type": "string"
-        },
-        "required": true
+        }
       }
     },
     "responses": {
@@ -6383,7 +5951,34 @@
           "application/json": {
             "schema": {
               "type": "object",
+              "properties": {
+                "jobid": {
+                  "type": "integer",
+                  "description": "Job ID returned when _async=true."
+                }
+              },
               "additionalProperties": true
+            }
+          }
+        }
+      },
+      "ServeTypesResponse": {
+        "description": "Supported rclone serve protocols.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "types"
+              ]
             }
           }
         }
@@ -6958,21 +6553,16 @@
             "schema": {
               "type": "object",
               "required": [
-                "name",
                 "type"
               ],
               "properties": {
-                "name": {
-                  "type": "string"
-                },
                 "type": {
-                  "type": "string"
-                },
-                "provider": {
                   "type": "string"
                 }
               },
-              "additionalProperties": true
+              "additionalProperties": {
+                "type": "string"
+              }
             }
           }
         }
@@ -9268,6 +8858,22 @@
           "speedAvg": {
             "type": "number",
             "description": "Current speed in bytes per second as an exponentially weighted moving average."
+          },
+          "srcFs": {
+            "type": "string",
+            "description": "Source remote or filesystem for this transfer."
+          },
+          "dstFs": {
+            "type": "string",
+            "description": "Destination remote or filesystem for this transfer."
+          },
+          "srcRemote": {
+            "type": "string",
+            "description": "Source path within srcFs."
+          },
+          "dstRemote": {
+            "type": "string",
+            "description": "Destination path within dstFs."
           }
         },
         "additionalProperties": true
@@ -9294,16 +8900,12 @@
       "RcNoopRequest": {
         "type": "object",
         "properties": {
-          "params": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Additional arbitrary parameters allowed."
-          },
           "_async": {
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        }
+        },
+        "additionalProperties": true
       },
       "OperationsCleanupRequest": {
         "type": "object",
@@ -9320,10 +8922,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs"
-        ]
+        }
       },
       "OperationsCopyfileRequest": {
         "type": "object",
@@ -9352,13 +8951,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "srcFs",
-          "srcRemote",
-          "dstFs",
-          "dstRemote"
-        ]
+        }
       },
       "OperationsCopyurlRequest": {
         "type": "object",
@@ -9387,12 +8980,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs",
-          "remote",
-          "url"
-        ]
+        }
       },
       "OperationsDeleteRequest": {
         "type": "object",
@@ -9417,10 +9005,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs"
-        ]
+        }
       },
       "OperationsDeletefileRequest": {
         "type": "object",
@@ -9441,11 +9026,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs",
-          "remote"
-        ]
+        }
       },
       "OperationsFsinfoRequest": {
         "type": "object",
@@ -9462,10 +9043,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs"
-        ]
+        }
       },
       "OperationsHashsumRequest": {
         "type": "object",
@@ -9494,11 +9072,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs",
-          "hashType"
-        ]
+        }
       },
       "OperationsHashsumfileRequest": {
         "type": "object",
@@ -9531,12 +9105,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs",
-          "remote",
-          "hashType"
-        ]
+        }
       },
       "OperationsMovefileRequest": {
         "type": "object",
@@ -9565,13 +9134,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "srcFs",
-          "srcRemote",
-          "dstFs",
-          "dstRemote"
-        ]
+        }
       },
       "OperationsPubliclinkRequest": {
         "type": "object",
@@ -9600,11 +9163,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs",
-          "remote"
-        ]
+        }
       },
       "OperationsRmdirsRequest": {
         "type": "object",
@@ -9629,11 +9188,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs",
-          "remote"
-        ]
+        }
       },
       "OperationsSettierRequest": {
         "type": "object",
@@ -9650,10 +9205,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs"
-        ]
+        }
       },
       "OperationsSettierfileRequest": {
         "type": "object",
@@ -9674,11 +9226,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs",
-          "remote"
-        ]
+        }
       },
       "OperationsSizeRequest": {
         "type": "object",
@@ -9695,10 +9243,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs"
-        ]
+        }
       },
       "CoreBwlimitRequest": {
         "type": "object",
@@ -9747,10 +9292,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "command"
-        ]
+        }
       },
       "CoreDuRequest": {
         "type": "object",
@@ -9823,10 +9365,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "clear"
-        ]
+        }
       },
       "CorePidRequest": {
         "type": "object",
@@ -9873,10 +9412,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "group"
-        ]
+        }
       },
       "CoreStatsResetRequest": {
         "type": "object",
@@ -9927,10 +9463,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "rate"
-        ]
+        }
       },
       "DebugSetGcPercentRequest": {
         "type": "object",
@@ -9947,10 +9480,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "gc-percent"
-        ]
+        }
       },
       "DebugSetMutexProfileFractionRequest": {
         "type": "object",
@@ -9967,10 +9497,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "rate"
-        ]
+        }
       },
       "DebugSetSoftMemoryLimitRequest": {
         "type": "object",
@@ -9987,10 +9514,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "mem-limit"
-        ]
+        }
       },
       "FscacheClearRequest": {
         "type": "object",
@@ -10070,11 +9594,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs",
-          "mountPoint"
-        ]
+        }
       },
       "MountTypesRequest": {
         "type": "object",
@@ -10104,10 +9624,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "mountPoint"
-        ]
+        }
       },
       "MountUnmountallRequest": {
         "type": "object",
@@ -10125,30 +9642,22 @@
       "RcNoopAuthRequest": {
         "type": "object",
         "properties": {
-          "params": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Additional arbitrary parameters allowed."
-          },
           "_async": {
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        }
+        },
+        "additionalProperties": true
       },
       "RcErrorRequest": {
         "type": "object",
         "properties": {
-          "params": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Additional arbitrary parameters allowed."
-          },
           "_async": {
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        }
+        },
+        "additionalProperties": true
       },
       "RcListRequest": {
         "type": "object",
@@ -10193,10 +9702,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "command"
-        ]
+        }
       },
       "CacheExpireRequest": {
         "type": "object",
@@ -10217,10 +9723,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "remote"
-        ]
+        }
       },
       "CacheFetchRequest": {
         "type": "object",
@@ -10228,11 +9731,6 @@
           "chunks": {
             "type": "string",
             "description": "Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch."
-          },
-          "params": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Additional arbitrary parameters allowed."
           },
           "_group": {
             "type": "string",
@@ -10242,7 +9740,8 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        }
+        },
+        "additionalProperties": true
       },
       "CacheStatsRequest": {
         "type": "object",
@@ -10284,12 +9783,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "name",
-          "parameters",
-          "type"
-        ]
+        }
       },
       "ConfigDeleteRequest": {
         "type": "object",
@@ -10306,10 +9800,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "name"
-        ]
+        }
       },
       "ConfigDumpRequest": {
         "type": "object",
@@ -10339,10 +9830,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "name"
-        ]
+        }
       },
       "ConfigListremotesRequest": {
         "type": "object",
@@ -10376,11 +9864,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "name",
-          "parameters"
-        ]
+        }
       },
       "ConfigPathsRequest": {
         "type": "object",
@@ -10423,10 +9907,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "path"
-        ]
+        }
       },
       "ConfigUnlockRequest": {
         "type": "object",
@@ -10443,10 +9924,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "configPassword"
-        ]
+        }
       },
       "ConfigUpdateRequest": {
         "type": "object",
@@ -10471,11 +9949,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "name",
-          "parameters"
-        ]
+        }
       },
       "CoreVersionRequest": {
         "type": "object",
@@ -10531,10 +10005,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "jobid"
-        ]
+        }
       },
       "JobStopRequest": {
         "type": "object",
@@ -10547,10 +10018,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "jobid"
-        ]
+        }
       },
       "JobStopgroupRequest": {
         "type": "object",
@@ -10563,10 +10031,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "group"
-        ]
+        }
       },
       "OperationsListRequest": {
         "type": "object",
@@ -10634,11 +10099,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs",
-          "remote"
-        ]
+        }
       },
       "OperationsStatRequest": {
         "type": "object",
@@ -10663,11 +10124,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs",
-          "remote"
-        ]
+        }
       },
       "OperationsAboutRequest": {
         "type": "object",
@@ -10684,10 +10141,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs"
-        ]
+        }
       },
       "OperationsPurgeRequest": {
         "type": "object",
@@ -10716,11 +10170,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs",
-          "remote"
-        ]
+        }
       },
       "OperationsMkdirRequest": {
         "type": "object",
@@ -10741,11 +10191,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs",
-          "remote"
-        ]
+        }
       },
       "OperationsRmdirRequest": {
         "type": "object",
@@ -10766,11 +10212,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "fs",
-          "remote"
-        ]
+        }
       },
       "OperationsCheckRequest": {
         "type": "object",
@@ -10835,11 +10277,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "srcFs",
-          "dstFs"
-        ]
+        }
       },
       "SyncSyncRequest": {
         "type": "object",
@@ -10872,11 +10310,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "srcFs",
-          "dstFs"
-        ]
+        }
       },
       "SyncCopyRequest": {
         "type": "object",
@@ -10909,11 +10343,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "srcFs",
-          "dstFs"
-        ]
+        }
       },
       "SyncMoveRequest": {
         "type": "object",
@@ -10950,11 +10380,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "srcFs",
-          "dstFs"
-        ]
+        }
       },
       "SyncBisyncRequest": {
         "type": "object",
@@ -11047,11 +10473,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "path1",
-          "path2"
-        ]
+        }
       },
       "OptionsBlocksRequest": {
         "type": "object",
@@ -11105,422 +10527,77 @@
         "properties": {
           "dlna": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `dlna` option block."
           },
           "filter": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `filter` option block."
           },
           "ftp": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `ftp` option block."
           },
           "main": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `main` option block."
           },
           "http": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `http` option block."
           },
           "log": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `log` option block."
           },
           "mount": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `mount` option block."
           },
           "nfs": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `nfs` option block."
           },
           "proxy": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `proxy` option block."
           },
           "rc": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `rc` option block."
           },
           "restic": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `restic` option block."
           },
           "s3": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `s3` option block."
           },
           "sftp": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `sftp` option block."
           },
           "vfs": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `vfs` option block."
           },
           "webdav": {
             "type": "object",
-            "additionalProperties": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "array",
-                  "items": {}
-                },
-                {
-                  "type": "object",
-                  "additionalProperties": {}
-                }
-              ]
-            },
+            "additionalProperties": true,
             "description": "Overrides for the `webdav` option block."
           },
           "_group": {
@@ -11575,11 +10652,6 @@
             "type": "string",
             "description": "Address and port to bind the server to, such as `:5572` or `localhost:8080`."
           },
-          "params": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Additional arbitrary parameters allowed."
-          },
           "_config": {
             "type": "string",
             "description": "JSON encoded config overrides applied for this call only."
@@ -11597,11 +10669,7 @@
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
         },
-        "required": [
-          "type",
-          "fs",
-          "addr"
-        ]
+        "additionalProperties": true
       },
       "ServeStopRequest": {
         "type": "object",
@@ -11618,10 +10686,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "id"
-        ]
+        }
       },
       "ServeStopallRequest": {
         "type": "object",
@@ -11656,11 +10721,6 @@
             "type": "string",
             "description": "Optional VFS identifier to target; required when more than one VFS is active."
           },
-          "params": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Additional arbitrary parameters allowed."
-          },
           "_group": {
             "type": "string",
             "description": "Assign the request to a custom stats group."
@@ -11669,7 +10729,8 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        }
+        },
+        "additionalProperties": true
       },
       "VfsListRequest": {
         "type": "object",
@@ -11757,11 +10818,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "id",
-          "expiry"
-        ]
+        }
       },
       "VfsRefreshRequest": {
         "type": "object",
@@ -11774,11 +10831,6 @@
             "type": "boolean",
             "description": "Set to true to refresh entire directory trees."
           },
-          "params": {
-            "type": "object",
-            "additionalProperties": true,
-            "description": "Additional arbitrary parameters allowed."
-          },
           "_group": {
             "type": "string",
             "description": "Assign the request to a custom stats group."
@@ -11787,7 +10839,8 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        }
+        },
+        "additionalProperties": true
       },
       "VfsStatsRequest": {
         "type": "object",
@@ -11821,10 +10874,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "url"
-        ]
+        }
       },
       "PluginsctlGetPluginsForTypeRequest": {
         "type": "object",
@@ -11888,10 +10938,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "name"
-        ]
+        }
       },
       "PluginsctlRemoveTestPluginRequest": {
         "type": "object",
@@ -11908,10 +10955,7 @@
             "type": "boolean",
             "description": "Run the command asynchronously. Returns a job id immediately."
           }
-        },
-        "required": [
-          "name"
-        ]
+        }
       }
     }
   }
