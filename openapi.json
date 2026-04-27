@@ -764,6 +764,42 @@
         "operationId": "coreCommand"
       }
     },
+    "/core/disks": {
+      "post": {
+        "summary": "List locally accessible paths",
+        "description": "Returns a list of locally accessible paths including mount points, user directories, and removable volumes.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/GlobalGroupParam"
+          },
+          {
+            "$ref": "#/components/parameters/GlobalAsyncParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreDisksRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CoreDisksResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreDisks"
+      }
+    },
     "/core/du": {
       "post": {
         "summary": "Report disk usage",
@@ -6211,6 +6247,28 @@
           }
         }
       },
+      "CoreDisksResponse": {
+        "description": "Locally accessible paths including mount points, user directories, and removable volumes.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "disks": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Accessible local paths such as disk mount points, user home folders, and removable volumes."
+                }
+              },
+              "required": [
+                "disks"
+              ]
+            }
+          }
+        }
+      },
       "CoreDuResponse": {
         "description": "Disk usage summary for the requested directory.",
         "content": {
@@ -10947,6 +11005,19 @@
             "type": "string",
             "description": "Name of the test plugin to uninstall."
           },
+          "_group": {
+            "type": "string",
+            "description": "Assign the request to a custom stats group."
+          },
+          "_async": {
+            "type": "boolean",
+            "description": "Run the command asynchronously. Returns a job id immediately."
+          }
+        }
+      },
+      "CoreDisksRequest": {
+        "type": "object",
+        "properties": {
           "_group": {
             "type": "string",
             "description": "Assign the request to a custom stats group."

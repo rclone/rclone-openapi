@@ -344,6 +344,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/core/disks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * List locally accessible paths
+         * @description Returns a list of locally accessible paths including mount points, user directories, and removable volumes.
+         */
+        post: operations["coreDisks"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/core/du": {
         parameters: {
             query?: never;
@@ -3103,6 +3123,12 @@ export interface components {
             /** @description Run the command asynchronously. Returns a job id immediately. */
             _async?: boolean;
         };
+        CoreDisksRequest: {
+            /** @description Assign the request to a custom stats group. */
+            _group?: string;
+            /** @description Run the command asynchronously. Returns a job id immediately. */
+            _async?: boolean;
+        };
     };
     responses: {
         /** @description Any error response (HTTP 4xx/5xx) */
@@ -3279,6 +3305,18 @@ export interface components {
                     error: boolean;
                     result?: string | null;
                     returnType?: string | null;
+                };
+            };
+        };
+        /** @description Locally accessible paths including mount points, user directories, and removable volumes. */
+        CoreDisksResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    /** @description Accessible local paths such as disk mount points, user home folders, and removable volumes. */
+                    disks: string[];
                 };
             };
         };
@@ -5119,6 +5157,29 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["CoreCommandResponse"];
+            "4XX": components["responses"]["RcError"];
+            "5XX": components["responses"]["RcError"];
+        };
+    };
+    coreDisks: {
+        parameters: {
+            query?: {
+                /** @description Assign the request to a custom stats group. */
+                _group?: components["parameters"]["GlobalGroupParam"];
+                /** @description Run the command asynchronously. Returns a job id immediately. */
+                _async?: components["parameters"]["GlobalAsyncParam"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CoreDisksRequest"];
+            };
+        };
+        responses: {
+            200: components["responses"]["CoreDisksResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
