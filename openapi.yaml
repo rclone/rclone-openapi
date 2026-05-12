@@ -1549,8 +1549,7 @@ paths:
         description: Multipart form payload containing one or more files to upload.
         content:
           multipart/form-data:
-            schema:
-              nullable: true
+            schema: {}
       responses:
         "200":
           $ref: "#/components/responses/EmptyObjectResponse"
@@ -3320,7 +3319,7 @@ components:
       description: Overrides for the `dlna` option block.
       style: deepObject
       explode: true
-      schema: &a1
+      schema:
         type: object
         additionalProperties: true
     Options_SetPostFilterParam:
@@ -3329,98 +3328,126 @@ components:
       description: Overrides for the `filter` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Options_SetPostFtpParam:
       name: ftp
       in: query
       description: Overrides for the `ftp` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Options_SetPostMainParam:
       name: main
       in: query
       description: Overrides for the `main` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Options_SetPostHttpParam:
       name: http
       in: query
       description: Overrides for the `http` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Options_SetPostLogParam:
       name: log
       in: query
       description: Overrides for the `log` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Options_SetPostMountParam:
       name: mount
       in: query
       description: Overrides for the `mount` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Options_SetPostNfsParam:
       name: nfs
       in: query
       description: Overrides for the `nfs` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Options_SetPostProxyParam:
       name: proxy
       in: query
       description: Overrides for the `proxy` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Options_SetPostRcParam:
       name: rc
       in: query
       description: Overrides for the `rc` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Options_SetPostResticParam:
       name: restic
       in: query
       description: Overrides for the `restic` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Options_SetPostS3Param:
       name: s3
       in: query
       description: Overrides for the `s3` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Options_SetPostSftpParam:
       name: sftp
       in: query
       description: Overrides for the `sftp` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Options_SetPostVfsParam:
       name: vfs
       in: query
       description: Overrides for the `vfs` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Options_SetPostWebdavParam:
       name: webdav
       in: query
       description: Overrides for the `webdav` option block.
       style: deepObject
       explode: true
-      schema: *a1
+      schema:
+        type: object
+        additionalProperties: true
     Serve_StartPostTypeParam:
       name: type
       in: query
@@ -3645,8 +3672,7 @@ components:
         application/json:
           schema:
             type: object
-            additionalProperties:
-              nullable: true
+            additionalProperties: {}
     OperationsFsinfoResponse:
       description: Capabilities, supported hashes, and metadata for the specified remote.
       content:
@@ -3663,8 +3689,9 @@ components:
                 items:
                   type: string
               MetadataInfo:
-                type: object
-                nullable: true
+                type:
+                  - object
+                  - "null"
                 additionalProperties: true
               Name:
                 type: string
@@ -3772,11 +3799,13 @@ components:
               error:
                 type: boolean
               result:
-                type: string
-                nullable: true
+                type:
+                  - string
+                  - "null"
               returnType:
-                type: string
-                nullable: true
+                type:
+                  - string
+                  - "null"
             required:
               - error
     CoreDisksResponse:
@@ -4000,7 +4029,6 @@ components:
             type: object
             properties:
               result:
-                nullable: true
                 description: Backend command result payload
             additionalProperties: true
     ConfigDumpResponse:
@@ -4145,8 +4173,9 @@ components:
               errors:
                 type: number
               eta:
-                type: number
-                nullable: true
+                type:
+                  - number
+                  - "null"
               fatalError:
                 type: boolean
               lastError:
@@ -4267,10 +4296,8 @@ components:
                 description: True if the job completed successfully.
               output:
                 description: Synchronous-style output payload when available.
-                nullable: true
               progress:
                 description: Progress measurements supplied by the underlying command.
-                nullable: true
             required:
               - finished
               - duration
@@ -4411,8 +4438,7 @@ components:
                       description: Encrypted path when using crypt remotes.
                     Metadata:
                       type: object
-                      additionalProperties:
-                        nullable: true
+                      additionalProperties: {}
                       description: Backend-provided metadata map.
             required:
               - list
@@ -4424,8 +4450,9 @@ components:
             type: object
             properties:
               item:
-                type: object
-                nullable: true
+                type:
+                  - object
+                  - "null"
                 properties:
                   Path:
                     type: string
@@ -4470,8 +4497,7 @@ components:
                     description: Encrypted path when using crypt remotes.
                   Metadata:
                     type: object
-                    additionalProperties:
-                      nullable: true
+                    additionalProperties: {}
                     description: Backend-provided metadata map.
                 required:
                   - Path
@@ -4587,25 +4613,70 @@ components:
               - vfs
               - webdav
             properties:
-              dlna: &a2
+              dlna:
                 type: array
                 items:
                   $ref: "#/components/schemas/OptionsInfoOption"
-              filter: *a2
-              ftp: *a2
-              http: *a2
-              log: *a2
-              main: *a2
-              mount: *a2
-              nfs: *a2
-              proxy: *a2
-              rc: *a2
-              restic: *a2
-              s3: *a2
-              sftp: *a2
-              vfs: *a2
-              webdav: *a2
-            additionalProperties: *a2
+              filter:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+              ftp:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+              http:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+              log:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+              main:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+              mount:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+              nfs:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+              proxy:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+              rc:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+              restic:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+              s3:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+              sftp:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+              vfs:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+              webdav:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OptionsInfoOption"
+            additionalProperties:
+              type: array
+              items:
+                $ref: "#/components/schemas/OptionsInfoOption"
     OptionsLocalResponse:
       description: Effective option values for the current request, separated into config and filter sections.
       content:
@@ -4665,17 +4736,17 @@ components:
                   DeleteMode:
                     type: number
                   DisableFeatures:
-                    type: string
-                    format: "null"
-                    nullable: true
+                    type:
+                      - string
+                      - "null"
                   DisableHTTP2:
                     type: boolean
                   DisableHTTPKeepAlives:
                     type: boolean
                   DownloadHeaders:
-                    type: string
-                    format: "null"
-                    nullable: true
+                    type:
+                      - string
+                      - "null"
                   DryRun:
                     type: boolean
                   Dump:
@@ -4691,9 +4762,9 @@ components:
                   FsCacheExpireInterval:
                     type: number
                   Headers:
-                    type: string
-                    format: "null"
-                    nullable: true
+                    type:
+                      - string
+                      - "null"
                   HumanReadable:
                     type: boolean
                   IgnoreCaseSync:
@@ -4743,13 +4814,13 @@ components:
                   Metadata:
                     type: boolean
                   MetadataMapper:
-                    type: string
-                    format: "null"
-                    nullable: true
+                    type:
+                      - string
+                      - "null"
                   MetadataSet:
-                    type: string
-                    format: "null"
-                    nullable: true
+                    type:
+                      - string
+                      - "null"
                   ModifyWindow:
                     type: number
                   MultiThreadChunkSize:
@@ -4781,9 +4852,9 @@ components:
                   PartialSuffix:
                     type: string
                   PasswordCommand:
-                    type: string
-                    format: "null"
-                    nullable: true
+                    type:
+                      - string
+                      - "null"
                   Progress:
                     type: boolean
                   ProgressTerminalTitle:
@@ -4833,9 +4904,9 @@ components:
                   UpdateOlder:
                     type: boolean
                   UploadHeaders:
-                    type: string
-                    format: "null"
-                    nullable: true
+                    type:
+                      - string
+                      - "null"
                   UseJSONLog:
                     type: boolean
                   UseListR:
@@ -5195,8 +5266,9 @@ components:
                 type: integer
                 description: Number of active references to the VFS.
               diskCache:
-                type: object
-                nullable: true
+                type:
+                  - object
+                  - "null"
                 additionalProperties: true
                 description: Disk cache metrics when caching is enabled.
               metadataCache:
@@ -5309,22 +5381,24 @@ components:
         path:
           type: string
         input:
-          type: object
-          nullable: true
-          additionalProperties:
-            nullable: true
+          type:
+            - object
+            - "null"
+          additionalProperties: {}
           description: Original request parameters echoed for debugging.
     ConfigProvider:
       type: object
       properties:
         Aliases:
-          type: array
-          nullable: true
+          type:
+            - array
+            - "null"
           items:
             type: string
         CommandHelp:
-          type: array
-          nullable: true
+          type:
+            - array
+            - "null"
           items:
             $ref: "#/components/schemas/ConfigProviderCommandHelp"
         Description:
@@ -5357,8 +5431,9 @@ components:
         Name:
           type: string
         Opts:
-          type: object
-          nullable: true
+          type:
+            - object
+            - "null"
           additionalProperties: true
         Short:
           type: string
@@ -5369,8 +5444,9 @@ components:
         Help:
           type: string
         System:
-          type: object
-          nullable: true
+          type:
+            - object
+            - "null"
           additionalProperties:
             $ref: "#/components/schemas/ConfigProviderMetadataSystemEntry"
       additionalProperties: true
@@ -5426,10 +5502,10 @@ components:
                 - Valid
               additionalProperties: false
         Value:
-          nullable: true
           anyOf:
             - type: boolean
             - type: number
+            - type: "null"
         Hide:
           type: integer
         Required:
@@ -5581,8 +5657,9 @@ components:
           type: number
           description: Bytes transferred so far for this object.
         eta:
-          type: number
-          nullable: true
+          type:
+            - number
+            - "null"
           description: Estimated seconds remaining, when available.
         group:
           type: string

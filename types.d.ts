@@ -2019,7 +2019,7 @@ export interface components {
                 Value: boolean;
                 Valid: boolean;
             };
-            Value: (boolean | number) | null;
+            Value: boolean | number | null;
             Hide: number;
             Required: boolean;
             IsPassword: boolean;
@@ -3914,11 +3914,9 @@ export interface components {
                         DataRateUnit: string;
                         DefaultTime: string;
                         DeleteMode: number;
-                        /** Format: null */
                         DisableFeatures: string | null;
                         DisableHTTP2: boolean;
                         DisableHTTPKeepAlives: boolean;
-                        /** Format: null */
                         DownloadHeaders: string | null;
                         DryRun: boolean;
                         Dump: string;
@@ -3927,7 +3925,6 @@ export interface components {
                         FixCase: boolean;
                         FsCacheExpireDuration: number;
                         FsCacheExpireInterval: number;
-                        /** Format: null */
                         Headers: string | null;
                         HumanReadable: boolean;
                         IgnoreCaseSync: boolean;
@@ -3953,9 +3950,7 @@ export interface components {
                         MaxStatsGroups: number;
                         MaxTransfer: number;
                         Metadata: boolean;
-                        /** Format: null */
                         MetadataMapper: string | null;
-                        /** Format: null */
                         MetadataSet: string | null;
                         ModifyWindow: number;
                         MultiThreadChunkSize: number;
@@ -3972,7 +3967,6 @@ export interface components {
                         NoUpdateModTime: boolean;
                         OrderBy: string;
                         PartialSuffix: string;
-                        /** Format: null */
                         PasswordCommand: string | null;
                         Progress: boolean;
                         ProgressTerminalTitle: boolean;
@@ -3998,7 +3992,6 @@ export interface components {
                         TrafficClass: number;
                         Transfers: number;
                         UpdateOlder: boolean;
-                        /** Format: null */
                         UploadHeaders: string | null;
                         UseJSONLog: boolean;
                         UseListR: boolean;

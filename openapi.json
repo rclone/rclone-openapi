@@ -2797,9 +2797,7 @@
           "description": "Multipart form payload containing one or more files to upload.",
           "content": {
             "multipart/form-data": {
-              "schema": {
-                "nullable": true
-              }
+              "schema": {}
             }
           }
         },
@@ -6041,9 +6039,7 @@
           "application/json": {
             "schema": {
               "type": "object",
-              "additionalProperties": {
-                "nullable": true
-              }
+              "additionalProperties": {}
             }
           }
         }
@@ -6068,8 +6064,10 @@
                   }
                 },
                 "MetadataInfo": {
-                  "type": "object",
-                  "nullable": true,
+                  "type": [
+                    "object",
+                    "null"
+                  ],
                   "additionalProperties": true
                 },
                 "Name": {
@@ -6232,12 +6230,16 @@
                   "type": "boolean"
                 },
                 "result": {
-                  "type": "string",
-                  "nullable": true
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 },
                 "returnType": {
-                  "type": "string",
-                  "nullable": true
+                  "type": [
+                    "string",
+                    "null"
+                  ]
                 }
               },
               "required": [
@@ -6579,7 +6581,6 @@
               "type": "object",
               "properties": {
                 "result": {
-                  "nullable": true,
                   "description": "Backend command result payload"
                 }
               },
@@ -6794,8 +6795,10 @@
                   "type": "number"
                 },
                 "eta": {
-                  "type": "number",
-                  "nullable": true
+                  "type": [
+                    "number",
+                    "null"
+                  ]
                 },
                 "fatalError": {
                   "type": "boolean"
@@ -6961,12 +6964,10 @@
                   "description": "True if the job completed successfully."
                 },
                 "output": {
-                  "description": "Synchronous-style output payload when available.",
-                  "nullable": true
+                  "description": "Synchronous-style output payload when available."
                 },
                 "progress": {
-                  "description": "Progress measurements supplied by the underlying command.",
-                  "nullable": true
+                  "description": "Progress measurements supplied by the underlying command."
                 }
               },
               "required": [
@@ -7162,9 +7163,7 @@
                       },
                       "Metadata": {
                         "type": "object",
-                        "additionalProperties": {
-                          "nullable": true
-                        },
+                        "additionalProperties": {},
                         "description": "Backend-provided metadata map."
                       }
                     }
@@ -7186,8 +7185,10 @@
               "type": "object",
               "properties": {
                 "item": {
-                  "type": "object",
-                  "nullable": true,
+                  "type": [
+                    "object",
+                    "null"
+                  ],
                   "properties": {
                     "Path": {
                       "type": "string",
@@ -7246,9 +7247,7 @@
                     },
                     "Metadata": {
                       "type": "object",
-                      "additionalProperties": {
-                        "nullable": true
-                      },
+                      "additionalProperties": {},
                       "description": "Backend-provided metadata map."
                     }
                   },
@@ -7588,9 +7587,10 @@
                       "type": "number"
                     },
                     "DisableFeatures": {
-                      "type": "string",
-                      "format": "null",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "DisableHTTP2": {
                       "type": "boolean"
@@ -7599,9 +7599,10 @@
                       "type": "boolean"
                     },
                     "DownloadHeaders": {
-                      "type": "string",
-                      "format": "null",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "DryRun": {
                       "type": "boolean"
@@ -7625,9 +7626,10 @@
                       "type": "number"
                     },
                     "Headers": {
-                      "type": "string",
-                      "format": "null",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "HumanReadable": {
                       "type": "boolean"
@@ -7702,14 +7704,16 @@
                       "type": "boolean"
                     },
                     "MetadataMapper": {
-                      "type": "string",
-                      "format": "null",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "MetadataSet": {
-                      "type": "string",
-                      "format": "null",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "ModifyWindow": {
                       "type": "number"
@@ -7757,9 +7761,10 @@
                       "type": "string"
                     },
                     "PasswordCommand": {
-                      "type": "string",
-                      "format": "null",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "Progress": {
                       "type": "boolean"
@@ -7834,9 +7839,10 @@
                       "type": "boolean"
                     },
                     "UploadHeaders": {
-                      "type": "string",
-                      "format": "null",
-                      "nullable": true
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "UseJSONLog": {
                       "type": "boolean"
@@ -8318,8 +8324,10 @@
                   "description": "Number of active references to the VFS."
                 },
                 "diskCache": {
-                  "type": "object",
-                  "nullable": true,
+                  "type": [
+                    "object",
+                    "null"
+                  ],
                   "additionalProperties": true,
                   "description": "Disk cache metrics when caching is enabled."
                 },
@@ -8484,11 +8492,11 @@
             "type": "string"
           },
           "input": {
-            "type": "object",
-            "nullable": true,
-            "additionalProperties": {
-              "nullable": true
-            },
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {},
             "description": "Original request parameters echoed for debugging."
           }
         }
@@ -8497,15 +8505,19 @@
         "type": "object",
         "properties": {
           "Aliases": {
-            "type": "array",
-            "nullable": true,
+            "type": [
+              "array",
+              "null"
+            ],
             "items": {
               "type": "string"
             }
           },
           "CommandHelp": {
-            "type": "array",
-            "nullable": true,
+            "type": [
+              "array",
+              "null"
+            ],
             "items": {
               "$ref": "#/components/schemas/ConfigProviderCommandHelp"
             }
@@ -8557,8 +8569,10 @@
             "type": "string"
           },
           "Opts": {
-            "type": "object",
-            "nullable": true,
+            "type": [
+              "object",
+              "null"
+            ],
             "additionalProperties": true
           },
           "Short": {
@@ -8574,8 +8588,10 @@
             "type": "string"
           },
           "System": {
-            "type": "object",
-            "nullable": true,
+            "type": [
+              "object",
+              "null"
+            ],
             "additionalProperties": {
               "$ref": "#/components/schemas/ConfigProviderMetadataSystemEntry"
             }
@@ -8666,13 +8682,15 @@
             ]
           },
           "Value": {
-            "nullable": true,
             "anyOf": [
               {
                 "type": "boolean"
               },
               {
                 "type": "number"
+              },
+              {
+                "type": "null"
               }
             ]
           },
@@ -8889,8 +8907,10 @@
             "description": "Bytes transferred so far for this object."
           },
           "eta": {
-            "type": "number",
-            "nullable": true,
+            "type": [
+              "number",
+              "null"
+            ],
             "description": "Estimated seconds remaining, when available."
           },
           "group": {
