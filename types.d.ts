@@ -3167,11 +3167,18 @@ export interface components {
                 [name: string]: unknown;
             };
             content: {
+                "application/json": Record<string, never>;
+            };
+        };
+        /** @description Request accepted for async processing. Poll /job/status with the returned jobid. */
+        AsyncJobResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
                 "application/json": {
-                    /** @description Job ID returned when _async=true. */
-                    jobid?: number;
-                } & {
-                    [key: string]: unknown;
+                    /** @description Job identifier. Pass to /job/status to track progress. */
+                    jobid: number;
                 };
             };
         };
@@ -3183,18 +3190,6 @@ export interface components {
             content: {
                 "application/json": {
                     types: string[];
-                };
-            };
-        };
-        /** @description Response for sync operations, containing job ID if async. */
-        SyncJobResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Job ID of the operation. */
-                    jobid?: number;
                 };
             };
         };
@@ -4219,6 +4214,8 @@ export interface components {
     parameters: {
         /** @description Run the command asynchronously. Returns a job id immediately. */
         GlobalAsyncParam: boolean;
+        /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+        PreferAsyncHeader: "respond-async";
         /** @description JSON encoded config overrides applied for this call only. */
         GlobalConfigParam: string;
         /** @description JSON encoded filter overrides applied for this call only. */
@@ -4683,7 +4680,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4694,6 +4694,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["RcNoopResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4708,7 +4709,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4719,6 +4723,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4739,7 +4744,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4750,6 +4758,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4770,7 +4779,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4781,6 +4793,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4799,7 +4812,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4810,6 +4826,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4826,7 +4843,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4837,6 +4857,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4851,7 +4872,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4862,6 +4886,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["OperationsFsinfoResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4882,7 +4907,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4893,6 +4921,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["OperationsHashsumResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4915,7 +4944,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4926,6 +4958,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["OperationsHashsumfileResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4946,7 +4979,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4957,6 +4993,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4977,7 +5014,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4988,6 +5028,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["OperationsPubliclinkResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5006,7 +5047,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5017,6 +5061,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5031,7 +5076,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5042,6 +5090,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5058,7 +5107,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5069,6 +5121,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5083,7 +5136,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5094,6 +5150,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["OperationsSizeResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5108,7 +5165,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5119,6 +5179,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["CoreBwlimitResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5139,7 +5200,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5150,6 +5214,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["CoreCommandResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5162,7 +5227,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5173,6 +5241,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["CoreDisksResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5187,7 +5256,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5198,6 +5270,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["CoreDuResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5210,7 +5283,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5221,6 +5297,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5233,7 +5310,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5254,6 +5334,7 @@ export interface operations {
                     };
                 };
             };
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5266,7 +5347,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5287,6 +5371,7 @@ export interface operations {
                     };
                 };
             };
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5301,7 +5386,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5322,6 +5410,7 @@ export interface operations {
                     };
                 };
             };
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5334,7 +5423,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5355,6 +5447,7 @@ export interface operations {
                     };
                 };
             };
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5369,7 +5462,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5380,6 +5476,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5394,7 +5491,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5405,6 +5505,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5419,7 +5520,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5430,6 +5534,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5444,7 +5549,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5455,6 +5563,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["CoreTransferredResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5469,7 +5578,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5480,6 +5592,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5494,7 +5607,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5505,6 +5621,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["DebugSetGcPercentResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5519,7 +5636,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5530,6 +5650,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["DebugSetMutexProfileFractionResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5544,7 +5665,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5555,6 +5679,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["DebugSetSoftMemoryLimitResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5567,7 +5692,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5578,6 +5706,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5590,7 +5719,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5601,6 +5733,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["FscacheEntriesResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5613,7 +5746,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5624,6 +5760,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["MountListmountsResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5650,7 +5787,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5661,6 +5801,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5673,7 +5814,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5684,6 +5828,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["MountTypesResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5698,7 +5843,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5709,6 +5857,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5721,7 +5870,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5732,6 +5884,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5744,7 +5897,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5755,6 +5911,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["RcNoopResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5767,7 +5924,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5778,6 +5938,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5790,7 +5951,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5801,6 +5965,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["RcListResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5821,7 +5986,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5832,6 +6000,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["BackendCommandResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5848,7 +6017,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5859,6 +6031,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5875,7 +6048,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5886,6 +6062,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5898,7 +6075,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5909,6 +6089,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5929,7 +6110,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5940,6 +6124,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5954,7 +6139,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5965,6 +6153,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5977,7 +6166,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5988,6 +6180,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["ConfigDumpResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6002,7 +6195,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6013,6 +6209,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["ConfigGetResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6025,7 +6222,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6036,6 +6236,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["ConfigListremotesResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6052,7 +6253,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6063,6 +6267,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6075,7 +6280,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6086,6 +6294,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["ConfigPathsResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6098,7 +6307,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6109,6 +6321,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["ConfigProvidersResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6123,7 +6336,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6134,6 +6350,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6148,7 +6365,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6159,6 +6379,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6177,7 +6398,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6188,6 +6412,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6200,7 +6425,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6211,6 +6439,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["CoreVersionResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6227,7 +6456,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6238,6 +6470,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["CoreStatsResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6252,7 +6485,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6263,6 +6499,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["JobBatchResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6273,7 +6510,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6284,6 +6524,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["JobListResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6296,7 +6537,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6307,6 +6551,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["JobStatusResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6319,7 +6564,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6330,6 +6578,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6342,7 +6591,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6353,6 +6605,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6391,7 +6644,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6402,6 +6658,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["OperationsListResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6420,7 +6677,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6431,6 +6691,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["OperationsStatResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6445,7 +6706,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6456,6 +6720,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["OperationsAboutResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6472,7 +6737,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6484,6 +6752,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6504,7 +6773,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6515,6 +6787,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6531,7 +6804,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6542,6 +6818,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6558,7 +6835,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6569,6 +6849,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6607,7 +6888,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6618,6 +6902,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["OperationsCheckResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6640,7 +6925,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6650,7 +6938,8 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["SyncJobResponse"];
+            200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6673,7 +6962,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6683,7 +6975,8 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["SyncJobResponse"];
+            200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6708,7 +7001,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6718,7 +7014,8 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["SyncJobResponse"];
+            200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6771,7 +7068,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6781,7 +7081,8 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["SyncJobResponse"];
+            200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6794,7 +7095,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6805,6 +7109,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["OptionsBlocksResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6819,7 +7124,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6830,6 +7138,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["OptionsGetResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6844,7 +7153,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6855,6 +7167,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["OptionsInfoResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6897,7 +7210,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6908,6 +7224,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6920,7 +7237,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6931,6 +7251,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["OptionsLocalResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6943,7 +7264,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6954,6 +7278,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["ServeListResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6978,7 +7303,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6989,6 +7317,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["ServeStartResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7003,7 +7332,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7014,6 +7346,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7026,7 +7359,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7037,6 +7373,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7049,7 +7386,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7060,6 +7400,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["ServeTypesResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7076,7 +7417,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7087,6 +7431,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["VfsForgetResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7101,7 +7446,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7112,6 +7460,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["VfsListResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7130,7 +7479,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7141,6 +7493,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["VfsPollIntervalResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7155,7 +7508,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7166,6 +7522,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["VfsQueueResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7186,7 +7543,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7197,6 +7557,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7215,7 +7576,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7226,6 +7590,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["VfsRefreshResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7240,7 +7605,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7251,6 +7619,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["VfsStatsResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7265,7 +7634,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7276,6 +7648,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7292,7 +7665,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7303,6 +7679,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["PluginsctlGetPluginsForTypeResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7315,7 +7692,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7326,6 +7706,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["PluginsctlListPluginsResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7338,7 +7719,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7349,6 +7733,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["PluginsctlListTestPluginsResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7363,7 +7748,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7374,6 +7762,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -7388,7 +7777,10 @@ export interface operations {
                 /** @description Run the command asynchronously. Returns a job id immediately. */
                 _async?: components["parameters"]["GlobalAsyncParam"];
             };
-            header?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -7399,6 +7791,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyResponse"];
+            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
