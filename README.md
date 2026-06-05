@@ -1,5 +1,6 @@
 # Rclone OpenAPI
 
+[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white)](https://discord.gg/rclone)
 [![npm version](https://img.shields.io/npm/v/rclone-openapi?color=cb0000&logo=npm)](https://www.npmjs.com/package/rclone-openapi)
 [![npm downloads](https://img.shields.io/npm/dm/rclone-openapi?color=cb0000&logo=npm)](https://www.npmjs.com/package/rclone-openapi)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -89,5 +90,5 @@ MIT
 <br />
 
 <div align="center">
-<sub>Made with ☁️ for the rclone community</sub>
+<sub>Made with ☁️ for the <a href="https://discord.gg/rclone">rclone community</a></sub>
 </div>
