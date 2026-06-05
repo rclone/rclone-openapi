@@ -49,6 +49,9 @@ for (const [path, item] of Object.entries(doc.paths)) {
         if (!paramRef.$ref) continue
         const paramDef = resolveRef(paramRef.$ref)
 
+        // Only query params belong in the request body
+        if (paramDef.in && paramDef.in !== 'query') continue
+
         // AdditionalParam: object with no named properties — marks body as open-ended
         const isAdditional =
             paramDef.name === 'params' &&
@@ -120,17 +123,6 @@ for (const [name, param] of Object.entries(doc.components.parameters)) {
     }
 }
 
-// --- Step 5: Fix EmptyObjectResponse ---
-
-const emptyResp =
-    doc.components.responses.EmptyObjectResponse?.content?.['application/json']?.schema
-if (emptyResp && !emptyResp.properties?.jobid) {
-    emptyResp.properties = {
-        jobid: { type: 'integer', description: 'Job ID returned when _async=true.' },
-    }
-    emptyResp.additionalProperties = true
-}
-
 // --- Write ---
 
 writeFileSync('openapi.yaml', stringify(doc, { lineWidth: 0 }))
@@ -139,4 +131,3 @@ console.log(`Added requestBody to ${addedCount} endpoints`)
 console.log(`Made ${madeOptional} query params optional`)
 console.log(`Simplified ${simplifiedDeepObjects} deepObject schemas`)
 console.log(`Fixed ${fixedAdditionalParams} AdditionalParam definitions`)
-console.log('Fixed EmptyObjectResponse')
