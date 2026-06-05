@@ -1,6 +1,6 @@
 {
   "name": "rclone-openapi",
-  "version": "1.74.1",
+  "version": "1.74.2-r1",
   "keywords": [
     "rclone",
     "openapi",
