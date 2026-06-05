@@ -45,6 +45,9 @@ type ListRemotesResponse = paths['/config/listremotes']['post']['responses']['20
 
 // Example: Type for operations
 type CopyFileParams = operations['operationsCopyfile']['parameters']['query'];
+
+// Example: Async operations return 202 with a job ID
+type AsyncJob = components['responses']['AsyncJobResponse']['content']['application/json'];
 ```
 
 Works great with API clients like [**openapi-fetch**](https://openapi-ts.dev/openapi-fetch/):
@@ -55,7 +58,14 @@ import type { paths } from 'rclone-openapi';
 
 const client = createClient<paths>({ baseUrl: 'http://localhost:5572' });
 
+// Synchronous call
 const { data, error } = await client.POST('/config/listremotes');
+
+// Async call — returns 202 with { jobid }
+const { data: job } = await client.POST('/sync/copy', {
+  body: { srcFs: 'drive:src', dstFs: 'drive:dst', _async: true },
+  headers: { Prefer: 'respond-async' },
+});
 ```
 
 ## Files
