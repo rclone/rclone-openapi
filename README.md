@@ -1,5 +1,6 @@
 # Rclone OpenAPI
 
+[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white)](https://discord.gg/rclone)
 [![npm version](https://img.shields.io/npm/v/rclone-openapi?color=cb0000&logo=npm)](https://www.npmjs.com/package/rclone-openapi)
 [![npm downloads](https://img.shields.io/npm/dm/rclone-openapi?color=cb0000&logo=npm)](https://www.npmjs.com/package/rclone-openapi)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -44,6 +45,9 @@ type ListRemotesResponse = paths['/config/listremotes']['post']['responses']['20
 
 // Example: Type for operations
 type CopyFileParams = operations['operationsCopyfile']['parameters']['query'];
+
+// Example: Async operations return 202 with a job ID
+type AsyncJob = components['responses']['AsyncJobResponse']['content']['application/json'];
 ```
 
 Works great with API clients like [**openapi-fetch**](https://openapi-ts.dev/openapi-fetch/):
@@ -54,7 +58,14 @@ import type { paths } from 'rclone-openapi';
 
 const client = createClient<paths>({ baseUrl: 'http://localhost:5572' });
 
+// Synchronous call
 const { data, error } = await client.POST('/config/listremotes');
+
+// Async call — returns 202 with { jobid }
+const { data: job } = await client.POST('/sync/copy', {
+  body: { srcFs: 'drive:src', dstFs: 'drive:dst', _async: true },
+  headers: { Prefer: 'respond-async' },
+});
 ```
 
 ## Files
@@ -89,5 +100,5 @@ MIT
 <br />
 
 <div align="center">
-<sub>Made with ☁️ for the rclone community</sub>
+<sub>Made with ☁️ for the <a href="https://discord.gg/rclone">rclone community</a></sub>
 </div>
