@@ -5927,7 +5927,26 @@ components:
                 - Value
                 - Valid
               additionalProperties: false
-        Value: {}
+        Value:
+          description: Current value of this option.
+          anyOf:
+            - type: array
+              items:
+                type: string
+            - type: boolean
+            - type: number
+            - type: string
+            - type: object
+              properties:
+                Value:
+                  type: boolean
+                Valid:
+                  type: boolean
+              required:
+                - Value
+                - Valid
+              additionalProperties: false
+            - type: "null"
         Hide:
           type: integer
         Required:

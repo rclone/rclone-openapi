@@ -2063,7 +2063,11 @@ export interface components {
                 Value: boolean;
                 Valid: boolean;
             };
-            Value: unknown;
+            /** @description Current value of this option. */
+            Value: string[] | boolean | number | string | {
+                Value: boolean;
+                Valid: boolean;
+            } | null;
             Hide: number;
             Required: boolean;
             IsPassword: boolean;
