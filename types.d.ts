@@ -573,6 +573,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Set the block profile rate
+         * @description Controls the fraction of goroutine blocking events reported in the blocking profile. Use a rate of 1 to include every event, or 0 or less to turn profiling off.
+         */
         post: operations["debugSetBlockProfileRate"];
         delete?: never;
         options?: never;
@@ -589,6 +593,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Set the GC target percentage
+         * @description Sets the garbage collection target percentage and returns the previous value. A negative percentage effectively turns garbage collection off, unless the memory limit is reached.
+         */
         post: operations["debugSetGcPercent"];
         delete?: never;
         options?: never;
@@ -605,6 +613,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Set the mutex profile fraction
+         * @description Controls the fraction of mutex contention events reported in the mutex profile, and returns the previous rate. Use 0 to turn profiling off, or a negative rate to only read the current value.
+         */
         post: operations["debugSetMutexProfileFraction"];
         delete?: never;
         options?: never;
@@ -621,6 +633,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Set the soft memory limit
+         * @description Sets a soft memory limit for the Go runtime, in bytes, and returns the previous limit.
+         */
         post: operations["debugSetSoftMemoryLimit"];
         delete?: never;
         options?: never;
@@ -637,6 +653,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Clear the remote cache
+         * @description Clears the cache of remotes created from backends. Call this after changing a backend's parameters, so that the next call creates the remote again.
+         */
         post: operations["fscacheClear"];
         delete?: never;
         options?: never;
@@ -653,6 +673,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Count cached remotes
+         * @description Returns the number of entries in the cache of remotes.
+         */
         post: operations["fscacheEntries"];
         delete?: never;
         options?: never;
@@ -669,6 +693,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * List mount points
+         * @description Returns the current mount points, which can be passed to `mount/unmount`.
+         */
         post: operations["mountListmounts"];
         delete?: never;
         options?: never;
@@ -685,7 +713,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Mount and VFS options can also be given as top-level keys. Rclone rejects any other key. */
+        /**
+         * Create a mount point
+         * @description Mounts a remote as a file system with FUSE. If `mountType` isn't set, rclone tries `mount`, then `cmount`, then `mount2`. Mount and VFS options can also be given as top-level keys. Rclone rejects any other key.
+         */
         post: operations["mountMount"];
         delete?: never;
         options?: never;
@@ -702,6 +733,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * List mount types
+         * @description Returns the possible mount types, which can be passed to `mount/mount` as `mountType`.
+         */
         post: operations["mountTypes"];
         delete?: never;
         options?: never;
@@ -718,6 +753,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Unmount a mount point
+         * @description Unmounts the mount at `mountPoint`.
+         */
         post: operations["mountUnmount"];
         delete?: never;
         options?: never;
@@ -734,6 +773,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * Unmount everything
+         * @description Unmounts all active mounts, and returns an error if an unmount fails.
+         */
         post: operations["mountUnmountall"];
         delete?: never;
         options?: never;
@@ -2218,21 +2261,6 @@ export interface components {
                 "application/json": components["schemas"]["RcError"];
             };
         };
-        /** @description Results of the batch job execution. */
-        JobBatchResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description One entry for each input, in order. Each is that command's result, its error, or a job ID if the input set `_async`. */
-                    results: {
-                        [key: string]: unknown;
-                    }[];
-                };
-            };
-        };
         /** @description Request succeeded returning an empty JSON object. */
         EmptyObjectResponse: {
             headers: {
@@ -2241,44 +2269,6 @@ export interface components {
             };
             content: {
                 "application/json": Record<string, never>;
-            };
-        };
-        /** @description Mount created successfully. */
-        MountMountResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Actual local path where the remote was mounted. May differ from the requested path (e.g. when '*' is used on Windows). */
-                    mountPoint: string;
-                };
-            };
-        };
-        /** @description Bisync completed with session details. */
-        SyncBisyncResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Captured output from the bisync operation. */
-                    output: string;
-                    /** @description Session name derived from the two filesystems. */
-                    session: string;
-                    /** @description Absolute path to the bisync working directory. */
-                    workDir: string;
-                    /** @description Base path for listing files. */
-                    basePath: string;
-                    /** @description Path to the Path1 listing file. */
-                    listing1: string;
-                    /** @description Path to the Path2 listing file. */
-                    listing2: string;
-                    /** @description Path to the log file. */
-                    logFile: string;
-                };
             };
         };
         /** @description The call is running in the background, because the request sent `Prefer: respond-async`. Poll `job/status` with the job ID. A job can be queried for up to 1 minute after it finishes. */
@@ -2297,18 +2287,6 @@ export interface components {
                 };
             };
         };
-        /** @description Supported rclone serve protocols. */
-        ServeTypesResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    types: string[];
-                };
-            };
-        };
         /** @description Echoes any supplied parameters, useful for testing RC connectivity. */
         RcNoopResponse: {
             headers: {
@@ -2318,1217 +2296,6 @@ export interface components {
             content: {
                 "application/json": {
                     [key: string]: unknown;
-                };
-            };
-        };
-        /** @description Capabilities, supported hashes, and metadata for the specified remote. */
-        OperationsFsinfoResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    Features: {
-                        [key: string]: boolean;
-                    };
-                    Hashes: string[];
-                    MetadataInfo?: components["schemas"]["ConfigProviderMetadataInfo"] | null;
-                    Name: string;
-                    Precision: number;
-                    Root: string;
-                    String: string;
-                };
-            };
-        };
-        /** @description Hash algorithm used and the ordered hash lines emitted by `operations/hashsum`. */
-        OperationsHashsumResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    hashType: string;
-                    hashsum: string[];
-                };
-            };
-        };
-        /** @description Hash algorithm used and the hash value for a single file from `operations/hashsumfile`. */
-        OperationsHashsumfileResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description The hash algorithm that was used. */
-                    hashType: string;
-                    /** @description The hash value of the file. */
-                    hash: string;
-                };
-            };
-        };
-        /** @description Public sharing URL returned by `operations/publiclink`. */
-        OperationsPubliclinkResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** Format: uri */
-                    url: string;
-                };
-            };
-        };
-        /** @description Aggregate object counts and total size from `operations/size`. */
-        OperationsSizeResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    bytes: number;
-                    count: number;
-                    sizeless: number;
-                };
-            };
-        };
-        /** @description Effective bandwidth limits in bytes per second and human readable form. */
-        CoreBwlimitResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    bytesPerSecond: number;
-                    bytesPerSecondRx: number;
-                    bytesPerSecondTx: number;
-                    rate: string;
-                };
-            };
-        };
-        /** @description Outcome of a command run with `core/command`. With the default `returnType` this is JSON. The `STREAM` return types write the output to the body as plain text. */
-        CoreCommandResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    error: boolean;
-                    result?: string | null;
-                };
-                "text/plain": string;
-            };
-        };
-        /** @description Locally accessible paths including mount points, user directories, and removable volumes. */
-        CoreDisksResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Accessible local paths such as disk mount points, user home folders, and removable volumes. */
-                    disks: string[];
-                };
-            };
-        };
-        /** @description Disk usage summary for the requested directory. */
-        CoreDuResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    dir: string;
-                    info: {
-                        Free: number;
-                        Available: number;
-                        Total: number;
-                    };
-                };
-            };
-        };
-        /** @description Completed transfer records including size, status, and timestamps. */
-        CoreTransferredResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    transferred: ({
-                        /** @description Stats group identifier this transfer belonged to. */
-                        group: string;
-                        /** @description Source remote or filesystem used for the transfer. */
-                        srcFs?: string;
-                        /** @description Destination remote or filesystem used for the transfer. */
-                        dstFs?: string;
-                        /** @description Source path within `srcFs`, when provided. */
-                        srcRemote?: string;
-                        /** @description Destination path within `dstFs`, when provided. */
-                        dstRemote?: string;
-                        name: string;
-                        size: number;
-                        bytes: number;
-                        checked: boolean;
-                        /** @description What the transfer was doing, such as `transferring` or `checking`. Bisync adds values such as `listing file - Path1`, so this is free text. */
-                        what: string;
-                        /** @description ISO8601 timestamp when the transfer started. */
-                        started_at: string;
-                        /** @description ISO8601 timestamp when the transfer completed. */
-                        completed_at: string;
-                        timestamp?: number;
-                        error: string;
-                        jobid?: number;
-                    } & {
-                        [key: string]: unknown;
-                    })[];
-                };
-            };
-        };
-        /** @description Previous garbage collection target percentage returned after update. */
-        DebugSetGcPercentResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    "existing-gc-percent": number;
-                };
-            };
-        };
-        /** @description Previous mutex profiling sampling rate. */
-        DebugSetMutexProfileFractionResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    previousRate: number;
-                };
-            };
-        };
-        /** @description Previous soft memory limit before the change. */
-        DebugSetSoftMemoryLimitResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    "existing-mem-limit": number;
-                };
-            };
-        };
-        /** @description Number of entries currently cached by the file system cache. */
-        FscacheEntriesResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    entries: number;
-                };
-            };
-        };
-        /** @description Active mount points with source remote and mount time. */
-        MountListmountsResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    mountPoints: {
-                        Fs: string;
-                        MountPoint: string;
-                        /** Format: date-time */
-                        MountedOn: string;
-                    }[];
-                };
-            };
-        };
-        /** @description List of mount backends available on this platform. */
-        MountTypesResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    mountTypes: string[];
-                };
-            };
-        };
-        /** @description Metadata for every available RC command, including auth requirements. */
-        RcListResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    commands: ({
-                        Path?: string;
-                        Title?: string;
-                        Help?: string;
-                        NeedsRequest?: boolean;
-                        NeedsResponse?: boolean;
-                        /** @description True if the call works without authentication. */
-                        NoAuth?: boolean;
-                    } & {
-                        [key: string]: unknown;
-                    })[];
-                };
-            };
-        };
-        /** @description Backend command output and any additional returned fields. */
-        BackendCommandResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Backend command result payload */
-                    result?: unknown;
-                } & {
-                    [key: string]: unknown;
-                };
-            };
-        };
-        /** @description Entire rclone configuration grouped by remote. */
-        ConfigDumpResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    [key: string]: {
-                        [key: string]: string;
-                    };
-                };
-            };
-        };
-        /** @description Configuration key/value pairs for the requested remote. */
-        ConfigGetResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    type: string;
-                } & {
-                    [key: string]: string;
-                };
-            };
-        };
-        /** @description Names of configured remotes. */
-        ConfigListremotesResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    remotes: string[];
-                };
-            };
-        };
-        /** @description Status of the interactive OAuth authentication server. */
-        ConfigOauthstatusResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /**
-                     * @description Whether the OAuth authentication server is currently running.
-                     * @enum {string}
-                     */
-                    status: "running" | "stopped";
-                    /** @description Authorization URL to open in a browser. Present only when status is "running". */
-                    authUrl?: string;
-                };
-            };
-        };
-        /** @description Paths to the config file, cache directory, and temporary directory. */
-        ConfigPathsResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    cache: string;
-                    config: string;
-                    temp: string;
-                };
-            };
-        };
-        /** @description Available backend providers and their metadata. */
-        ConfigProvidersResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    providers: components["schemas"]["ConfigProvider"][];
-                } & {
-                    [key: string]: unknown;
-                };
-            };
-        };
-        /** @description rclone version, build information, and runtime details. */
-        CoreVersionResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Full semantic version string (e.g. 1.67.0). */
-                    version: string;
-                    /** @description Operating system rclone is running on (e.g. linux, darwin). */
-                    os: string;
-                    /** @description CPU architecture (e.g. amd64, arm64). */
-                    arch: string;
-                    /** @description Version number broken into components. */
-                    decomposed: number[];
-                    /** @description True when built directly from a git checkout. */
-                    isGit: boolean;
-                    /** @description Indicates whether this build is a beta version. */
-                    isBeta: boolean;
-                    /** @description Go toolchain version used to build rclone. */
-                    goVersion: string;
-                    /** @description OS Version (e.g. ubuntu 24.04 (64 bit)). */
-                    osVersion?: string;
-                    /** @description OS Kernel version (e.g. 6.8.0-86-generic (x86_64)). */
-                    osKernel?: string;
-                    /** @description CPU architecture in use (e.g. arm64 (ARMv8 compatible)). */
-                    osArch?: string;
-                    /** @description Linking mode for the binary (static or dynamic). */
-                    linking: string;
-                    /** @description Space separated Go build tags, if any. */
-                    goTags: string;
-                };
-            };
-        };
-        /** @description Current transfer statistics including totals, rates, and recent activity. */
-        CoreStatsResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    bytes: number;
-                    checks: number;
-                    deletedDirs: number;
-                    deletes: number;
-                    elapsedTime: number;
-                    errors: number;
-                    eta?: number | null;
-                    fatalError: boolean;
-                    lastError?: string;
-                    retryError: boolean;
-                    renames: number;
-                    listed?: number;
-                    serverSideCopies: number;
-                    serverSideCopyBytes: number;
-                    serverSideMoveBytes: number;
-                    serverSideMoves: number;
-                    speed: number;
-                    totalBytes: number;
-                    totalChecks: number;
-                    totalTransfers: number;
-                    transferTime: number;
-                    transfers: number;
-                    /** @description Active transfers currently in progress grouped by stats group. */
-                    transferring?: components["schemas"]["CoreStatsTransfer"][];
-                    /** @description Objects currently undergoing verification operations. */
-                    checking?: components["schemas"]["CoreStatsChecking"][];
-                };
-            };
-        };
-        /** @description Identifiers of active and recently completed async jobs. */
-        JobListResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Identifier for this rclone process. */
-                    executeId: string;
-                    /** @description Job IDs suitable for use with `job/status` and `job/stop`. */
-                    jobids: number[];
-                    /** @description Array of integer job ids that are running. */
-                    runningIds: number[];
-                    /** @description Array of integer job ids that are finished. */
-                    finishedIds: number[];
-                };
-            };
-        };
-        /** @description Detailed status for a background job, including timing, success flag, and optional output. */
-        JobStatusResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Identifier for this rclone process. */
-                    executeId: string;
-                    /** @description True once the job has completed. */
-                    finished: boolean;
-                    /** @description Execution time in seconds. */
-                    duration: number;
-                    /** @description Timestamp when the job finished. (e.g. '2025-12-26T18:50:20.528746884+01:00') */
-                    endTime: string;
-                    /** @description Error message, or empty string on success. */
-                    error: string;
-                    /** @description Job identifier. */
-                    id: number;
-                    /** @description Timestamp when the job started. (e.g. '2025-12-24T18:50:20.5281314+01:00') */
-                    startTime: string;
-                    /** @description True if the job completed successfully. */
-                    success: boolean;
-                    /** @description Synchronous-style output payload when available. */
-                    output?: unknown;
-                    /** @description Progress measurements supplied by the underlying command. */
-                    progress?: unknown;
-                    /** @description Stats group of the job. */
-                    group: string;
-                };
-            };
-        };
-        /** @description Quota and usage information from `operations/about`, including total, used, and free space. */
-        OperationsAboutResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    total?: number;
-                    used?: number;
-                    free?: number;
-                    trashed?: number;
-                    other?: number;
-                    objects?: number;
-                };
-            };
-        };
-        /** @description Comparison summary from `operations/check`, including missing, matching, and differing files. */
-        OperationsCheckResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description True when the check completes without differences or errors. */
-                    success: boolean;
-                    /** @description Human readable status string. */
-                    status: string;
-                    /** @description Hash algorithm used for comparisons when applicable. */
-                    hashType?: string;
-                    /** @description Combined summary lines when `combined=true` is requested. */
-                    combined?: string[];
-                    /** @description Files present on the destination but missing from the source. */
-                    missingOnSrc?: string[];
-                    /** @description Files present on the source but missing from the destination. */
-                    missingOnDst?: string[];
-                    /** @description Files that matched on both sides. */
-                    match?: string[];
-                    /** @description Files that differed between source and destination. */
-                    differ?: string[];
-                    /** @description Entries that produced errors during the check. */
-                    error?: string[];
-                };
-            };
-        };
-        /** @description Directory listing entries from `operations/list`, mirroring the `lsjson` format. */
-        OperationsListResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Array of entries equivalent to the items returned by `rclone lsjson`. */
-                    list: {
-                        /** @description Path relative to the requested remote root. */
-                        Path: string;
-                        /** @description Base name of the entry. */
-                        Name: string;
-                        /** @description Object size in bytes. */
-                        Size?: number;
-                        /** @description MIME type where available. */
-                        MimeType?: string;
-                        /** @description Modification timestamp in RFC3339 format. */
-                        ModTime?: string;
-                        /** @description True if the entry represents a directory. */
-                        IsDir: boolean;
-                        /** @description Hash digests keyed by algorithm when requested. */
-                        Hashes?: {
-                            [key: string]: string;
-                        };
-                        /** @description Backend-specific identifier when provided. */
-                        ID?: string;
-                        /** @description Original backend identifier when recorded. */
-                        OrigID?: string;
-                        /** @description True for bucket/root entries on bucket-based remotes. */
-                        IsBucket?: boolean;
-                        /** @description Storage class or tier, if supplied by the backend. */
-                        Tier?: string;
-                        /** @description Encrypted entry name when using crypt remotes. */
-                        Encrypted?: string;
-                        /** @description Encrypted path when using crypt remotes. */
-                        EncryptedPath?: string;
-                        /** @description Backend-provided metadata map. */
-                        Metadata?: {
-                            [key: string]: unknown;
-                        };
-                    }[];
-                };
-            };
-        };
-        /** @description Metadata for a single file or directory from `operations/stat`. */
-        OperationsStatResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    item: {
-                        /** @description Path relative to the remote root. */
-                        Path: string;
-                        /** @description Base name of the entry. */
-                        Name: string;
-                        /** @description Object size in bytes. */
-                        Size: number;
-                        /** @description MIME type where available. */
-                        MimeType: string;
-                        /** @description Modification timestamp in RFC3339 format. */
-                        ModTime: string;
-                        /** @description True if the entry is a directory. */
-                        IsDir: boolean;
-                        /** @description Hash digests keyed by algorithm when requested. */
-                        Hashes?: {
-                            [key: string]: string;
-                        };
-                        /** @description Backend-specific identifier when provided. */
-                        ID?: string;
-                        /** @description Original backend identifier when recorded. */
-                        OrigID?: string;
-                        /** @description True for bucket/root entries on bucket-based remotes. */
-                        IsBucket?: boolean;
-                        /** @description Storage class or tier, if supplied by the backend. */
-                        Tier?: string;
-                        /** @description Encrypted entry name when using crypt remotes. */
-                        Encrypted?: string;
-                        /** @description Encrypted path when using crypt remotes. */
-                        EncryptedPath?: string;
-                        /** @description Backend-provided metadata map. */
-                        Metadata?: {
-                            [key: string]: unknown;
-                        };
-                    } | null;
-                };
-            };
-        };
-        /** @description Names of option blocks that can be queried with `options/get` or `options/info`. */
-        OptionsBlocksResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    options: string[];
-                };
-            };
-        };
-        /** @description Current global option values keyed by block name. */
-        OptionsGetResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    dlna?: {
-                        [key: string]: unknown;
-                    };
-                    filter?: {
-                        [key: string]: unknown;
-                    };
-                    ftp?: {
-                        [key: string]: unknown;
-                    };
-                    http?: {
-                        [key: string]: unknown;
-                    };
-                    log?: {
-                        [key: string]: unknown;
-                    };
-                    main?: {
-                        [key: string]: unknown;
-                    };
-                    mount?: {
-                        [key: string]: unknown;
-                    };
-                    nfs?: {
-                        [key: string]: unknown;
-                    };
-                    proxy?: {
-                        [key: string]: unknown;
-                    };
-                    rc?: {
-                        [key: string]: unknown;
-                    };
-                    restic?: {
-                        [key: string]: unknown;
-                    };
-                    s3?: {
-                        [key: string]: unknown;
-                    };
-                    sftp?: {
-                        [key: string]: unknown;
-                    };
-                    vfs?: {
-                        [key: string]: unknown;
-                    };
-                    webdav?: {
-                        [key: string]: unknown;
-                    };
-                } & {
-                    [key: string]: unknown;
-                };
-            };
-        };
-        /** @description Metadata describing available options, organised by block. */
-        OptionsInfoResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    dlna?: components["schemas"]["OptionsInfoOption"][];
-                    filter?: components["schemas"]["OptionsInfoOption"][];
-                    ftp?: components["schemas"]["OptionsInfoOption"][];
-                    http?: components["schemas"]["OptionsInfoOption"][];
-                    log?: components["schemas"]["OptionsInfoOption"][];
-                    main?: components["schemas"]["OptionsInfoOption"][];
-                    mount?: components["schemas"]["OptionsInfoOption"][];
-                    nfs?: components["schemas"]["OptionsInfoOption"][];
-                    proxy?: components["schemas"]["OptionsInfoOption"][];
-                    rc?: components["schemas"]["OptionsInfoOption"][];
-                    restic?: components["schemas"]["OptionsInfoOption"][];
-                    s3?: components["schemas"]["OptionsInfoOption"][];
-                    sftp?: components["schemas"]["OptionsInfoOption"][];
-                    vfs?: components["schemas"]["OptionsInfoOption"][];
-                    webdav?: components["schemas"]["OptionsInfoOption"][];
-                } & {
-                    [key: string]: components["schemas"]["OptionsInfoOption"][];
-                };
-            };
-        };
-        /** @description Effective option values for the current request, separated into config and filter sections. */
-        OptionsLocalResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    config: {
-                        AskPassword: boolean;
-                        AutoConfirm: boolean;
-                        BackupDir: string;
-                        BindAddr: string;
-                        BufferSize: number;
-                        BwLimit: string;
-                        BwLimitFile: string;
-                        CaCert: string[];
-                        CheckFirst: boolean;
-                        CheckSum: boolean;
-                        Checkers: number;
-                        ClientCert: string;
-                        ClientKey: string;
-                        CompareDest: string[];
-                        ConnectTimeout: number;
-                        Cookie: boolean;
-                        CopyDest: string[];
-                        CutoffMode: string;
-                        DataRateUnit: string;
-                        DefaultTime: string;
-                        DeleteMode: number;
-                        DisableFeatures: string | null;
-                        DisableHTTP2: boolean;
-                        DisableHTTPKeepAlives: boolean;
-                        DownloadHeaders: string | null;
-                        DryRun: boolean;
-                        Dump: string;
-                        ErrorOnNoTransfer: boolean;
-                        ExpectContinueTimeout: number;
-                        FixCase: boolean;
-                        FsCacheExpireDuration: number;
-                        FsCacheExpireInterval: number;
-                        Headers: string | null;
-                        HumanReadable: boolean;
-                        IgnoreCaseSync: boolean;
-                        IgnoreChecksum: boolean;
-                        IgnoreErrors: boolean;
-                        IgnoreExisting: boolean;
-                        IgnoreSize: boolean;
-                        IgnoreTimes: boolean;
-                        Immutable: boolean;
-                        Inplace: boolean;
-                        InsecureSkipVerify: boolean;
-                        Interactive: boolean;
-                        KvLockTime: number;
-                        Links: boolean;
-                        LogLevel: string;
-                        LowLevelRetries: number;
-                        MaxBacklog: number;
-                        MaxBufferMemory: number;
-                        MaxDelete: number;
-                        MaxDeleteSize: number;
-                        MaxDepth: number;
-                        MaxDuration: number;
-                        MaxStatsGroups: number;
-                        MaxTransfer: number;
-                        Metadata: boolean;
-                        MetadataMapper: string | null;
-                        MetadataSet: string | null;
-                        ModifyWindow: number;
-                        MultiThreadChunkSize: number;
-                        MultiThreadCutoff: number;
-                        MultiThreadSet: boolean;
-                        MultiThreadStreams: number;
-                        MultiThreadWriteBufferSize: number;
-                        NoCheckDest: boolean;
-                        NoConsole: boolean;
-                        NoGzip: boolean;
-                        NoTraverse: boolean;
-                        NoUnicodeNormalization: boolean;
-                        NoUpdateDirModTime: boolean;
-                        NoUpdateModTime: boolean;
-                        OrderBy: string;
-                        PartialSuffix: string;
-                        PasswordCommand: string | null;
-                        Progress: boolean;
-                        ProgressTerminalTitle: boolean;
-                        RefreshTimes: boolean;
-                        Retries: number;
-                        RetriesInterval: number;
-                        ServerSideAcrossConfigs: boolean;
-                        SizeOnly: boolean;
-                        StatsFileNameLength: number;
-                        StatsLogLevel: string;
-                        StatsOneLine: boolean;
-                        StatsOneLineDate: boolean;
-                        StatsOneLineDateFormat: string;
-                        StreamingUploadCutoff: number;
-                        Suffix: string;
-                        SuffixKeepExtension: boolean;
-                        TPSLimit: number;
-                        TPSLimitBurst: number;
-                        TerminalColorMode: string;
-                        Timeout: number;
-                        TrackRenames: boolean;
-                        TrackRenamesStrategy: string;
-                        TrafficClass: number;
-                        Transfers: number;
-                        UpdateOlder: boolean;
-                        UploadHeaders: string | null;
-                        UseJSONLog: boolean;
-                        UseListR: boolean;
-                        UseMmap: boolean;
-                        UseServerModTime: boolean;
-                        UserAgent: string;
-                        ListCutoff: number;
-                        ClientPass: string;
-                        MaxConnections: number;
-                        NameTransform: string[] | null;
-                        HTTPProxy: string;
-                    };
-                    filter: {
-                        DeleteExcluded: boolean;
-                        ExcludeFile: string[];
-                        ExcludeFrom: string[];
-                        ExcludeRule: string[];
-                        FilesFrom: string[];
-                        FilesFromRaw: string[];
-                        FilterFrom: string[];
-                        FilterRule: string[];
-                        HashFilter: string;
-                        IgnoreCase: boolean;
-                        IncludeFrom: string[];
-                        IncludeRule: string[];
-                        MaxAge: number;
-                        MaxSize: number;
-                        MetaRules: {
-                            ExcludeFrom: string[];
-                            ExcludeRule: string[];
-                            FilterFrom: string[];
-                            FilterRule: string[];
-                            IncludeFrom: string[];
-                            IncludeRule: string[];
-                        };
-                        MinAge: number;
-                        MinSize: number;
-                        FilesFrom0: string[] | null;
-                    };
-                };
-            };
-        };
-        /** @description List of active `serve` instances, including their IDs, bind addresses, and parameters. */
-        ServeListResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    list: {
-                        /** @description Identifier returned by `serve/start`. */
-                        id: string;
-                        /** @description Address and port the server is listening on. */
-                        addr: string;
-                        /** @description Serve configuration parameters supplied at startup. */
-                        params: {
-                            fs: string | components["schemas"]["RemoteDefinition"];
-                            type: string;
-                            opt?: {
-                                [key: string]: unknown;
-                            };
-                            vfsOpt?: {
-                                [key: string]: unknown;
-                            };
-                        } & {
-                            [key: string]: unknown;
-                        };
-                    }[];
-                };
-            };
-        };
-        /** @description Confirmation of a newly started server, including ID and bound address. */
-        ServeStartResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Address and port the server is listening on. */
-                    addr: string;
-                    /** @description Identifier to pass to `serve/stop`. */
-                    id: string;
-                };
-            };
-        };
-        /** @description Paths evicted from the VFS directory cache. */
-        VfsForgetResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Paths that were successfully forgotten. */
-                    forgotten: string[];
-                };
-            };
-        };
-        /** @description Identifiers for the VFS instances currently in use. */
-        VfsListResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description VFS name that can be used with other VFS endpoints. */
-                    vfses: string[];
-                };
-            };
-        };
-        /** @description Status of the poll-interval setting, possibly including the new interval. */
-        VfsPollIntervalResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description True if polling is on. */
-                    enabled: boolean;
-                    /** @description True if the remote supports polling. */
-                    supported: boolean;
-                    /** @description The polling interval. */
-                    interval: {
-                        /** @description Interval in nanoseconds. */
-                        raw: number;
-                        /** @description Interval in whole seconds. */
-                        seconds: number;
-                        /** @description Interval as text, such as `1m0s`. */
-                        string: string;
-                    };
-                    /** @description True if setting the interval timed out. Only present when setting it. */
-                    timeout?: boolean;
-                };
-            };
-        };
-        /** @description Upload queue entries for the selected VFS. */
-        VfsQueueResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Files waiting to upload. Absent when the VFS has no cache. */
-                    queue?: {
-                        /** @description Full path of the file. */
-                        name: string;
-                        /** @description Queue item ID, for `vfs/queue-set-expiry`. */
-                        id: number;
-                        /** @description Size in bytes. */
-                        size: number;
-                        /** @description Seconds until the file is eligible for transfer. */
-                        expiry: number;
-                        /** @description Upload attempts so far. */
-                        tries: number;
-                        /** @description Delay between upload attempts in seconds. */
-                        delay: number;
-                        /** @description True if the file is uploading now. */
-                        uploading: boolean;
-                    }[];
-                };
-            };
-        };
-        /** @description Acknowledgement of directories refreshed in the VFS cache. */
-        VfsRefreshResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Map of refreshed directories to status messages. */
-                    result: {
-                        [key: string]: string;
-                    };
-                };
-            };
-        };
-        /** @description Runtime statistics for a VFS, including disk cache and metadata cache state. */
-        VfsStatsResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Name of the VFS. */
-                    fs: string;
-                    /** @description Number of active references to the VFS. */
-                    inUse: number;
-                    /** @description Disk cache metrics when caching is enabled. */
-                    diskCache?: {
-                        /** @description Bytes used by the cache. */
-                        bytesUsed?: number;
-                        /** @description Files with errors. */
-                        erroredFiles?: number;
-                        /** @description Files in the cache. */
-                        files?: number;
-                        /** @description Internal number of the hash the cache uses. */
-                        hashType?: number;
-                        /** @description True if the cache has run out of space. */
-                        outOfSpace?: boolean;
-                        /** @description Directory of the cached data. */
-                        path?: string;
-                        /** @description Directory of the cached metadata. */
-                        pathMeta?: string;
-                        /** @description Uploads running now. */
-                        uploadsInProgress?: number;
-                        /** @description Uploads waiting to run. */
-                        uploadsQueued?: number;
-                    } | null;
-                    /** @description In-memory metadata cache counters. */
-                    metadataCache: {
-                        /** @description Directories cached. */
-                        dirs?: number;
-                        /** @description Files cached. */
-                        files?: number;
-                    };
-                    /** @description Effective options of the VFS. Durations are in nanoseconds, and sizes are in bytes. */
-                    opt: {
-                        NoSeek?: boolean;
-                        NoChecksum?: boolean;
-                        ReadOnly?: boolean;
-                        Links?: boolean;
-                        NoModTime?: boolean;
-                        DirCacheTime?: number;
-                        Refresh?: boolean;
-                        PollInterval?: number;
-                        Umask?: number;
-                        UID?: number;
-                        GID?: number;
-                        DirPerms?: number;
-                        FilePerms?: number;
-                        LinkPerms?: number;
-                        ChunkSize?: number;
-                        ChunkSizeLimit?: number;
-                        ChunkStreams?: number;
-                        CacheMode?: number;
-                        CacheMaxAge?: number;
-                        CacheMaxSize?: number;
-                        CacheMinFreeSpace?: number;
-                        CachePollInterval?: number;
-                        CaseInsensitive?: boolean;
-                        BlockNormDupes?: boolean;
-                        WriteWait?: number;
-                        ReadWait?: number;
-                        WriteBack?: number;
-                        ReadAhead?: number;
-                        UsedIsSize?: boolean;
-                        FastFingerprint?: boolean;
-                        DiskSpaceTotalSize?: number;
-                        HandleCaching?: number;
-                        MetadataExtension?: string;
-                    };
-                };
-            };
-        };
-        /** @description Loaded plugin metadata for the requested MIME type. */
-        PluginsctlGetPluginsForTypeResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Installed plugins keyed by repository name. */
-                    loadedPlugins: {
-                        [key: string]: {
-                            [key: string]: unknown;
-                        };
-                    };
-                    /** @description Installed test plugins keyed by repository name. */
-                    loadedTestPlugins: {
-                        [key: string]: {
-                            [key: string]: unknown;
-                        };
-                    };
-                };
-            };
-        };
-        /** @description Lists installed production and test plugins with their metadata. */
-        PluginsctlListPluginsResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Metadata entries for installed plugins. */
-                    loadedPlugins: {
-                        [key: string]: unknown;
-                    }[];
-                    /** @description Metadata entries for installed test plugins. */
-                    loadedTestPlugins: {
-                        [key: string]: unknown;
-                    }[];
-                };
-            };
-        };
-        /** @description Metadata for installed test plugins keyed by repository name. */
-        PluginsctlListTestPluginsResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Installed test plugin metadata keyed by repository. */
-                    loadedTestPlugins: {
-                        [key: string]: {
-                            [key: string]: unknown;
-                        };
-                    };
-                };
-            };
-        };
-        /** @description Statistics for the cache remote. */
-        CacheStatsResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Always `ok`. */
-                    status: string;
-                    /** @description Cache statistics. */
-                    stats: {
-                        [key: string]: unknown;
-                    };
-                };
-            };
-        };
-        /** @description Confirmation that the path was cleared. */
-        CacheExpireResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Always `ok`. */
-                    status: string;
-                    /** @description Describes what was cleared. */
-                    message: string;
-                };
-            };
-        };
-        /** @description What was fetched for each file. */
-        CacheFetchResponse: {
-            headers: {
-                "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": {
-                    /** @description Results keyed by file name. */
-                    status: {
-                        [key: string]: {
-                            /** @description Error message, or an empty string. */
-                            Error: string;
-                            /** @description Number of chunks fetched. */
-                            FetchedChunks: number;
-                        };
-                    };
                 };
             };
         };
@@ -3776,7 +2543,26 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["OperationsFsinfoResponse"];
+            /** @description Capabilities, supported hashes, and metadata for the specified remote. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        Features: {
+                            [key: string]: boolean;
+                        };
+                        Hashes: string[];
+                        MetadataInfo?: components["schemas"]["ConfigProviderMetadataInfo"] | null;
+                        Name: string;
+                        Precision: number;
+                        Root: string;
+                        String: string;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3808,7 +2594,19 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["OperationsHashsumResponse"];
+            /** @description Hash algorithm used and the ordered hash lines emitted by `operations/hashsum`. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        hashType: string;
+                        hashsum: string[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3842,7 +2640,21 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["OperationsHashsumfileResponse"];
+            /** @description Hash algorithm used and the hash value for a single file from `operations/hashsumfile`. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The hash algorithm that was used. */
+                        hashType: string;
+                        /** @description The hash value of the file. */
+                        hash: string;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -3906,7 +2718,19 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["OperationsPubliclinkResponse"];
+            /** @description Public sharing URL returned by `operations/publiclink`. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uri */
+                        url: string;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4020,7 +2844,20 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["OperationsSizeResponse"];
+            /** @description Aggregate object counts and total size from `operations/size`. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        bytes: number;
+                        count: number;
+                        sizeless: number;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4046,7 +2883,21 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["CoreBwlimitResponse"];
+            /** @description Effective bandwidth limits in bytes per second and human readable form. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        bytesPerSecond: number;
+                        bytesPerSecondRx: number;
+                        bytesPerSecondTx: number;
+                        rate: string;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4080,7 +2931,20 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["CoreCommandResponse"];
+            /** @description Outcome of a command run with `core/command`. With the default `returnType` this is JSON. The `STREAM` return types write the output to the body as plain text. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: boolean;
+                        result?: string | null;
+                    };
+                    "text/plain": string;
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4103,7 +2967,19 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["CoreDisksResponse"];
+            /** @description Locally accessible paths including mount points, user directories, and removable volumes. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Accessible local paths such as disk mount points, user home folders, and removable volumes. */
+                        disks: string[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4129,7 +3005,23 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["CoreDuResponse"];
+            /** @description Disk usage summary for the requested directory. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        dir: string;
+                        info: {
+                            Free: number;
+                            Available: number;
+                            Total: number;
+                        };
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4415,7 +3307,44 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["CoreTransferredResponse"];
+            /** @description Completed transfer records including size, status, and timestamps. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        transferred: ({
+                            /** @description Stats group identifier this transfer belonged to. */
+                            group: string;
+                            /** @description Source remote or filesystem used for the transfer. */
+                            srcFs?: string;
+                            /** @description Destination remote or filesystem used for the transfer. */
+                            dstFs?: string;
+                            /** @description Source path within `srcFs`, when provided. */
+                            srcRemote?: string;
+                            /** @description Destination path within `dstFs`, when provided. */
+                            dstRemote?: string;
+                            name: string;
+                            size: number;
+                            bytes: number;
+                            checked: boolean;
+                            /** @description What the transfer was doing, such as `transferring` or `checking`. Bisync adds values such as `listing file - Path1`, so this is free text. */
+                            what: string;
+                            /** @description ISO8601 timestamp when the transfer started. */
+                            started_at: string;
+                            /** @description ISO8601 timestamp when the transfer completed. */
+                            completed_at: string;
+                            timestamp?: number;
+                            error: string;
+                            jobid?: number;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4467,7 +3396,18 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["DebugSetGcPercentResponse"];
+            /** @description Previous garbage collection target percentage returned after update. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        "existing-gc-percent": number;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4493,7 +3433,18 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["DebugSetMutexProfileFractionResponse"];
+            /** @description Previous mutex profiling sampling rate. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        previousRate: number;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4519,7 +3470,18 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["DebugSetSoftMemoryLimitResponse"];
+            /** @description Previous soft memory limit before the change. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        "existing-mem-limit": number;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4565,7 +3527,18 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["FscacheEntriesResponse"];
+            /** @description Number of entries currently cached by the file system cache. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: number;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4588,7 +3561,23 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["MountListmountsResponse"];
+            /** @description Active mount points with source remote and mount time. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        mountPoints: {
+                            Fs: string;
+                            MountPoint: string;
+                            /** Format: date-time */
+                            MountedOn: string;
+                        }[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4628,7 +3617,19 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["MountMountResponse"];
+            /** @description Mount created successfully. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Actual local path where the remote was mounted. May differ from the requested path (e.g. when '*' is used on Windows). */
+                        mountPoint: string;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4651,7 +3652,18 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["MountTypesResponse"];
+            /** @description List of mount backends available on this platform. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        mountTypes: string[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4772,7 +3784,28 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["RcListResponse"];
+            /** @description Metadata for every available RC command, including auth requirements. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        commands: ({
+                            Path?: string;
+                            Title?: string;
+                            Help?: string;
+                            NeedsRequest?: boolean;
+                            NeedsResponse?: boolean;
+                            /** @description True if the call works without authentication. */
+                            NoAuth?: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4806,7 +3839,21 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["BackendCommandResponse"];
+            /** @description Backend command output and any additional returned fields. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Backend command result payload */
+                        result?: unknown;
+                    } & {
+                        [key: string]: unknown;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4834,7 +3881,21 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["CacheExpireResponse"];
+            /** @description Confirmation that the path was cleared. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Always `ok`. */
+                        status: string;
+                        /** @description Describes what was cleared. */
+                        message: string;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4864,7 +3925,26 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["CacheFetchResponse"];
+            /** @description What was fetched for each file. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Results keyed by file name. */
+                        status: {
+                            [key: string]: {
+                                /** @description Error message, or an empty string. */
+                                Error: string;
+                                /** @description Number of chunks fetched. */
+                                FetchedChunks: number;
+                            };
+                        };
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4887,7 +3967,23 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["CacheStatsResponse"];
+            /** @description Statistics for the cache remote. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Always `ok`. */
+                        status: string;
+                        /** @description Cache statistics. */
+                        stats: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4979,7 +4075,20 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["ConfigDumpResponse"];
+            /** @description Entire rclone configuration grouped by remote. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: {
+                            [key: string]: string;
+                        };
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5005,7 +4114,20 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["ConfigGetResponse"];
+            /** @description Configuration key/value pairs for the requested remote. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        type: string;
+                    } & {
+                        [key: string]: string;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5028,7 +4150,18 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["ConfigListremotesResponse"];
+            /** @description Names of configured remotes. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        remotes: string[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5051,7 +4184,24 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["ConfigOauthstatusResponse"];
+            /** @description Status of the interactive OAuth authentication server. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description Whether the OAuth authentication server is currently running.
+                         * @enum {string}
+                         */
+                        status: "running" | "stopped";
+                        /** @description Authorization URL to open in a browser. Present only when status is "running". */
+                        authUrl?: string;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5127,7 +4277,20 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["ConfigPathsResponse"];
+            /** @description Paths to the config file, cache directory, and temporary directory. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        cache: string;
+                        config: string;
+                        temp: string;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5150,7 +4313,20 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["ConfigProvidersResponse"];
+            /** @description Available backend providers and their metadata. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        providers: components["schemas"]["ConfigProvider"][];
+                    } & {
+                        [key: string]: unknown;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5266,7 +4442,41 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["CoreVersionResponse"];
+            /** @description rclone version, build information, and runtime details. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Full semantic version string (e.g. 1.67.0). */
+                        version: string;
+                        /** @description Operating system rclone is running on (e.g. linux, darwin). */
+                        os: string;
+                        /** @description CPU architecture (e.g. amd64, arm64). */
+                        arch: string;
+                        /** @description Version number broken into components. */
+                        decomposed: number[];
+                        /** @description True when built directly from a git checkout. */
+                        isGit: boolean;
+                        /** @description Indicates whether this build is a beta version. */
+                        isBeta: boolean;
+                        /** @description Go toolchain version used to build rclone. */
+                        goVersion: string;
+                        /** @description OS Version (e.g. ubuntu 24.04 (64 bit)). */
+                        osVersion?: string;
+                        /** @description OS Kernel version (e.g. 6.8.0-86-generic (x86_64)). */
+                        osKernel?: string;
+                        /** @description CPU architecture in use (e.g. arm64 (ARMv8 compatible)). */
+                        osArch?: string;
+                        /** @description Linking mode for the binary (static or dynamic). */
+                        linking: string;
+                        /** @description Space separated Go build tags, if any. */
+                        goTags: string;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5294,7 +4504,43 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["CoreStatsResponse"];
+            /** @description Current transfer statistics including totals, rates, and recent activity. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        bytes: number;
+                        checks: number;
+                        deletedDirs: number;
+                        deletes: number;
+                        elapsedTime: number;
+                        errors: number;
+                        eta?: number | null;
+                        fatalError: boolean;
+                        lastError?: string;
+                        retryError: boolean;
+                        renames: number;
+                        listed?: number;
+                        serverSideCopies: number;
+                        serverSideCopyBytes: number;
+                        serverSideMoveBytes: number;
+                        serverSideMoves: number;
+                        speed: number;
+                        totalBytes: number;
+                        totalChecks: number;
+                        totalTransfers: number;
+                        transferTime: number;
+                        transfers: number;
+                        /** @description Active transfers currently in progress grouped by stats group. */
+                        transferring?: components["schemas"]["CoreStatsTransfer"][];
+                        /** @description Objects currently undergoing verification operations. */
+                        checking?: components["schemas"]["CoreStatsChecking"][];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5331,7 +4577,21 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["JobBatchResponse"];
+            /** @description Results of the batch job execution. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description One entry for each input, in order. Each is that command's result, its error, or a job ID if the input set `_async`. */
+                        results: {
+                            [key: string]: unknown;
+                        }[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5354,7 +4614,25 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["JobListResponse"];
+            /** @description Identifiers of active and recently completed async jobs. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Identifier for this rclone process. */
+                        executeId: string;
+                        /** @description Job IDs suitable for use with `job/status` and `job/stop`. */
+                        jobids: number[];
+                        /** @description Array of integer job ids that are running. */
+                        runningIds: number[];
+                        /** @description Array of integer job ids that are finished. */
+                        finishedIds: number[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5380,7 +4658,39 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["JobStatusResponse"];
+            /** @description Detailed status for a background job, including timing, success flag, and optional output. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Identifier for this rclone process. */
+                        executeId: string;
+                        /** @description True once the job has completed. */
+                        finished: boolean;
+                        /** @description Execution time in seconds. */
+                        duration: number;
+                        /** @description Timestamp when the job finished. (e.g. '2025-12-26T18:50:20.528746884+01:00') */
+                        endTime: string;
+                        /** @description Error message, or empty string on success. */
+                        error: string;
+                        /** @description Job identifier. */
+                        id: number;
+                        /** @description Timestamp when the job started. (e.g. '2025-12-24T18:50:20.5281314+01:00') */
+                        startTime: string;
+                        /** @description True if the job completed successfully. */
+                        success: boolean;
+                        /** @description Synchronous-style output payload when available. */
+                        output?: unknown;
+                        /** @description Progress measurements supplied by the underlying command. */
+                        progress?: unknown;
+                        /** @description Stats group of the job. */
+                        group: string;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5473,7 +4783,52 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["OperationsListResponse"];
+            /** @description Directory listing entries from `operations/list`, mirroring the `lsjson` format. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Array of entries equivalent to the items returned by `rclone lsjson`. */
+                        list: {
+                            /** @description Path relative to the requested remote root. */
+                            Path: string;
+                            /** @description Base name of the entry. */
+                            Name: string;
+                            /** @description Object size in bytes. */
+                            Size?: number;
+                            /** @description MIME type where available. */
+                            MimeType?: string;
+                            /** @description Modification timestamp in RFC3339 format. */
+                            ModTime?: string;
+                            /** @description True if the entry represents a directory. */
+                            IsDir: boolean;
+                            /** @description Hash digests keyed by algorithm when requested. */
+                            Hashes?: {
+                                [key: string]: string;
+                            };
+                            /** @description Backend-specific identifier when provided. */
+                            ID?: string;
+                            /** @description Original backend identifier when recorded. */
+                            OrigID?: string;
+                            /** @description True for bucket/root entries on bucket-based remotes. */
+                            IsBucket?: boolean;
+                            /** @description Storage class or tier, if supplied by the backend. */
+                            Tier?: string;
+                            /** @description Encrypted entry name when using crypt remotes. */
+                            Encrypted?: string;
+                            /** @description Encrypted path when using crypt remotes. */
+                            EncryptedPath?: string;
+                            /** @description Backend-provided metadata map. */
+                            Metadata?: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5514,7 +4869,51 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["OperationsStatResponse"];
+            /** @description Metadata for a single file or directory from `operations/stat`. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        item: {
+                            /** @description Path relative to the remote root. */
+                            Path: string;
+                            /** @description Base name of the entry. */
+                            Name: string;
+                            /** @description Object size in bytes. */
+                            Size: number;
+                            /** @description MIME type where available. */
+                            MimeType: string;
+                            /** @description Modification timestamp in RFC3339 format. */
+                            ModTime: string;
+                            /** @description True if the entry is a directory. */
+                            IsDir: boolean;
+                            /** @description Hash digests keyed by algorithm when requested. */
+                            Hashes?: {
+                                [key: string]: string;
+                            };
+                            /** @description Backend-specific identifier when provided. */
+                            ID?: string;
+                            /** @description Original backend identifier when recorded. */
+                            OrigID?: string;
+                            /** @description True for bucket/root entries on bucket-based remotes. */
+                            IsBucket?: boolean;
+                            /** @description Storage class or tier, if supplied by the backend. */
+                            Tier?: string;
+                            /** @description Encrypted entry name when using crypt remotes. */
+                            Encrypted?: string;
+                            /** @description Encrypted path when using crypt remotes. */
+                            EncryptedPath?: string;
+                            /** @description Backend-provided metadata map. */
+                            Metadata?: {
+                                [key: string]: unknown;
+                            };
+                        } | null;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5540,7 +4939,23 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["OperationsAboutResponse"];
+            /** @description Quota and usage information from `operations/about`, including total, used, and free space. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        total?: number;
+                        used?: number;
+                        free?: number;
+                        trashed?: number;
+                        other?: number;
+                        objects?: number;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5705,7 +5120,35 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["OperationsCheckResponse"];
+            /** @description Comparison summary from `operations/check`, including missing, matching, and differing files. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description True when the check completes without differences or errors. */
+                        success: boolean;
+                        /** @description Human readable status string. */
+                        status: string;
+                        /** @description Hash algorithm used for comparisons when applicable. */
+                        hashType?: string;
+                        /** @description Combined summary lines when `combined=true` is requested. */
+                        combined?: string[];
+                        /** @description Files present on the destination but missing from the source. */
+                        missingOnSrc?: string[];
+                        /** @description Files present on the source but missing from the destination. */
+                        missingOnDst?: string[];
+                        /** @description Files that matched on both sides. */
+                        match?: string[];
+                        /** @description Files that differed between source and destination. */
+                        differ?: string[];
+                        /** @description Entries that produced errors during the check. */
+                        error?: string[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5864,7 +5307,31 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["SyncBisyncResponse"];
+            /** @description Bisync completed with session details. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Captured output from the bisync operation. */
+                        output: string;
+                        /** @description Session name derived from the two filesystems. */
+                        session: string;
+                        /** @description Absolute path to the bisync working directory. */
+                        workDir: string;
+                        /** @description Base path for listing files. */
+                        basePath: string;
+                        /** @description Path to the Path1 listing file. */
+                        listing1: string;
+                        /** @description Path to the Path2 listing file. */
+                        listing2: string;
+                        /** @description Path to the log file. */
+                        logFile: string;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5887,7 +5354,18 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["OptionsBlocksResponse"];
+            /** @description Names of option blocks that can be queried with `options/get` or `options/info`. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        options: string[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5913,7 +5391,64 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["OptionsGetResponse"];
+            /** @description Current global option values keyed by block name. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        dlna?: {
+                            [key: string]: unknown;
+                        };
+                        filter?: {
+                            [key: string]: unknown;
+                        };
+                        ftp?: {
+                            [key: string]: unknown;
+                        };
+                        http?: {
+                            [key: string]: unknown;
+                        };
+                        log?: {
+                            [key: string]: unknown;
+                        };
+                        main?: {
+                            [key: string]: unknown;
+                        };
+                        mount?: {
+                            [key: string]: unknown;
+                        };
+                        nfs?: {
+                            [key: string]: unknown;
+                        };
+                        proxy?: {
+                            [key: string]: unknown;
+                        };
+                        rc?: {
+                            [key: string]: unknown;
+                        };
+                        restic?: {
+                            [key: string]: unknown;
+                        };
+                        s3?: {
+                            [key: string]: unknown;
+                        };
+                        sftp?: {
+                            [key: string]: unknown;
+                        };
+                        vfs?: {
+                            [key: string]: unknown;
+                        };
+                        webdav?: {
+                            [key: string]: unknown;
+                        };
+                    } & {
+                        [key: string]: unknown;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5939,7 +5474,34 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["OptionsInfoResponse"];
+            /** @description Metadata describing available options, organised by block. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        dlna?: components["schemas"]["OptionsInfoOption"][];
+                        filter?: components["schemas"]["OptionsInfoOption"][];
+                        ftp?: components["schemas"]["OptionsInfoOption"][];
+                        http?: components["schemas"]["OptionsInfoOption"][];
+                        log?: components["schemas"]["OptionsInfoOption"][];
+                        main?: components["schemas"]["OptionsInfoOption"][];
+                        mount?: components["schemas"]["OptionsInfoOption"][];
+                        nfs?: components["schemas"]["OptionsInfoOption"][];
+                        proxy?: components["schemas"]["OptionsInfoOption"][];
+                        rc?: components["schemas"]["OptionsInfoOption"][];
+                        restic?: components["schemas"]["OptionsInfoOption"][];
+                        s3?: components["schemas"]["OptionsInfoOption"][];
+                        sftp?: components["schemas"]["OptionsInfoOption"][];
+                        vfs?: components["schemas"]["OptionsInfoOption"][];
+                        webdav?: components["schemas"]["OptionsInfoOption"][];
+                    } & {
+                        [key: string]: components["schemas"]["OptionsInfoOption"][];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -6050,7 +5612,156 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["OptionsLocalResponse"];
+            /** @description Effective option values for the current request, separated into config and filter sections. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        config: {
+                            AskPassword: boolean;
+                            AutoConfirm: boolean;
+                            BackupDir: string;
+                            BindAddr: string;
+                            BufferSize: number;
+                            BwLimit: string;
+                            BwLimitFile: string;
+                            CaCert: string[];
+                            CheckFirst: boolean;
+                            CheckSum: boolean;
+                            Checkers: number;
+                            ClientCert: string;
+                            ClientKey: string;
+                            CompareDest: string[];
+                            ConnectTimeout: number;
+                            Cookie: boolean;
+                            CopyDest: string[];
+                            CutoffMode: string;
+                            DataRateUnit: string;
+                            DefaultTime: string;
+                            DeleteMode: number;
+                            DisableFeatures: string | null;
+                            DisableHTTP2: boolean;
+                            DisableHTTPKeepAlives: boolean;
+                            DownloadHeaders: string | null;
+                            DryRun: boolean;
+                            Dump: string;
+                            ErrorOnNoTransfer: boolean;
+                            ExpectContinueTimeout: number;
+                            FixCase: boolean;
+                            FsCacheExpireDuration: number;
+                            FsCacheExpireInterval: number;
+                            Headers: string | null;
+                            HumanReadable: boolean;
+                            IgnoreCaseSync: boolean;
+                            IgnoreChecksum: boolean;
+                            IgnoreErrors: boolean;
+                            IgnoreExisting: boolean;
+                            IgnoreSize: boolean;
+                            IgnoreTimes: boolean;
+                            Immutable: boolean;
+                            Inplace: boolean;
+                            InsecureSkipVerify: boolean;
+                            Interactive: boolean;
+                            KvLockTime: number;
+                            Links: boolean;
+                            LogLevel: string;
+                            LowLevelRetries: number;
+                            MaxBacklog: number;
+                            MaxBufferMemory: number;
+                            MaxDelete: number;
+                            MaxDeleteSize: number;
+                            MaxDepth: number;
+                            MaxDuration: number;
+                            MaxStatsGroups: number;
+                            MaxTransfer: number;
+                            Metadata: boolean;
+                            MetadataMapper: string | null;
+                            MetadataSet: string | null;
+                            ModifyWindow: number;
+                            MultiThreadChunkSize: number;
+                            MultiThreadCutoff: number;
+                            MultiThreadSet: boolean;
+                            MultiThreadStreams: number;
+                            MultiThreadWriteBufferSize: number;
+                            NoCheckDest: boolean;
+                            NoConsole: boolean;
+                            NoGzip: boolean;
+                            NoTraverse: boolean;
+                            NoUnicodeNormalization: boolean;
+                            NoUpdateDirModTime: boolean;
+                            NoUpdateModTime: boolean;
+                            OrderBy: string;
+                            PartialSuffix: string;
+                            PasswordCommand: string | null;
+                            Progress: boolean;
+                            ProgressTerminalTitle: boolean;
+                            RefreshTimes: boolean;
+                            Retries: number;
+                            RetriesInterval: number;
+                            ServerSideAcrossConfigs: boolean;
+                            SizeOnly: boolean;
+                            StatsFileNameLength: number;
+                            StatsLogLevel: string;
+                            StatsOneLine: boolean;
+                            StatsOneLineDate: boolean;
+                            StatsOneLineDateFormat: string;
+                            StreamingUploadCutoff: number;
+                            Suffix: string;
+                            SuffixKeepExtension: boolean;
+                            TPSLimit: number;
+                            TPSLimitBurst: number;
+                            TerminalColorMode: string;
+                            Timeout: number;
+                            TrackRenames: boolean;
+                            TrackRenamesStrategy: string;
+                            TrafficClass: number;
+                            Transfers: number;
+                            UpdateOlder: boolean;
+                            UploadHeaders: string | null;
+                            UseJSONLog: boolean;
+                            UseListR: boolean;
+                            UseMmap: boolean;
+                            UseServerModTime: boolean;
+                            UserAgent: string;
+                            ListCutoff: number;
+                            ClientPass: string;
+                            MaxConnections: number;
+                            NameTransform: string[] | null;
+                            HTTPProxy: string;
+                        };
+                        filter: {
+                            DeleteExcluded: boolean;
+                            ExcludeFile: string[];
+                            ExcludeFrom: string[];
+                            ExcludeRule: string[];
+                            FilesFrom: string[];
+                            FilesFromRaw: string[];
+                            FilterFrom: string[];
+                            FilterRule: string[];
+                            HashFilter: string;
+                            IgnoreCase: boolean;
+                            IncludeFrom: string[];
+                            IncludeRule: string[];
+                            MaxAge: number;
+                            MaxSize: number;
+                            MetaRules: {
+                                ExcludeFrom: string[];
+                                ExcludeRule: string[];
+                                FilterFrom: string[];
+                                FilterRule: string[];
+                                IncludeFrom: string[];
+                                IncludeRule: string[];
+                            };
+                            MinAge: number;
+                            MinSize: number;
+                            FilesFrom0: string[] | null;
+                        };
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -6073,7 +5784,36 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["ServeListResponse"];
+            /** @description List of active `serve` instances, including their IDs, bind addresses, and parameters. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        list: {
+                            /** @description Identifier returned by `serve/start`. */
+                            id: string;
+                            /** @description Address and port the server is listening on. */
+                            addr: string;
+                            /** @description Serve configuration parameters supplied at startup. */
+                            params: {
+                                fs: string | components["schemas"]["RemoteDefinition"];
+                                type: string;
+                                opt?: {
+                                    [key: string]: unknown;
+                                };
+                                vfsOpt?: {
+                                    [key: string]: unknown;
+                                };
+                            } & {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -6105,7 +5845,21 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["ServeStartResponse"];
+            /** @description Confirmation of a newly started server, including ID and bound address. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Address and port the server is listening on. */
+                        addr: string;
+                        /** @description Identifier to pass to `serve/stop`. */
+                        id: string;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -6177,7 +5931,18 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["ServeTypesResponse"];
+            /** @description Supported rclone serve protocols. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        types: string[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -6209,7 +5974,19 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["VfsForgetResponse"];
+            /** @description Paths evicted from the VFS directory cache. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Paths that were successfully forgotten. */
+                        forgotten: string[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -6232,7 +6009,19 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["VfsListResponse"];
+            /** @description Identifiers for the VFS instances currently in use. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description VFS name that can be used with other VFS endpoints. */
+                        vfses: string[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -6262,7 +6051,32 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["VfsPollIntervalResponse"];
+            /** @description Status of the poll-interval setting, possibly including the new interval. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description True if polling is on. */
+                        enabled: boolean;
+                        /** @description True if the remote supports polling. */
+                        supported: boolean;
+                        /** @description The polling interval. */
+                        interval: {
+                            /** @description Interval in nanoseconds. */
+                            raw: number;
+                            /** @description Interval in whole seconds. */
+                            seconds: number;
+                            /** @description Interval as text, such as `1m0s`. */
+                            string: string;
+                        };
+                        /** @description True if setting the interval timed out. Only present when setting it. */
+                        timeout?: boolean;
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -6288,7 +6102,34 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["VfsQueueResponse"];
+            /** @description Upload queue entries for the selected VFS. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Files waiting to upload. Absent when the VFS has no cache. */
+                        queue?: {
+                            /** @description Full path of the file. */
+                            name: string;
+                            /** @description Queue item ID, for `vfs/queue-set-expiry`. */
+                            id: number;
+                            /** @description Size in bytes. */
+                            size: number;
+                            /** @description Seconds until the file is eligible for transfer. */
+                            expiry: number;
+                            /** @description Upload attempts so far. */
+                            tries: number;
+                            /** @description Delay between upload attempts in seconds. */
+                            delay: number;
+                            /** @description True if the file is uploading now. */
+                            uploading: boolean;
+                        }[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -6355,7 +6196,21 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["VfsRefreshResponse"];
+            /** @description Acknowledgement of directories refreshed in the VFS cache. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Map of refreshed directories to status messages. */
+                        result: {
+                            [key: string]: string;
+                        };
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -6381,7 +6236,85 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["VfsStatsResponse"];
+            /** @description Runtime statistics for a VFS, including disk cache and metadata cache state. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Name of the VFS. */
+                        fs: string;
+                        /** @description Number of active references to the VFS. */
+                        inUse: number;
+                        /** @description Disk cache metrics when caching is enabled. */
+                        diskCache?: {
+                            /** @description Bytes used by the cache. */
+                            bytesUsed?: number;
+                            /** @description Files with errors. */
+                            erroredFiles?: number;
+                            /** @description Files in the cache. */
+                            files?: number;
+                            /** @description Internal number of the hash the cache uses. */
+                            hashType?: number;
+                            /** @description True if the cache has run out of space. */
+                            outOfSpace?: boolean;
+                            /** @description Directory of the cached data. */
+                            path?: string;
+                            /** @description Directory of the cached metadata. */
+                            pathMeta?: string;
+                            /** @description Uploads running now. */
+                            uploadsInProgress?: number;
+                            /** @description Uploads waiting to run. */
+                            uploadsQueued?: number;
+                        } | null;
+                        /** @description In-memory metadata cache counters. */
+                        metadataCache: {
+                            /** @description Directories cached. */
+                            dirs?: number;
+                            /** @description Files cached. */
+                            files?: number;
+                        };
+                        /** @description Effective options of the VFS. Durations are in nanoseconds, and sizes are in bytes. */
+                        opt: {
+                            NoSeek?: boolean;
+                            NoChecksum?: boolean;
+                            ReadOnly?: boolean;
+                            Links?: boolean;
+                            NoModTime?: boolean;
+                            DirCacheTime?: number;
+                            Refresh?: boolean;
+                            PollInterval?: number;
+                            Umask?: number;
+                            UID?: number;
+                            GID?: number;
+                            DirPerms?: number;
+                            FilePerms?: number;
+                            LinkPerms?: number;
+                            ChunkSize?: number;
+                            ChunkSizeLimit?: number;
+                            ChunkStreams?: number;
+                            CacheMode?: number;
+                            CacheMaxAge?: number;
+                            CacheMaxSize?: number;
+                            CacheMinFreeSpace?: number;
+                            CachePollInterval?: number;
+                            CaseInsensitive?: boolean;
+                            BlockNormDupes?: boolean;
+                            WriteWait?: number;
+                            ReadWait?: number;
+                            WriteBack?: number;
+                            ReadAhead?: number;
+                            UsedIsSize?: boolean;
+                            FastFingerprint?: boolean;
+                            DiskSpaceTotalSize?: number;
+                            HandleCaching?: number;
+                            MetadataExtension?: string;
+                        };
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -6437,7 +6370,29 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["PluginsctlGetPluginsForTypeResponse"];
+            /** @description Loaded plugin metadata for the requested MIME type. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Installed plugins keyed by repository name. */
+                        loadedPlugins: {
+                            [key: string]: {
+                                [key: string]: unknown;
+                            };
+                        };
+                        /** @description Installed test plugins keyed by repository name. */
+                        loadedTestPlugins: {
+                            [key: string]: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -6460,7 +6415,25 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["PluginsctlListPluginsResponse"];
+            /** @description Lists installed production and test plugins with their metadata. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Metadata entries for installed plugins. */
+                        loadedPlugins: {
+                            [key: string]: unknown;
+                        }[];
+                        /** @description Metadata entries for installed test plugins. */
+                        loadedTestPlugins: {
+                            [key: string]: unknown;
+                        }[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -6483,7 +6456,23 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["PluginsctlListTestPluginsResponse"];
+            /** @description Metadata for installed test plugins keyed by repository name. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Installed test plugin metadata keyed by repository. */
+                        loadedTestPlugins: {
+                            [key: string]: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
