@@ -1351,7 +1351,7 @@ export interface paths {
         put?: never;
         /**
          * Upload files via multipart
-         * @description Accepts multipart/form-data payloads and writes the uploaded files to the specified remote path.
+         * @description Accepts multipart/form-data payloads and writes the uploaded files to the specified remote path. Its parameters go in the query string, because rclone doesn't read them from a multipart body. A JSON body returns 200 and uploads nothing. This route can't run in the background.
          */
         post: operations["operationsUploadfile"];
         delete?: never;
@@ -1980,27 +1980,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/config/unset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Unset keys in a remote
+         * @description Removes keys from a remote in the config file.
+         */
+        post: operations["configUnset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        JobBatchRequest: {
-            /** @description Stats group this batch accumulates under. */
-            _group?: string;
-            /** @description Do this many commands concurrently. Defaults to --transfers if not set. */
-            concurrency?: number;
-            /** @description List of inputs to the commands with an extra _path parameter. */
-            inputs?: ({
-                /** @description rc/path */
-                _path: string;
-                /** @description Stats group this input accumulates under. */
-                _group?: string;
-            } & {
-                [key: string]: unknown;
-            })[];
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
         RcError: {
             error: string;
             status: number;
@@ -2159,1043 +2162,28 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
-        RcNoopRequest: {
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        } & {
-            [key: string]: unknown;
-        };
-        OperationsCleanupRequest: {
-            /** @description Remote name or path to clean up, for example `drive:`. */
-            fs?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsCopyfileRequest: {
-            /** @description Source remote name or path, such as `drive:` or `/` for the local filesystem. */
-            srcFs?: string;
-            /** @description Path to the source object within `srcFs`, for example `dir/file.txt`. */
-            srcRemote?: string;
-            /** @description Destination remote name or path, such as `drive2:` or `/` for local filesystem. */
-            dstFs?: string;
-            /** @description Target path within `dstFs` where the file should be written. */
-            dstRemote?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsCopyurlRequest: {
-            /** @description Remote name or path that will receive the downloaded file, e.g. `drive:`. */
-            fs?: string;
-            /** @description Destination path within `fs` where the fetched object will be stored. */
-            remote?: string;
-            /** @description Source URL to fetch the object from. */
-            url?: string;
-            /** @description Set to true to derive the destination filename from the URL. */
-            autoFilename?: boolean;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsDeleteRequest: {
-            /** @description Remote name or path whose contents should be removed. */
-            fs?: string;
-            /** @description JSON encoded config overrides applied for this call only. */
-            _config?: string;
-            /** @description JSON encoded filter overrides applied for this call only. */
-            _filter?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsDeletefileRequest: {
-            /** @description Remote name or path that contains the file to delete. */
-            fs?: string;
-            /** @description Exact path to the file within `fs` that should be deleted. */
-            remote?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsFsinfoRequest: {
-            /** @description Remote name or path to inspect, e.g. `drive:`. */
-            fs?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsHashsumRequest: {
-            /** @description Remote name or path to hash, such as `drive:` or `/`. */
-            fs?: string;
-            /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
-            hashType?: string;
-            /** @description Set to true to force reading the data instead of using remote checksums. */
-            download?: boolean;
-            /** @description Set to true to emit hash values in base64 rather than hexadecimal. */
-            base64?: boolean;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsHashsumfileRequest: {
-            /** @description Remote name or path containing the file to hash. */
-            fs?: string;
-            /** @description Path to the specific file within `fs` to hash. */
-            remote?: string;
-            /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
-            hashType?: string;
-            /** @description Set to true to force reading the data instead of using remote checksums. */
-            download?: boolean;
-            /** @description Set to true to emit the hash value in base64 rather than hexadecimal. */
-            base64?: boolean;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsMovefileRequest: {
-            /** @description Source remote name or path containing the file to move. */
-            srcFs?: string;
-            /** @description Path to the source object within `srcFs`. */
-            srcRemote?: string;
-            /** @description Destination remote name or path where the file will be moved. */
-            dstFs?: string;
-            /** @description Destination path within `dstFs` for the moved object. */
-            dstRemote?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsPubliclinkRequest: {
-            /** @description Remote name or path hosting the object for which to manage a public link. */
-            fs?: string;
-            /** @description Path within `fs` to the object for which to create or remove a public link. */
-            remote?: string;
-            /** @description Set to true to remove an existing public link instead of creating one. */
-            unlink?: boolean;
-            /** @description Optional expiration time for the public link, formatted as supported by the backend. */
-            expire?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsRmdirsRequest: {
-            /** @description Remote name or path to scan for empty directories. */
-            fs?: string;
-            /** @description Path within `fs` whose empty subdirectories should be removed. */
-            remote?: string;
-            /** @description Set to true to preserve the top-level directory even if empty. */
-            leaveRoot?: boolean;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsSettierRequest: {
-            /** @description Remote name or path whose storage class tier should be changed. */
-            fs?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsSettierfileRequest: {
-            /** @description Remote name or path that contains the object whose tier should change. */
-            fs?: string;
-            /** @description Path within `fs` to the object whose storage class tier should be updated. */
-            remote?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsSizeRequest: {
-            /** @description Remote name or path to measure aggregate size information for. */
-            fs?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreBwlimitRequest: {
-            /** @description Bandwidth limit to apply, for example `off`, `5M`, or a schedule string. */
-            rate?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreCommandRequest: {
-            /** @description Name of the rclone command to execute, for example `ls` or `lsf`. */
-            command?: string;
-            /** @description Optional positional arguments for the command. Repeat to supply multiple values. */
-            arg?: string[];
-            /** @description Optional command options encoded as a JSON string. */
-            opt?: string;
-            /** @description Controls how output is returned; accepts `COMBINED_OUTPUT`, `STREAM`, `STREAM_ONLY_STDOUT`, or `STREAM_ONLY_STDERR`. */
-            returnType?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreDuRequest: {
-            /** @description Local directory path to report disk usage for. Defaults to the rclone cache directory when omitted. */
-            dir?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreGcRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreGroupListRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreMemstatsRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreObscureRequest: {
-            /** @description Plain-text string to obscure for storage in the config file. */
-            clear?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CorePidRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreQuitRequest: {
-            /** @description Optional exit code to use when terminating the rclone process. */
-            exitCode?: number;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreStatsDeleteRequest: {
-            /** @description Stats group identifier to remove. */
-            group?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreStatsResetRequest: {
-            /** @description Stats group identifier whose counters should be reset. Leave unset to reset all groups. */
-            group?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreTransferredRequest: {
-            /** @description Stats group identifier to filter the completed transfer list. Leave unset for all groups. */
-            group?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        DebugSetBlockProfileRateRequest: {
-            /** @description Sampling interval in nanoseconds for blocking profile collection; use 1 to capture all events. */
-            rate?: number;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        DebugSetGcPercentRequest: {
-            /** @description Target percentage of newly allocated data to trigger garbage collection. */
-            "gc-percent"?: number;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        DebugSetMutexProfileFractionRequest: {
-            /** @description Sampling fraction for mutex contention profiling; set to 0 to disable. */
-            rate?: number;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        DebugSetSoftMemoryLimitRequest: {
-            /** @description Soft memory limit for the Go runtime in bytes. */
-            "mem-limit"?: number;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        FscacheClearRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        FscacheEntriesRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        MountListmountsRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        MountMountRequest: {
-            /** @description Remote path to mount, such as `drive:` or `remote:subdir`. */
-            fs?: string;
-            /** @description Absolute local path where the remote should be mounted. */
-            mountPoint?: string;
-            /** @description Optional mount implementation to use (`mount`, `cmount`, or `mount2`). */
-            mountType?: string;
-            /** @description Mount options encoded as JSON, matching flags accepted by `rclone mount`. */
-            mountOpt?: string;
-            /** @description VFS options encoded as JSON, matching flags accepted by `rclone mount`. */
-            vfsOpt?: string;
-            /** @description JSON encoded config overrides applied for this call only. */
-            _config?: string;
-            /** @description JSON encoded filter overrides applied for this call only. */
-            _filter?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        MountTypesRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        MountUnmountRequest: {
-            /** @description Local mount point path to unmount. */
-            mountPoint?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        MountUnmountallRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        RcNoopAuthRequest: {
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        } & {
-            [key: string]: unknown;
-        };
-        RcErrorRequest: {
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        } & {
-            [key: string]: unknown;
-        };
-        RcListRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        BackendCommandRequest: {
-            /** @description Backend-specific command to invoke. */
-            command?: string;
-            /** @description Remote name or path the backend command should target. */
-            fs?: string;
-            /** @description Optional positional arguments for the backend command. */
-            arg?: string[];
-            /** @description Backend command options encoded as a JSON string. */
-            opt?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CacheExpireRequest: {
-            /** @description Remote path to expire from the cache, e.g. `remote:path/to/dir`. */
-            remote?: string;
-            /** @description Set to true to drop cached chunk data along with directory entries. */
-            withData?: boolean;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CacheFetchRequest: {
-            /** @description Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch. */
-            chunks?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        } & {
-            [key: string]: unknown;
-        };
-        CacheStatsRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ConfigCreateRequest: {
-            /** @description Name of the new remote configuration. */
-            name?: string;
-            /** @description JSON object of configuration key/value pairs required for the remote. */
-            parameters?: string;
-            /** @description Backend type identifier, such as `drive`, `s3`, or `dropbox`. */
+        /** @description A remote defined inline. Needs `type` or `_name`. Other keys are backend options and must be strings. */
+        RemoteDefinition: {
+            /** @description Backend type, such as `s3`. */
             type?: string;
-            /** @description Optional JSON object controlling interactive behaviour (e.g. `obscure`, `continue`). */
-            opt?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ConfigDeleteRequest: {
-            /** @description Name of the remote configuration to delete. */
-            name?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ConfigDumpRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ConfigGetRequest: {
-            /** @description Name of the remote configuration to fetch. */
-            name?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ConfigListremotesRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ConfigOauthstatusRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ConfigOauthstopRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ConfigPasswordRequest: {
-            /** @description Name of the remote whose secrets should be updated. */
-            name?: string;
-            /** @description JSON object of password answers, typically including `pass`. */
-            parameters?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ConfigPathsRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ConfigProvidersRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ConfigSetpathRequest: {
-            /** @description Absolute path to the `rclone.conf` file that rclone should use. */
-            path?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ConfigUnlockRequest: {
-            /** @description Password used to unlock an encrypted config file. */
-            configPassword?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ConfigUpdateRequest: {
-            /** @description Name of the remote configuration to update. */
-            name?: string;
-            /** @description JSON object of configuration key/value pairs to apply to the remote. */
-            parameters?: string;
-            /** @description Optional JSON object controlling update behaviour (e.g. `obscure`, `continue`). */
-            opt?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreVersionRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreStatsRequest: {
-            /** @description Stats group identifier to return a snapshot for. Leave unset to include all groups. */
-            group?: string;
-            /** @description When true, omit the `transferring` and `checking` arrays from the response. */
-            short?: boolean;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        JobListRequest: {
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        JobStatusRequest: {
-            /** @description Numeric identifier of the job to query, as returned from an async call. */
-            jobid?: number;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        JobStopRequest: {
-            /** @description Numeric identifier of the job to cancel. */
-            jobid?: number;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        JobStopgroupRequest: {
-            /** @description Stats group name whose active jobs should be stopped. */
-            group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsListRequest: {
-            /** @description Remote name or path to list, for example `drive:`. */
-            fs?: string;
-            /** @description Directory path within `fs` to list; leave empty to target the root. */
-            remote?: string;
-            /** @description Optional JSON-encoded object of listing flags (e.g. `{ "recurse": true, "showHash": true }`). */
-            opt?: string;
-            /** @description Set to true to list directories recursively. */
-            recurse?: boolean;
-            /** @description Set to true to omit modification times for faster listings on some backends. */
-            noModTime?: boolean;
-            /** @description Set to true to include encrypted names when using crypt remotes. */
-            showEncrypted?: boolean;
-            /** @description Set to true to include original backend identifiers where available. */
-            showOrigIDs?: boolean;
-            /** @description Set to true to include hash digests for each entry. */
-            showHash?: boolean;
-            /** @description Set to true to omit MIME type detection. */
-            noMimeType?: boolean;
-            /** @description Set to true to return only directory entries. */
-            dirsOnly?: boolean;
-            /** @description Set to true to return only file entries. */
-            filesOnly?: boolean;
-            /** @description Set to true to include backend-provided metadata maps. */
-            metadata?: boolean;
-            /** @description Specify one or more hash algorithms to include when `showHash` is true (e.g. `md5`). */
-            hashTypes?: string[];
-            /** @description JSON encoded config overrides applied for this call only. */
-            _config?: string;
-            /** @description JSON encoded filter overrides applied for this call only. */
-            _filter?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsStatRequest: {
-            /** @description Remote name or path that contains the item to inspect. */
-            fs?: string;
-            /** @description Path to the file or directory within `fs` to describe. */
-            remote?: string;
-            /** @description Optional JSON object of listing flags, matching those accepted by `operations/list`. */
-            opt?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsAboutRequest: {
-            /** @description Remote name or path to query for capacity information. */
-            fs?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsPurgeRequest: {
-            /** @description Remote name or path from which to remove all contents. */
-            fs?: string;
-            /** @description Path within `fs` whose contents should be purged. */
-            remote?: string;
-            /** @description JSON encoded config overrides applied for this call only. */
-            _config?: string;
-            /** @description JSON encoded filter overrides applied for this call only. */
-            _filter?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsMkdirRequest: {
-            /** @description Remote name or path in which to create a directory. */
-            fs?: string;
-            /** @description Directory path within `fs` to create. */
-            remote?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsRmdirRequest: {
-            /** @description Remote name or path containing the directory to remove. */
-            fs?: string;
-            /** @description Directory path within `fs` to delete. */
-            remote?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OperationsCheckRequest: {
-            /** @description Source remote name or path to verify, e.g. `drive:`. */
-            srcFs?: string;
-            /** @description Destination remote name or path that should match the source. */
-            dstFs?: string;
-            /** @description Set to true to read file contents during comparison instead of relying on hashes. */
-            download?: boolean;
-            /** @description Hash name to expect in the supplied SUM file, such as `md5`. */
-            checkFileHash?: string;
-            /** @description Remote containing the checksum SUM file when using `checkFileHash`. */
-            checkFileFs?: string;
-            /** @description Path within `checkFileFs` to the checksum SUM file. */
-            checkFileRemote?: string;
-            /** @description Set to true to only ensure that source files exist on the destination. */
-            oneWay?: boolean;
-            /** @description Set to true to include a combined summary report in the response. */
-            combined?: boolean;
-            /** @description Set to true to report files missing from the source. */
-            missingOnSrc?: boolean;
-            /** @description Set to true to report files missing from the destination. */
-            missingOnDst?: boolean;
-            /** @description Set to true to include matching files in the report. */
-            match?: boolean;
-            /** @description Set to true to include differing files in the report. */
-            differ?: boolean;
-            /** @description Set to true to include entries that encountered errors. */
-            error?: boolean;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        SyncSyncRequest: {
-            /** @description Source remote path to sync from, e.g. `drive:src`. */
-            srcFs?: string;
-            /** @description Destination remote path to sync to, e.g. `drive:dst`. */
-            dstFs?: string;
-            /** @description Set to true to create empty source directories on the destination. */
-            createEmptySrcDirs?: boolean;
-            /** @description JSON encoded config overrides applied for this call only. */
-            _config?: string;
-            /** @description JSON encoded filter overrides applied for this call only. */
-            _filter?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        SyncCopyRequest: {
-            /** @description Source remote path to copy from. */
-            srcFs?: string;
-            /** @description Destination remote path to copy to. */
-            dstFs?: string;
-            /** @description Set to true to replicate empty source directories on the destination. */
-            createEmptySrcDirs?: boolean;
-            /** @description JSON encoded config overrides applied for this call only. */
-            _config?: string;
-            /** @description JSON encoded filter overrides applied for this call only. */
-            _filter?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        SyncMoveRequest: {
-            /** @description Source remote path whose contents will be moved. */
-            srcFs?: string;
-            /** @description Destination remote path that will receive moved files. */
-            dstFs?: string;
-            /** @description Set to true to create empty source directories on the destination. */
-            createEmptySrcDirs?: boolean;
-            /** @description Set to true to delete empty directories from the source after the move completes. */
-            deleteEmptySrcDirs?: boolean;
-            /** @description JSON encoded config overrides applied for this call only. */
-            _config?: string;
-            /** @description JSON encoded filter overrides applied for this call only. */
-            _filter?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        SyncBisyncRequest: {
-            /** @description First remote directory, e.g. `drive:path1`. */
-            path1?: string;
-            /** @description Second remote directory, e.g. `drive:path2`. */
-            path2?: string;
-            /** @description Set to true to simulate the bisync run without making changes. */
-            dryRun?: boolean;
-            /** @description Set to true to perform a one-time resync, rebuilding bisync history. */
-            resync?: boolean;
-            /** @description Set to true to abort if `RCLONE_TEST` files are missing on either side. */
-            checkAccess?: boolean;
-            /** @description Override the access-check sentinel filename; defaults to `RCLONE_TEST`. */
-            checkFilename?: string;
-            /** @description Abort the run if deletions exceed this percentage (default 50). */
-            maxDelete?: number;
-            /** @description Set to true to bypass the `maxDelete` safety check. */
-            force?: boolean;
-            /** @description Controls final listing comparison; leave true for normal verification or set false to skip. */
-            checkSync?: boolean;
-            /** @description Set to true to mirror empty directories between the two paths. */
-            createEmptySrcDirs?: boolean;
-            /** @description Set to true to remove empty directories during cleanup. */
-            removeEmptyDirs?: boolean;
-            /** @description Path to an rclone filters file applied to both paths. */
-            filtersFile?: string;
-            /** @description Set to true to ignore checksum differences when comparing listings. */
-            ignoreListingChecksum?: boolean;
-            /** @description Set to true to allow retrying after certain recoverable errors. */
-            resilient?: boolean;
-            /** @description Directory path used to store bisync working files. */
-            workdir?: string;
-            /** @description Backup directory on the first remote for changed files. */
-            backupdir1?: string;
-            /** @description Backup directory on the second remote for changed files. */
-            backupdir2?: string;
-            /** @description Set to true to keep bisync working files after completion. */
-            noCleanup?: boolean;
-            /** @description JSON encoded config overrides applied for this call only. */
-            _config?: string;
-            /** @description JSON encoded filter overrides applied for this call only. */
-            _filter?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OptionsBlocksRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OptionsGetRequest: {
-            /** @description Optional comma-separated list of option block names to return. */
-            blocks?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OptionsInfoRequest: {
-            /** @description Optional comma-separated list of option block names to describe. */
-            blocks?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        OptionsSetRequest: {
-            /** @description Overrides for the `dlna` option block. */
-            dlna?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `filter` option block. */
-            filter?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `ftp` option block. */
-            ftp?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `main` option block. */
-            main?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `http` option block. */
-            http?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `log` option block. */
-            log?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `mount` option block. */
-            mount?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `nfs` option block. */
-            nfs?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `proxy` option block. */
-            proxy?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `rc` option block. */
-            rc?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `restic` option block. */
-            restic?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `s3` option block. */
-            s3?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `sftp` option block. */
-            sftp?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `vfs` option block. */
-            vfs?: {
-                [key: string]: unknown;
-            };
-            /** @description Overrides for the `webdav` option block. */
-            webdav?: {
-                [key: string]: unknown;
-            };
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
+            /** @description Name of a configured remote. */
+            _name?: string;
+            /** @description Root path within the remote. */
+            _root?: string;
         } & {
-            [key: string]: unknown;
+            [key: string]: string;
         };
-        OptionsLocalRequest: {
-            /** @description JSON encoded config overrides applied for this call only. */
-            _config?: string;
-            /** @description JSON encoded filter overrides applied for this call only. */
-            _filter?: string;
-            /** @description Assign the request to a custom stats group. */
+        RcGlobalOptions: {
+            /** @description Config overrides for this call only. */
+            _config?: {
+                [key: string]: unknown;
+            };
+            /** @description Filter overrides for this call only. */
+            _filter?: {
+                [key: string]: unknown;
+            };
+            /** @description Stats group for this call. */
             _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ServeListRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ServeStartRequest: {
-            /** @description Type of server to start (e.g. `http`, `webdav`, `ftp`, `sftp`). */
-            type?: string;
-            /** @description Remote path that will be served. */
-            fs?: string;
-            /** @description Address and port to bind the server to, such as `:5572` or `localhost:8080`. */
-            addr?: string;
-            /** @description JSON encoded config overrides applied for this call only. */
-            _config?: string;
-            /** @description JSON encoded filter overrides applied for this call only. */
-            _filter?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        } & {
-            [key: string]: unknown;
-        };
-        ServeStopRequest: {
-            /** @description Identifier of the running serve instance returned by `serve/start`. */
-            id?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ServeStopallRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        ServeTypesRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        VfsForgetRequest: {
-            /** @description Optional VFS identifier to target; required when more than one VFS is active. */
-            fs?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        } & {
-            [key: string]: unknown;
-        };
-        VfsListRequest: {
-            /** @description Optional VFS identifier; omit to list all active VFS instances. */
-            fs?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        VfsPollIntervalRequest: {
-            /** @description Optional VFS identifier whose poll interval should be queried or modified. */
-            fs?: string;
-            /** @description Duration string (e.g. `5m`) to set as the new poll interval. */
-            interval?: string;
-            /** @description Duration to wait for the poll interval change to take effect; `0` waits indefinitely. */
-            timeout?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        VfsQueueRequest: {
-            /** @description Optional VFS identifier whose upload queue should be inspected. */
-            fs?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        VfsQueueSetExpiryRequest: {
-            /** @description Optional VFS identifier for the queued item. */
-            fs?: string;
-            /** @description Queue item ID as returned by `vfs/queue`. */
-            id?: number;
-            /** @description New eligibility time in seconds (may be negative for immediate upload). */
-            expiry?: number;
-            /** @description Set to true to treat `expiry` as relative to the current value. */
-            relative?: boolean;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        VfsRefreshRequest: {
-            /** @description Optional VFS identifier whose directory cache should be refreshed. */
-            fs?: string;
-            /** @description Set to true to refresh entire directory trees. */
-            recursive?: boolean;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        } & {
-            [key: string]: unknown;
-        };
-        VfsStatsRequest: {
-            /** @description Optional VFS identifier whose statistics should be returned. */
-            fs?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        PluginsctlAddPluginRequest: {
-            /** @description Repository URL of the plugin to install. */
-            url?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        PluginsctlGetPluginsForTypeRequest: {
-            /** @description MIME type to match when listing plugins. */
-            type?: string;
-            /** @description Filter results by plugin type (e.g. `test`). */
-            pluginType?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        PluginsctlListPluginsRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        PluginsctlListTestPluginsRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        PluginsctlRemovePluginRequest: {
-            /** @description Name of the plugin to uninstall. */
-            name?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        PluginsctlRemoveTestPluginRequest: {
-            /** @description Name of the test plugin to uninstall. */
-            name?: string;
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
-        };
-        CoreDisksRequest: {
-            /** @description Assign the request to a custom stats group. */
-            _group?: string;
-            /** @description Run the command asynchronously. Returns a job id immediately. */
-            _async?: boolean;
         };
     };
     responses: {
@@ -4337,459 +3325,18 @@ export interface components {
         };
     };
     parameters: {
-        /** @description Run the command asynchronously. Returns a job id immediately. */
-        GlobalAsyncParam: boolean;
         /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
         PreferAsyncHeader: "respond-async";
-        /** @description JSON encoded config overrides applied for this call only. */
-        GlobalConfigParam: string;
-        /** @description JSON encoded filter overrides applied for this call only. */
-        GlobalFilterParam: string;
         /** @description Assign the request to a custom stats group. */
         GlobalGroupParam: string;
-        /** @description Additional arbitrary parameters allowed. */
-        Rc_NoopPostAdditionalParam: {
-            [key: string]: unknown;
-        };
-        /** @description Do this many commands concurrently. Defaults to --transfers if not set. */
-        Job_BatchPostConcurrencyParam: number;
-        /** @description List of inputs to the commands with an extra _path parameter. */
-        Job_BatchPostInputsParam: ({
-            /** @description rc/path */
-            _path: string;
-        } & {
-            [key: string]: unknown;
-        })[];
-        /** @description Remote name or path to clean up, for example `drive:`. */
-        Operations_CleanupPostFsParam: string;
-        /** @description Source remote name or path, such as `drive:` or `/` for the local filesystem. */
-        Operations_CopyfilePostSrcFsParam: string;
-        /** @description Path to the source object within `srcFs`, for example `dir/file.txt`. */
-        Operations_CopyfilePostSrcRemoteParam: string;
-        /** @description Destination remote name or path, such as `drive2:` or `/` for local filesystem. */
-        Operations_CopyfilePostDstFsParam: string;
-        /** @description Target path within `dstFs` where the file should be written. */
-        Operations_CopyfilePostDstRemoteParam: string;
-        /** @description Remote name or path that will receive the downloaded file, e.g. `drive:`. */
-        Operations_CopyurlPostFsParam: string;
-        /** @description Destination path within `fs` where the fetched object will be stored. */
-        Operations_CopyurlPostRemoteParam: string;
-        /** @description Source URL to fetch the object from. */
-        Operations_CopyurlPostUrlParam: string;
-        /** @description Set to true to derive the destination filename from the URL. */
-        Operations_CopyurlPostAutoFilenameParam: boolean;
-        /** @description Remote name or path whose contents should be removed. */
-        Operations_DeletePostFsParam: string;
-        /** @description Remote name or path that contains the file to delete. */
-        Operations_DeletefilePostFsParam: string;
-        /** @description Exact path to the file within `fs` that should be deleted. */
-        Operations_DeletefilePostRemoteParam: string;
-        /** @description Remote name or path to inspect, e.g. `drive:`. */
-        Operations_FsinfoPostFsParam: string;
-        /** @description Remote name or path to hash, such as `drive:` or `/`. */
-        Operations_HashsumPostFsParam: string;
-        /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
-        Operations_HashsumPostHashTypeParam: string;
-        /** @description Set to true to force reading the data instead of using remote checksums. */
-        Operations_HashsumPostDownloadParam: boolean;
-        /** @description Set to true to emit hash values in base64 rather than hexadecimal. */
-        Operations_HashsumPostBase64Param: boolean;
-        /** @description Remote name or path containing the file to hash. */
-        Operations_HashsumfilePostFsParam: string;
-        /** @description Path to the specific file within `fs` to hash. */
-        Operations_HashsumfilePostRemoteParam: string;
-        /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
-        Operations_HashsumfilePostHashTypeParam: string;
-        /** @description Set to true to force reading the data instead of using remote checksums. */
-        Operations_HashsumfilePostDownloadParam: boolean;
-        /** @description Set to true to emit the hash value in base64 rather than hexadecimal. */
-        Operations_HashsumfilePostBase64Param: boolean;
-        /** @description Source remote name or path containing the file to move. */
-        Operations_MovefilePostSrcFsParam: string;
-        /** @description Path to the source object within `srcFs`. */
-        Operations_MovefilePostSrcRemoteParam: string;
-        /** @description Destination remote name or path where the file will be moved. */
-        Operations_MovefilePostDstFsParam: string;
-        /** @description Destination path within `dstFs` for the moved object. */
-        Operations_MovefilePostDstRemoteParam: string;
-        /** @description Remote name or path hosting the object for which to manage a public link. */
-        Operations_PubliclinkPostFsParam: string;
-        /** @description Path within `fs` to the object for which to create or remove a public link. */
-        Operations_PubliclinkPostRemoteParam: string;
-        /** @description Set to true to remove an existing public link instead of creating one. */
-        Operations_PubliclinkPostUnlinkParam: boolean;
-        /** @description Optional expiration time for the public link, formatted as supported by the backend. */
-        Operations_PubliclinkPostExpireParam: string;
-        /** @description Remote name or path to scan for empty directories. */
-        Operations_RmdirsPostFsParam: string;
-        /** @description Path within `fs` whose empty subdirectories should be removed. */
-        Operations_RmdirsPostRemoteParam: string;
-        /** @description Set to true to preserve the top-level directory even if empty. */
-        Operations_RmdirsPostLeaveRootParam: boolean;
-        /** @description Remote name or path whose storage class tier should be changed. */
-        Operations_SettierPostFsParam: string;
-        /** @description Remote name or path that contains the object whose tier should change. */
-        Operations_SettierfilePostFsParam: string;
-        /** @description Path within `fs` to the object whose storage class tier should be updated. */
-        Operations_SettierfilePostRemoteParam: string;
-        /** @description Remote name or path to measure aggregate size information for. */
-        Operations_SizePostFsParam: string;
-        /** @description Bandwidth limit to apply, for example `off`, `5M`, or a schedule string. */
-        Core_BwlimitPostRateParam: string;
-        /** @description Name of the rclone command to execute, for example `ls` or `lsf`. */
-        Core_CommandPostCommandParam: string;
-        /** @description Optional positional arguments for the command. Repeat to supply multiple values. */
-        Core_CommandPostArgParam: string[];
-        /** @description Optional command options encoded as a JSON string. */
-        Core_CommandPostOptParam: string;
-        /** @description Controls how output is returned; accepts `COMBINED_OUTPUT`, `STREAM`, `STREAM_ONLY_STDOUT`, or `STREAM_ONLY_STDERR`. */
-        Core_CommandPostReturnTypeParam: string;
-        /** @description Local directory path to report disk usage for. Defaults to the rclone cache directory when omitted. */
-        Core_DuPostDirParam: string;
-        /** @description Plain-text string to obscure for storage in the config file. */
-        Core_ObscurePostClearParam: string;
-        /** @description Optional exit code to use when terminating the rclone process. */
-        Core_QuitPostExitCodeParam: number;
-        /** @description Stats group identifier to remove. */
-        Core_StatsDeletePostGroupParam: string;
-        /** @description Stats group identifier to return a snapshot for. Leave unset to include all groups. */
-        Core_StatsPostGroupParam: string;
-        /** @description When true, omit the `transferring` and `checking` arrays from the response. */
-        Core_StatsPostShortParam: boolean;
-        /** @description Stats group identifier whose counters should be reset. Leave unset to reset all groups. */
-        Core_StatsResetPostGroupParam: string;
-        /** @description Stats group identifier to filter the completed transfer list. Leave unset for all groups. */
-        Core_TransferredPostGroupParam: string;
-        /** @description Sampling interval in nanoseconds for blocking profile collection; use 1 to capture all events. */
-        Debug_SetBlockProfileRatePostRateParam: number;
-        /** @description Target percentage of newly allocated data to trigger garbage collection. */
-        Debug_SetGcPercentPostGcPercentParam: number;
-        /** @description Sampling fraction for mutex contention profiling; set to 0 to disable. */
-        Debug_SetMutexProfileFractionPostRateParam: number;
-        /** @description Soft memory limit for the Go runtime in bytes. */
-        Debug_SetSoftMemoryLimitPostMemLimitParam: number;
-        /** @description Remote path to mount, such as `drive:` or `remote:subdir`. */
-        Mount_MountPostFsParam: string;
-        /** @description Absolute local path where the remote should be mounted. */
-        Mount_MountPostMountPointParam: string;
-        /** @description Optional mount implementation to use (`mount`, `cmount`, or `mount2`). */
-        Mount_MountPostMountTypeParam: string;
-        /** @description Mount options encoded as JSON, matching flags accepted by `rclone mount`. */
-        Mount_MountPostMountOptParam: string;
-        /** @description VFS options encoded as JSON, matching flags accepted by `rclone mount`. */
-        Mount_MountPostVfsOptParam: string;
-        /** @description Local mount point path to unmount. */
-        Mount_UnmountPostMountPointParam: string;
-        /** @description Additional arbitrary parameters allowed. */
-        Rc_NoopauthPostAdditionalParam: {
-            [key: string]: unknown;
-        };
-        /** @description Additional arbitrary parameters allowed. */
-        Rc_ErrorPostAdditionalParam: {
-            [key: string]: unknown;
-        };
-        /** @description Backend-specific command to invoke. */
-        Backend_CommandPostCommandParam: string;
-        /** @description Remote name or path the backend command should target. */
-        Backend_CommandPostFsParam: string;
-        /** @description Optional positional arguments for the backend command. */
-        Backend_CommandPostArgParam: string[];
-        /** @description Backend command options encoded as a JSON string. */
-        Backend_CommandPostOptParam: string;
-        /** @description Remote path to expire from the cache, e.g. `remote:path/to/dir`. */
-        Cache_ExpirePostRemoteParam: string;
-        /** @description Set to true to drop cached chunk data along with directory entries. */
-        Cache_ExpirePostWithDataParam: boolean;
-        /** @description Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch. */
-        Cache_FetchPostChunksParam: string;
-        /** @description Additional arbitrary parameters allowed. */
-        Cache_FetchPostAdditionalParam: {
-            [key: string]: unknown;
-        };
-        /** @description Name of the new remote configuration. */
-        Config_CreatePostNameParam: string;
-        /** @description JSON object of configuration key/value pairs required for the remote. */
-        Config_CreatePostParametersParam: string;
-        /** @description Backend type identifier, such as `drive`, `s3`, or `dropbox`. */
-        Config_CreatePostTypeParam: string;
-        /** @description Optional JSON object controlling interactive behaviour (e.g. `obscure`, `continue`). */
-        Config_CreatePostOptParam: string;
-        /** @description Name of the remote configuration to delete. */
-        Config_DeletePostNameParam: string;
-        /** @description Name of the remote configuration to fetch. */
-        Config_GetPostNameParam: string;
-        /** @description Name of the remote whose secrets should be updated. */
-        Config_PasswordPostNameParam: string;
-        /** @description JSON object of password answers, typically including `pass`. */
-        Config_PasswordPostParametersParam: string;
-        /** @description Absolute path to the `rclone.conf` file that rclone should use. */
-        Config_SetpathPostPathParam: string;
-        /** @description Password used to unlock an encrypted config file. */
-        Config_UnlockPostConfigPasswordParam: string;
-        /** @description Name of the remote configuration to update. */
-        Config_UpdatePostNameParam: string;
-        /** @description JSON object of configuration key/value pairs to apply to the remote. */
-        Config_UpdatePostParametersParam: string;
-        /** @description Optional JSON object controlling update behaviour (e.g. `obscure`, `continue`). */
-        Config_UpdatePostOptParam: string;
-        /** @description Numeric identifier of the job to query, as returned from an async call. */
-        Job_StatusPostJobidParam: number;
-        /** @description Numeric identifier of the job to cancel. */
-        Job_StopPostJobidParam: number;
-        /** @description Stats group name whose active jobs should be stopped. */
-        Job_StopgroupPostGroupParam: string;
-        /** @description Remote name or path to list, for example `drive:`. */
-        Operations_ListPostFsParam: string;
-        /** @description Directory path within `fs` to list; leave empty to target the root. */
-        Operations_ListPostRemoteParam: string;
-        /** @description Optional JSON-encoded object of listing flags (e.g. `{ "recurse": true, "showHash": true }`). */
-        Operations_ListPostOptParam: string;
-        /** @description Set to true to list directories recursively. */
-        Operations_ListPostRecurseParam: boolean;
-        /** @description Set to true to omit modification times for faster listings on some backends. */
-        Operations_ListPostNoModTimeParam: boolean;
-        /** @description Set to true to include encrypted names when using crypt remotes. */
-        Operations_ListPostShowEncryptedParam: boolean;
-        /** @description Set to true to include original backend identifiers where available. */
-        Operations_ListPostShowOrigIDsParam: boolean;
-        /** @description Set to true to include hash digests for each entry. */
-        Operations_ListPostShowHashParam: boolean;
-        /** @description Set to true to omit MIME type detection. */
-        Operations_ListPostNoMimeTypeParam: boolean;
-        /** @description Set to true to return only directory entries. */
-        Operations_ListPostDirsOnlyParam: boolean;
-        /** @description Set to true to return only file entries. */
-        Operations_ListPostFilesOnlyParam: boolean;
-        /** @description Set to true to include backend-provided metadata maps. */
-        Operations_ListPostMetadataParam: boolean;
-        /** @description Specify one or more hash algorithms to include when `showHash` is true (e.g. `md5`). */
-        Operations_ListPostHashTypesParam: string[];
-        /** @description Remote name or path that contains the item to inspect. */
-        Operations_StatPostFsParam: string;
-        /** @description Path to the file or directory within `fs` to describe. */
-        Operations_StatPostRemoteParam: string;
-        /** @description Optional JSON object of listing flags, matching those accepted by `operations/list`. */
-        Operations_StatPostOptParam: string;
-        /** @description Remote name or path to query for capacity information. */
-        Operations_AboutPostFsParam: string;
-        /** @description Remote name or path from which to remove all contents. */
-        Operations_PurgePostFsParam: string;
-        /** @description Path within `fs` whose contents should be purged. */
-        Operations_PurgePostRemoteParam: string;
         /** @description Remote name or path where the uploaded file should be stored. */
         Operations_UploadfilePostFsParam: string;
         /** @description Destination path within `fs` for the uploaded file. */
         Operations_UploadfilePostRemoteParam: string;
-        /** @description Remote name or path in which to create a directory. */
-        Operations_MkdirPostFsParam: string;
-        /** @description Directory path within `fs` to create. */
-        Operations_MkdirPostRemoteParam: string;
-        /** @description Remote name or path containing the directory to remove. */
-        Operations_RmdirPostFsParam: string;
-        /** @description Directory path within `fs` to delete. */
-        Operations_RmdirPostRemoteParam: string;
-        /** @description Source remote name or path to verify, e.g. `drive:`. */
-        Operations_CheckPostSrcFsParam: string;
-        /** @description Destination remote name or path that should match the source. */
-        Operations_CheckPostDstFsParam: string;
-        /** @description Set to true to read file contents during comparison instead of relying on hashes. */
-        Operations_CheckPostDownloadParam: boolean;
-        /** @description Hash name to expect in the supplied SUM file, such as `md5`. */
-        Operations_CheckPostCheckFileHashParam: string;
-        /** @description Remote containing the checksum SUM file when using `checkFileHash`. */
-        Operations_CheckPostCheckFileFsParam: string;
-        /** @description Path within `checkFileFs` to the checksum SUM file. */
-        Operations_CheckPostCheckFileRemoteParam: string;
-        /** @description Set to true to only ensure that source files exist on the destination. */
-        Operations_CheckPostOneWayParam: boolean;
-        /** @description Set to true to include a combined summary report in the response. */
-        Operations_CheckPostCombinedParam: boolean;
-        /** @description Set to true to report files missing from the source. */
-        Operations_CheckPostMissingOnSrcParam: boolean;
-        /** @description Set to true to report files missing from the destination. */
-        Operations_CheckPostMissingOnDstParam: boolean;
-        /** @description Set to true to include matching files in the report. */
-        Operations_CheckPostMatchParam: boolean;
-        /** @description Set to true to include differing files in the report. */
-        Operations_CheckPostDifferParam: boolean;
-        /** @description Set to true to include entries that encountered errors. */
-        Operations_CheckPostErrorParam: boolean;
-        /** @description Source remote path to sync from, e.g. `drive:src`. */
-        Sync_SyncPostSrcFsParam: string;
-        /** @description Destination remote path to sync to, e.g. `drive:dst`. */
-        Sync_SyncPostDstFsParam: string;
-        /** @description Set to true to create empty source directories on the destination. */
-        Sync_SyncPostCreateEmptySrcDirsParam: boolean;
-        /** @description Source remote path to copy from. */
-        Sync_CopyPostSrcFsParam: string;
-        /** @description Destination remote path to copy to. */
-        Sync_CopyPostDstFsParam: string;
-        /** @description Set to true to replicate empty source directories on the destination. */
-        Sync_CopyPostCreateEmptySrcDirsParam: boolean;
-        /** @description Source remote path whose contents will be moved. */
-        Sync_MovePostSrcFsParam: string;
-        /** @description Destination remote path that will receive moved files. */
-        Sync_MovePostDstFsParam: string;
-        /** @description Set to true to create empty source directories on the destination. */
-        Sync_MovePostCreateEmptySrcDirsParam: boolean;
-        /** @description Set to true to delete empty directories from the source after the move completes. */
-        Sync_MovePostDeleteEmptySrcDirsParam: boolean;
-        /** @description First remote directory, e.g. `drive:path1`. */
-        Sync_BisyncPostPath1Param: string;
-        /** @description Second remote directory, e.g. `drive:path2`. */
-        Sync_BisyncPostPath2Param: string;
-        /** @description Set to true to simulate the bisync run without making changes. */
-        Sync_BisyncPostDryRunParam: boolean;
-        /** @description Set to true to perform a one-time resync, rebuilding bisync history. */
-        Sync_BisyncPostResyncParam: boolean;
-        /** @description Set to true to abort if `RCLONE_TEST` files are missing on either side. */
-        Sync_BisyncPostCheckAccessParam: boolean;
-        /** @description Override the access-check sentinel filename; defaults to `RCLONE_TEST`. */
-        Sync_BisyncPostCheckFilenameParam: string;
-        /** @description Abort the run if deletions exceed this percentage (default 50). */
-        Sync_BisyncPostMaxDeleteParam: number;
-        /** @description Set to true to bypass the `maxDelete` safety check. */
-        Sync_BisyncPostForceParam: boolean;
-        /** @description Controls final listing comparison; leave true for normal verification or set false to skip. */
-        Sync_BisyncPostCheckSyncParam: boolean;
-        /** @description Set to true to mirror empty directories between the two paths. */
-        Sync_BisyncPostCreateEmptySrcDirsParam: boolean;
-        /** @description Set to true to remove empty directories during cleanup. */
-        Sync_BisyncPostRemoveEmptyDirsParam: boolean;
-        /** @description Path to an rclone filters file applied to both paths. */
-        Sync_BisyncPostFiltersFileParam: string;
-        /** @description Set to true to ignore checksum differences when comparing listings. */
-        Sync_BisyncPostIgnoreListingChecksumParam: boolean;
-        /** @description Set to true to allow retrying after certain recoverable errors. */
-        Sync_BisyncPostResilientParam: boolean;
-        /** @description Directory path used to store bisync working files. */
-        Sync_BisyncPostWorkdirParam: string;
-        /** @description Backup directory on the first remote for changed files. */
-        Sync_BisyncPostBackupdir1Param: string;
-        /** @description Backup directory on the second remote for changed files. */
-        Sync_BisyncPostBackupdir2Param: string;
-        /** @description Set to true to keep bisync working files after completion. */
-        Sync_BisyncPostNoCleanupParam: boolean;
-        /** @description Optional comma-separated list of option block names to return. */
-        Options_GetPostBlocksParam: string;
-        /** @description Optional comma-separated list of option block names to describe. */
-        Options_InfoPostBlocksParam: string;
-        /** @description Overrides for the `dlna` option block. */
-        Options_SetPostDlnaParam: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `filter` option block. */
-        Options_SetPostFilterParam: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `ftp` option block. */
-        Options_SetPostFtpParam: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `main` option block. */
-        Options_SetPostMainParam: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `http` option block. */
-        Options_SetPostHttpParam: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `log` option block. */
-        Options_SetPostLogParam: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `mount` option block. */
-        Options_SetPostMountParam: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `nfs` option block. */
-        Options_SetPostNfsParam: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `proxy` option block. */
-        Options_SetPostProxyParam: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `rc` option block. */
-        Options_SetPostRcParam: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `restic` option block. */
-        Options_SetPostResticParam: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `s3` option block. */
-        Options_SetPostS3Param: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `sftp` option block. */
-        Options_SetPostSftpParam: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `vfs` option block. */
-        Options_SetPostVfsParam: {
-            [key: string]: unknown;
-        };
-        /** @description Overrides for the `webdav` option block. */
-        Options_SetPostWebdavParam: {
-            [key: string]: unknown;
-        };
-        /** @description Type of server to start (e.g. `http`, `webdav`, `ftp`, `sftp`). */
-        Serve_StartPostTypeParam: string;
-        /** @description Remote path that will be served. */
-        Serve_StartPostFsParam: string;
-        /** @description Address and port to bind the server to, such as `:5572` or `localhost:8080`. */
-        Serve_StartPostAddrParam: string;
-        /** @description Additional arbitrary parameters allowed. */
-        Serve_StartPostAdditionalParam: {
-            [key: string]: unknown;
-        };
-        /** @description Identifier of the running serve instance returned by `serve/start`. */
-        Serve_StopPostIdParam: string;
-        /** @description Optional VFS identifier to target; required when more than one VFS is active. */
-        Vfs_ForgetPostFsParam: string;
-        /** @description Additional arbitrary parameters allowed. */
-        Vfs_ForgetPostAdditionalParam: {
-            [key: string]: unknown;
-        };
-        /** @description Optional VFS identifier; omit to list all active VFS instances. */
-        Vfs_ListPostFsParam: string;
-        /** @description Optional VFS identifier whose poll interval should be queried or modified. */
-        Vfs_PollIntervalPostFsParam: string;
-        /** @description Duration string (e.g. `5m`) to set as the new poll interval. */
-        Vfs_PollIntervalPostIntervalParam: string;
-        /** @description Duration to wait for the poll interval change to take effect; `0` waits indefinitely. */
-        Vfs_PollIntervalPostTimeoutParam: string;
-        /** @description Optional VFS identifier whose upload queue should be inspected. */
-        Vfs_QueuePostFsParam: string;
-        /** @description Optional VFS identifier for the queued item. */
-        Vfs_QueueSetExpiryPostFsParam: string;
-        /** @description Queue item ID as returned by `vfs/queue`. */
-        Vfs_QueueSetExpiryPostIdParam: number;
-        /** @description New eligibility time in seconds (may be negative for immediate upload). */
-        Vfs_QueueSetExpiryPostExpiryParam: number;
-        /** @description Set to true to treat `expiry` as relative to the current value. */
-        Vfs_QueueSetExpiryPostRelativeParam: boolean;
-        /** @description Optional VFS identifier whose directory cache should be refreshed. */
-        Vfs_RefreshPostFsParam: string;
-        /** @description Set to true to refresh entire directory trees. */
-        Vfs_RefreshPostRecursiveParam: boolean;
-        /** @description Additional arbitrary parameters allowed. */
-        Vfs_RefreshPostAdditionalParam: {
-            [key: string]: unknown;
-        };
-        /** @description Optional VFS identifier whose statistics should be returned. */
-        Vfs_StatsPostFsParam: string;
-        /** @description Repository URL of the plugin to install. */
-        Pluginsctl_AddPluginPostUrlParam: string;
-        /** @description MIME type to match when listing plugins. */
-        Pluginsctl_GetPluginsForTypePostTypeParam: string;
-        /** @description Filter results by plugin type (e.g. `test`). */
-        Pluginsctl_GetPluginsForTypePostPluginTypeParam: string;
-        /** @description Name of the plugin to uninstall. */
-        Pluginsctl_RemovePluginPostNameParam: string;
-        /** @description Name of the test plugin to uninstall. */
-        Pluginsctl_RemoveTestPluginPostNameParam: string;
+        /** @description JSON encoded config overrides for this call only. */
+        UploadfileConfigParam: string;
+        /** @description JSON encoded filter overrides for this call only. */
+        UploadfileFilterParam: string;
     };
     requestBodies: never;
     headers: never;
@@ -4799,12 +3346,7 @@ export type $defs = Record<string, never>;
 export interface operations {
     rcNoop: {
         parameters: {
-            query?: {
-                /** @description Additional arbitrary parameters allowed. */
-                params?: components["parameters"]["Rc_NoopPostAdditionalParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -4814,7 +3356,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["RcNoopRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    [key: string]: unknown;
+                };
             };
         };
         responses: {
@@ -4826,14 +3370,7 @@ export interface operations {
     };
     operationsCleanup: {
         parameters: {
-            query?: {
-                /** @description Remote name or path to clean up, for example `drive:`. */
-                fs?: components["parameters"]["Operations_CleanupPostFsParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -4841,9 +3378,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsCleanupRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path to clean up, for example `drive:`. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                };
             };
         };
         responses: {
@@ -4855,20 +3395,7 @@ export interface operations {
     };
     operationsCopyfile: {
         parameters: {
-            query?: {
-                /** @description Source remote name or path, such as `drive:` or `/` for the local filesystem. */
-                srcFs?: components["parameters"]["Operations_CopyfilePostSrcFsParam"];
-                /** @description Path to the source object within `srcFs`, for example `dir/file.txt`. */
-                srcRemote?: components["parameters"]["Operations_CopyfilePostSrcRemoteParam"];
-                /** @description Destination remote name or path, such as `drive2:` or `/` for local filesystem. */
-                dstFs?: components["parameters"]["Operations_CopyfilePostDstFsParam"];
-                /** @description Target path within `dstFs` where the file should be written. */
-                dstRemote?: components["parameters"]["Operations_CopyfilePostDstRemoteParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -4876,9 +3403,18 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsCopyfileRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Source remote name or path, such as `drive:` or `/` for the local filesystem. */
+                    srcFs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Path to the source object within `srcFs`, for example `dir/file.txt`. */
+                    srcRemote: string;
+                    /** @description Destination remote name or path, such as `drive2:` or `/` for local filesystem. */
+                    dstFs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Target path within `dstFs` where the file should be written. */
+                    dstRemote: string;
+                };
             };
         };
         responses: {
@@ -4890,20 +3426,7 @@ export interface operations {
     };
     operationsCopyurl: {
         parameters: {
-            query?: {
-                /** @description Remote name or path that will receive the downloaded file, e.g. `drive:`. */
-                fs?: components["parameters"]["Operations_CopyurlPostFsParam"];
-                /** @description Destination path within `fs` where the fetched object will be stored. */
-                remote?: components["parameters"]["Operations_CopyurlPostRemoteParam"];
-                /** @description Source URL to fetch the object from. */
-                url?: components["parameters"]["Operations_CopyurlPostUrlParam"];
-                /** @description Set to true to derive the destination filename from the URL. */
-                autoFilename?: components["parameters"]["Operations_CopyurlPostAutoFilenameParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -4911,9 +3434,20 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsCopyurlRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path that will receive the downloaded file, e.g. `drive:`. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Destination path within `fs` where the fetched object will be stored. */
+                    remote: string;
+                    /** @description Source URL to fetch the object from. */
+                    url: string;
+                    /** @description Set to true to derive the destination filename from the URL. */
+                    autoFilename?: boolean;
+                    noClobber?: boolean;
+                    headerFilename?: boolean;
+                };
             };
         };
         responses: {
@@ -4925,18 +3459,7 @@ export interface operations {
     };
     operationsDelete: {
         parameters: {
-            query?: {
-                /** @description Remote name or path whose contents should be removed. */
-                fs?: components["parameters"]["Operations_DeletePostFsParam"];
-                /** @description JSON encoded config overrides applied for this call only. */
-                _config?: components["parameters"]["GlobalConfigParam"];
-                /** @description JSON encoded filter overrides applied for this call only. */
-                _filter?: components["parameters"]["GlobalFilterParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -4944,9 +3467,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsDeleteRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path whose contents should be removed. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                };
             };
         };
         responses: {
@@ -4958,16 +3484,7 @@ export interface operations {
     };
     operationsDeletefile: {
         parameters: {
-            query?: {
-                /** @description Remote name or path that contains the file to delete. */
-                fs?: components["parameters"]["Operations_DeletefilePostFsParam"];
-                /** @description Exact path to the file within `fs` that should be deleted. */
-                remote?: components["parameters"]["Operations_DeletefilePostRemoteParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -4975,9 +3492,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsDeletefileRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path that contains the file to delete. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Exact path to the file within `fs` that should be deleted. */
+                    remote: string;
+                };
             };
         };
         responses: {
@@ -4989,14 +3511,7 @@ export interface operations {
     };
     operationsFsinfo: {
         parameters: {
-            query?: {
-                /** @description Remote name or path to inspect, e.g. `drive:`. */
-                fs?: components["parameters"]["Operations_FsinfoPostFsParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5004,9 +3519,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsFsinfoRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path to inspect, e.g. `drive:`. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                };
             };
         };
         responses: {
@@ -5018,20 +3536,7 @@ export interface operations {
     };
     operationsHashsum: {
         parameters: {
-            query?: {
-                /** @description Remote name or path to hash, such as `drive:` or `/`. */
-                fs?: components["parameters"]["Operations_HashsumPostFsParam"];
-                /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
-                hashType?: components["parameters"]["Operations_HashsumPostHashTypeParam"];
-                /** @description Set to true to force reading the data instead of using remote checksums. */
-                download?: components["parameters"]["Operations_HashsumPostDownloadParam"];
-                /** @description Set to true to emit hash values in base64 rather than hexadecimal. */
-                base64?: components["parameters"]["Operations_HashsumPostBase64Param"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5039,9 +3544,18 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsHashsumRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path to hash, such as `drive:` or `/`. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
+                    hashType: string;
+                    /** @description Set to true to force reading the data instead of using remote checksums. */
+                    download?: boolean;
+                    /** @description Set to true to emit hash values in base64 rather than hexadecimal. */
+                    base64?: boolean;
+                };
             };
         };
         responses: {
@@ -5053,22 +3567,7 @@ export interface operations {
     };
     operationsHashsumfile: {
         parameters: {
-            query?: {
-                /** @description Remote name or path containing the file to hash. */
-                fs?: components["parameters"]["Operations_HashsumfilePostFsParam"];
-                /** @description Path to the specific file within `fs` to hash. */
-                remote?: components["parameters"]["Operations_HashsumfilePostRemoteParam"];
-                /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
-                hashType?: components["parameters"]["Operations_HashsumfilePostHashTypeParam"];
-                /** @description Set to true to force reading the data instead of using remote checksums. */
-                download?: components["parameters"]["Operations_HashsumfilePostDownloadParam"];
-                /** @description Set to true to emit the hash value in base64 rather than hexadecimal. */
-                base64?: components["parameters"]["Operations_HashsumfilePostBase64Param"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5076,9 +3575,20 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsHashsumfileRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path containing the file to hash. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Path to the specific file within `fs` to hash. */
+                    remote: string;
+                    /** @description Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name. */
+                    hashType: string;
+                    /** @description Set to true to force reading the data instead of using remote checksums. */
+                    download?: boolean;
+                    /** @description Set to true to emit the hash value in base64 rather than hexadecimal. */
+                    base64?: boolean;
+                };
             };
         };
         responses: {
@@ -5090,20 +3600,7 @@ export interface operations {
     };
     operationsMovefile: {
         parameters: {
-            query?: {
-                /** @description Source remote name or path containing the file to move. */
-                srcFs?: components["parameters"]["Operations_MovefilePostSrcFsParam"];
-                /** @description Path to the source object within `srcFs`. */
-                srcRemote?: components["parameters"]["Operations_MovefilePostSrcRemoteParam"];
-                /** @description Destination remote name or path where the file will be moved. */
-                dstFs?: components["parameters"]["Operations_MovefilePostDstFsParam"];
-                /** @description Destination path within `dstFs` for the moved object. */
-                dstRemote?: components["parameters"]["Operations_MovefilePostDstRemoteParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5111,9 +3608,18 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsMovefileRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Source remote name or path containing the file to move. */
+                    srcFs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Path to the source object within `srcFs`. */
+                    srcRemote: string;
+                    /** @description Destination remote name or path where the file will be moved. */
+                    dstFs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Destination path within `dstFs` for the moved object. */
+                    dstRemote: string;
+                };
             };
         };
         responses: {
@@ -5125,20 +3631,7 @@ export interface operations {
     };
     operationsPubliclink: {
         parameters: {
-            query?: {
-                /** @description Remote name or path hosting the object for which to manage a public link. */
-                fs?: components["parameters"]["Operations_PubliclinkPostFsParam"];
-                /** @description Path within `fs` to the object for which to create or remove a public link. */
-                remote?: components["parameters"]["Operations_PubliclinkPostRemoteParam"];
-                /** @description Set to true to remove an existing public link instead of creating one. */
-                unlink?: components["parameters"]["Operations_PubliclinkPostUnlinkParam"];
-                /** @description Optional expiration time for the public link, formatted as supported by the backend. */
-                expire?: components["parameters"]["Operations_PubliclinkPostExpireParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5146,9 +3639,18 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsPubliclinkRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path hosting the object for which to manage a public link. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Path within `fs` to the object for which to create or remove a public link. */
+                    remote: string;
+                    /** @description Set to true to remove an existing public link instead of creating one. */
+                    unlink?: boolean;
+                    /** @description Optional expiration time for the public link, formatted as supported by the backend. */
+                    expire?: string;
+                };
             };
         };
         responses: {
@@ -5160,18 +3662,7 @@ export interface operations {
     };
     operationsRmdirs: {
         parameters: {
-            query?: {
-                /** @description Remote name or path to scan for empty directories. */
-                fs?: components["parameters"]["Operations_RmdirsPostFsParam"];
-                /** @description Path within `fs` whose empty subdirectories should be removed. */
-                remote?: components["parameters"]["Operations_RmdirsPostRemoteParam"];
-                /** @description Set to true to preserve the top-level directory even if empty. */
-                leaveRoot?: components["parameters"]["Operations_RmdirsPostLeaveRootParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5179,9 +3670,16 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsRmdirsRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path to scan for empty directories. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Path within `fs` whose empty subdirectories should be removed. */
+                    remote: string;
+                    /** @description Set to true to preserve the top-level directory even if empty. */
+                    leaveRoot?: boolean;
+                };
             };
         };
         responses: {
@@ -5193,14 +3691,7 @@ export interface operations {
     };
     operationsSettier: {
         parameters: {
-            query?: {
-                /** @description Remote name or path whose storage class tier should be changed. */
-                fs?: components["parameters"]["Operations_SettierPostFsParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5208,9 +3699,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsSettierRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path whose storage class tier should be changed. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Storage tier or class. */
+                    tier: string;
+                };
             };
         };
         responses: {
@@ -5222,16 +3718,7 @@ export interface operations {
     };
     operationsSettierfile: {
         parameters: {
-            query?: {
-                /** @description Remote name or path that contains the object whose tier should change. */
-                fs?: components["parameters"]["Operations_SettierfilePostFsParam"];
-                /** @description Path within `fs` to the object whose storage class tier should be updated. */
-                remote?: components["parameters"]["Operations_SettierfilePostRemoteParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5239,9 +3726,16 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsSettierfileRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path that contains the object whose tier should change. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Path within `fs` to the object whose storage class tier should be updated. */
+                    remote: string;
+                    /** @description Storage tier or class. */
+                    tier: string;
+                };
             };
         };
         responses: {
@@ -5253,14 +3747,7 @@ export interface operations {
     };
     operationsSize: {
         parameters: {
-            query?: {
-                /** @description Remote name or path to measure aggregate size information for. */
-                fs?: components["parameters"]["Operations_SizePostFsParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5268,9 +3755,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsSizeRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path to measure aggregate size information for. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                };
             };
         };
         responses: {
@@ -5282,14 +3772,7 @@ export interface operations {
     };
     coreBwlimit: {
         parameters: {
-            query?: {
-                /** @description Bandwidth limit to apply, for example `off`, `5M`, or a schedule string. */
-                rate?: components["parameters"]["Core_BwlimitPostRateParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5299,7 +3782,10 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CoreBwlimitRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Bandwidth limit to apply, for example `off`, `5M`, or a schedule string. */
+                    rate?: string;
+                };
             };
         };
         responses: {
@@ -5311,20 +3797,7 @@ export interface operations {
     };
     coreCommand: {
         parameters: {
-            query?: {
-                /** @description Name of the rclone command to execute, for example `ls` or `lsf`. */
-                command?: components["parameters"]["Core_CommandPostCommandParam"];
-                /** @description Optional positional arguments for the command. Repeat to supply multiple values. */
-                arg?: components["parameters"]["Core_CommandPostArgParam"];
-                /** @description Optional command options encoded as a JSON string. */
-                opt?: components["parameters"]["Core_CommandPostOptParam"];
-                /** @description Controls how output is returned; accepts `COMBINED_OUTPUT`, `STREAM`, `STREAM_ONLY_STDOUT`, or `STREAM_ONLY_STDERR`. */
-                returnType?: components["parameters"]["Core_CommandPostReturnTypeParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5334,7 +3807,18 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CoreCommandRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Name of the rclone command to execute, for example `ls` or `lsf`. */
+                    command?: string;
+                    /** @description Arguments passed to the command. */
+                    arg?: string[];
+                    /** @description Flags passed to the command. */
+                    opt?: {
+                        [key: string]: string;
+                    };
+                    /** @enum {string} */
+                    returnType?: "COMBINED_OUTPUT" | "STREAM" | "STREAM_ONLY_STDOUT" | "STREAM_ONLY_STDERR";
+                };
             };
         };
         responses: {
@@ -5346,12 +3830,7 @@ export interface operations {
     };
     coreDisks: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5361,7 +3840,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CoreDisksRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -5373,14 +3852,7 @@ export interface operations {
     };
     coreDu: {
         parameters: {
-            query?: {
-                /** @description Local directory path to report disk usage for. Defaults to the rclone cache directory when omitted. */
-                dir?: components["parameters"]["Core_DuPostDirParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5390,7 +3862,10 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CoreDuRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Local directory path to report disk usage for. Defaults to the rclone cache directory when omitted. */
+                    dir?: string;
+                };
             };
         };
         responses: {
@@ -5402,12 +3877,7 @@ export interface operations {
     };
     coreGc: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5417,7 +3887,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CoreGcRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -5429,12 +3899,7 @@ export interface operations {
     };
     coreGroupList: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5444,7 +3909,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CoreGroupListRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -5466,12 +3931,7 @@ export interface operations {
     };
     coreMemstats: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5481,7 +3941,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CoreMemstatsRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -5503,14 +3963,7 @@ export interface operations {
     };
     coreObscure: {
         parameters: {
-            query?: {
-                /** @description Plain-text string to obscure for storage in the config file. */
-                clear?: components["parameters"]["Core_ObscurePostClearParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5518,9 +3971,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["CoreObscureRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Plain-text string to obscure for storage in the config file. */
+                    clear: string;
+                };
             };
         };
         responses: {
@@ -5542,12 +3998,7 @@ export interface operations {
     };
     corePid: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5557,7 +4008,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CorePidRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -5579,14 +4030,7 @@ export interface operations {
     };
     coreQuit: {
         parameters: {
-            query?: {
-                /** @description Optional exit code to use when terminating the rclone process. */
-                exitCode?: components["parameters"]["Core_QuitPostExitCodeParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5596,7 +4040,10 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CoreQuitRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Optional exit code to use when terminating the rclone process. */
+                    exitCode?: number;
+                };
             };
         };
         responses: {
@@ -5608,14 +4055,7 @@ export interface operations {
     };
     coreStatsDelete: {
         parameters: {
-            query?: {
-                /** @description Stats group identifier to remove. */
-                group?: components["parameters"]["Core_StatsDeletePostGroupParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5625,7 +4065,10 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CoreStatsDeleteRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Stats group identifier to remove. */
+                    group?: string;
+                };
             };
         };
         responses: {
@@ -5637,14 +4080,7 @@ export interface operations {
     };
     coreStatsReset: {
         parameters: {
-            query?: {
-                /** @description Stats group identifier whose counters should be reset. Leave unset to reset all groups. */
-                group?: components["parameters"]["Core_StatsResetPostGroupParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5654,7 +4090,10 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CoreStatsResetRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Stats group identifier whose counters should be reset. Leave unset to reset all groups. */
+                    group?: string;
+                };
             };
         };
         responses: {
@@ -5666,14 +4105,7 @@ export interface operations {
     };
     coreTransferred: {
         parameters: {
-            query?: {
-                /** @description Stats group identifier to filter the completed transfer list. Leave unset for all groups. */
-                group?: components["parameters"]["Core_TransferredPostGroupParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5683,7 +4115,10 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CoreTransferredRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Stats group identifier to filter the completed transfer list. Leave unset for all groups. */
+                    group?: string;
+                };
             };
         };
         responses: {
@@ -5695,14 +4130,7 @@ export interface operations {
     };
     debugSetBlockProfileRate: {
         parameters: {
-            query?: {
-                /** @description Sampling interval in nanoseconds for blocking profile collection; use 1 to capture all events. */
-                rate?: components["parameters"]["Debug_SetBlockProfileRatePostRateParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5710,9 +4138,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["DebugSetBlockProfileRateRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Sampling interval in nanoseconds for blocking profile collection; use 1 to capture all events. */
+                    rate: number;
+                };
             };
         };
         responses: {
@@ -5724,14 +4155,7 @@ export interface operations {
     };
     debugSetGcPercent: {
         parameters: {
-            query?: {
-                /** @description Target percentage of newly allocated data to trigger garbage collection. */
-                "gc-percent"?: components["parameters"]["Debug_SetGcPercentPostGcPercentParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5739,9 +4163,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["DebugSetGcPercentRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Target percentage of newly allocated data to trigger garbage collection. */
+                    "gc-percent": number;
+                };
             };
         };
         responses: {
@@ -5753,14 +4180,7 @@ export interface operations {
     };
     debugSetMutexProfileFraction: {
         parameters: {
-            query?: {
-                /** @description Sampling fraction for mutex contention profiling; set to 0 to disable. */
-                rate?: components["parameters"]["Debug_SetMutexProfileFractionPostRateParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5768,9 +4188,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["DebugSetMutexProfileFractionRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Sampling fraction for mutex contention profiling; set to 0 to disable. */
+                    rate: number;
+                };
             };
         };
         responses: {
@@ -5782,14 +4205,7 @@ export interface operations {
     };
     debugSetSoftMemoryLimit: {
         parameters: {
-            query?: {
-                /** @description Soft memory limit for the Go runtime in bytes. */
-                "mem-limit"?: components["parameters"]["Debug_SetSoftMemoryLimitPostMemLimitParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5797,9 +4213,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["DebugSetSoftMemoryLimitRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Memory limit in bytes. Use a string for values above 2^53, such as the default of 9223372036854775807. */
+                    "mem-limit": number | string;
+                };
             };
         };
         responses: {
@@ -5811,12 +4230,7 @@ export interface operations {
     };
     fscacheClear: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5826,7 +4240,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["FscacheClearRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -5838,12 +4252,7 @@ export interface operations {
     };
     fscacheEntries: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5853,7 +4262,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["FscacheEntriesRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -5865,12 +4274,7 @@ export interface operations {
     };
     mountListmounts: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5880,7 +4284,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["MountListmountsRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -5892,26 +4296,7 @@ export interface operations {
     };
     mountMount: {
         parameters: {
-            query?: {
-                /** @description Remote path to mount, such as `drive:` or `remote:subdir`. */
-                fs?: components["parameters"]["Mount_MountPostFsParam"];
-                /** @description Absolute local path where the remote should be mounted. */
-                mountPoint?: components["parameters"]["Mount_MountPostMountPointParam"];
-                /** @description Optional mount implementation to use (`mount`, `cmount`, or `mount2`). */
-                mountType?: components["parameters"]["Mount_MountPostMountTypeParam"];
-                /** @description Mount options encoded as JSON, matching flags accepted by `rclone mount`. */
-                mountOpt?: components["parameters"]["Mount_MountPostMountOptParam"];
-                /** @description VFS options encoded as JSON, matching flags accepted by `rclone mount`. */
-                vfsOpt?: components["parameters"]["Mount_MountPostVfsOptParam"];
-                /** @description JSON encoded config overrides applied for this call only. */
-                _config?: components["parameters"]["GlobalConfigParam"];
-                /** @description JSON encoded filter overrides applied for this call only. */
-                _filter?: components["parameters"]["GlobalFilterParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5919,9 +4304,20 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["MountMountRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote path to mount, such as `drive:` or `remote:subdir`. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Absolute local path where the remote should be mounted. */
+                    mountPoint: string;
+                    /** @description Optional mount implementation to use (`mount`, `cmount`, or `mount2`). */
+                    mountType?: string;
+                    /** @description Mount options encoded as JSON, matching flags accepted by `rclone mount`. */
+                    mountOpt?: string;
+                    /** @description VFS options encoded as JSON, matching flags accepted by `rclone mount`. */
+                    vfsOpt?: string;
+                };
             };
         };
         responses: {
@@ -5933,12 +4329,7 @@ export interface operations {
     };
     mountTypes: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5948,7 +4339,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["MountTypesRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -5960,14 +4351,7 @@ export interface operations {
     };
     mountUnmount: {
         parameters: {
-            query?: {
-                /** @description Local mount point path to unmount. */
-                mountPoint?: components["parameters"]["Mount_UnmountPostMountPointParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -5975,9 +4359,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["MountUnmountRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Local mount point path to unmount. */
+                    mountPoint: string;
+                };
             };
         };
         responses: {
@@ -5989,12 +4376,7 @@ export interface operations {
     };
     mountUnmountall: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6004,7 +4386,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["MountUnmountallRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -6016,12 +4398,7 @@ export interface operations {
     };
     rcNoopAuth: {
         parameters: {
-            query?: {
-                /** @description Additional arbitrary parameters allowed. */
-                params?: components["parameters"]["Rc_NoopauthPostAdditionalParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6031,7 +4408,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["RcNoopAuthRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    [key: string]: unknown;
+                };
             };
         };
         responses: {
@@ -6043,12 +4422,7 @@ export interface operations {
     };
     rcError: {
         parameters: {
-            query?: {
-                /** @description Additional arbitrary parameters allowed. */
-                params?: components["parameters"]["Rc_ErrorPostAdditionalParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6058,7 +4432,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["RcErrorRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    [key: string]: unknown;
+                };
             };
         };
         responses: {
@@ -6070,12 +4446,7 @@ export interface operations {
     };
     rcList: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6085,7 +4456,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["RcListRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -6097,20 +4468,7 @@ export interface operations {
     };
     backendCommand: {
         parameters: {
-            query?: {
-                /** @description Backend-specific command to invoke. */
-                command?: components["parameters"]["Backend_CommandPostCommandParam"];
-                /** @description Remote name or path the backend command should target. */
-                fs?: components["parameters"]["Backend_CommandPostFsParam"];
-                /** @description Optional positional arguments for the backend command. */
-                arg?: components["parameters"]["Backend_CommandPostArgParam"];
-                /** @description Backend command options encoded as a JSON string. */
-                opt?: components["parameters"]["Backend_CommandPostOptParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6118,9 +4476,20 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["BackendCommandRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Backend-specific command to invoke. */
+                    command: string;
+                    /** @description Remote name or path the backend command should target. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Arguments passed to the backend command. */
+                    arg?: string[];
+                    /** @description Options passed to the backend command. */
+                    opt?: {
+                        [key: string]: string;
+                    };
+                };
             };
         };
         responses: {
@@ -6132,16 +4501,7 @@ export interface operations {
     };
     cacheExpire: {
         parameters: {
-            query?: {
-                /** @description Remote path to expire from the cache, e.g. `remote:path/to/dir`. */
-                remote?: components["parameters"]["Cache_ExpirePostRemoteParam"];
-                /** @description Set to true to drop cached chunk data along with directory entries. */
-                withData?: components["parameters"]["Cache_ExpirePostWithDataParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6149,9 +4509,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["CacheExpireRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote path to expire from the cache, e.g. `remote:path/to/dir`. */
+                    remote: string;
+                    /** @description Set to true to drop cached chunk data along with directory entries. */
+                    withData?: boolean;
+                };
             };
         };
         responses: {
@@ -6163,16 +4528,7 @@ export interface operations {
     };
     cacheFetch: {
         parameters: {
-            query?: {
-                /** @description Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch. */
-                chunks?: components["parameters"]["Cache_FetchPostChunksParam"];
-                /** @description Additional arbitrary parameters allowed. */
-                params?: components["parameters"]["Cache_FetchPostAdditionalParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6182,7 +4538,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CacheFetchRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & ({
+                    /** @description Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch. */
+                    chunks?: string;
+                } & {
+                    [key: string]: unknown;
+                });
             };
         };
         responses: {
@@ -6194,12 +4555,7 @@ export interface operations {
     };
     cacheStats: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6209,7 +4565,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CacheStatsRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -6221,20 +4577,7 @@ export interface operations {
     };
     configCreate: {
         parameters: {
-            query?: {
-                /** @description Name of the new remote configuration. */
-                name?: components["parameters"]["Config_CreatePostNameParam"];
-                /** @description JSON object of configuration key/value pairs required for the remote. */
-                parameters?: components["parameters"]["Config_CreatePostParametersParam"];
-                /** @description Backend type identifier, such as `drive`, `s3`, or `dropbox`. */
-                type?: components["parameters"]["Config_CreatePostTypeParam"];
-                /** @description Optional JSON object controlling interactive behaviour (e.g. `obscure`, `continue`). */
-                opt?: components["parameters"]["Config_CreatePostOptParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6242,9 +4585,29 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["ConfigCreateRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Name of the new remote configuration. */
+                    name: string;
+                    /** @description Backend options for the remote. */
+                    parameters: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Backend type identifier, such as `drive`, `s3`, or `dropbox`. */
+                    type: string;
+                    /** @description Options that control the configuration. */
+                    opt?: {
+                        obscure?: boolean;
+                        noObscure?: boolean;
+                        noOutput?: boolean;
+                        nonInteractive?: boolean;
+                        continue?: boolean;
+                        all?: boolean;
+                        state?: string;
+                        result?: string;
+                    };
+                };
             };
         };
         responses: {
@@ -6256,14 +4619,7 @@ export interface operations {
     };
     configDelete: {
         parameters: {
-            query?: {
-                /** @description Name of the remote configuration to delete. */
-                name?: components["parameters"]["Config_DeletePostNameParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6271,9 +4627,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["ConfigDeleteRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Name of the remote configuration to delete. */
+                    name: string;
+                };
             };
         };
         responses: {
@@ -6285,12 +4644,7 @@ export interface operations {
     };
     configDump: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6300,7 +4654,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["ConfigDumpRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -6312,14 +4666,7 @@ export interface operations {
     };
     configGet: {
         parameters: {
-            query?: {
-                /** @description Name of the remote configuration to fetch. */
-                name?: components["parameters"]["Config_GetPostNameParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6327,9 +4674,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["ConfigGetRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Name of the remote configuration to fetch. */
+                    name: string;
+                };
             };
         };
         responses: {
@@ -6341,12 +4691,7 @@ export interface operations {
     };
     configListremotes: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6356,7 +4701,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["ConfigListremotesRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -6368,12 +4713,7 @@ export interface operations {
     };
     configOauthstatus: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6383,7 +4723,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["ConfigOauthstatusRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -6395,12 +4735,7 @@ export interface operations {
     };
     configOauthstop: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6410,7 +4745,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["ConfigOauthstopRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -6422,16 +4757,7 @@ export interface operations {
     };
     configPassword: {
         parameters: {
-            query?: {
-                /** @description Name of the remote whose secrets should be updated. */
-                name?: components["parameters"]["Config_PasswordPostNameParam"];
-                /** @description JSON object of password answers, typically including `pass`. */
-                parameters?: components["parameters"]["Config_PasswordPostParametersParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6439,9 +4765,16 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["ConfigPasswordRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Name of the remote whose secrets should be updated. */
+                    name: string;
+                    /** @description Password options for the remote. */
+                    parameters: {
+                        [key: string]: unknown;
+                    };
+                };
             };
         };
         responses: {
@@ -6453,12 +4786,7 @@ export interface operations {
     };
     configPaths: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6468,7 +4796,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["ConfigPathsRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -6480,12 +4808,7 @@ export interface operations {
     };
     configProviders: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6495,7 +4818,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["ConfigProvidersRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -6507,14 +4830,7 @@ export interface operations {
     };
     configSetpath: {
         parameters: {
-            query?: {
-                /** @description Absolute path to the `rclone.conf` file that rclone should use. */
-                path?: components["parameters"]["Config_SetpathPostPathParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6522,9 +4838,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["ConfigSetpathRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Absolute path to the `rclone.conf` file that rclone should use. */
+                    path: string;
+                };
             };
         };
         responses: {
@@ -6536,14 +4855,7 @@ export interface operations {
     };
     configUnlock: {
         parameters: {
-            query?: {
-                /** @description Password used to unlock an encrypted config file. */
-                configPassword?: components["parameters"]["Config_UnlockPostConfigPasswordParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6551,9 +4863,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["ConfigUnlockRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Password used to unlock an encrypted config file. */
+                    configPassword: string;
+                };
             };
         };
         responses: {
@@ -6565,18 +4880,7 @@ export interface operations {
     };
     configUpdate: {
         parameters: {
-            query?: {
-                /** @description Name of the remote configuration to update. */
-                name?: components["parameters"]["Config_UpdatePostNameParam"];
-                /** @description JSON object of configuration key/value pairs to apply to the remote. */
-                parameters?: components["parameters"]["Config_UpdatePostParametersParam"];
-                /** @description Optional JSON object controlling update behaviour (e.g. `obscure`, `continue`). */
-                opt?: components["parameters"]["Config_UpdatePostOptParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6584,9 +4888,27 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["ConfigUpdateRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Name of the remote configuration to update. */
+                    name: string;
+                    /** @description Backend options for the remote. */
+                    parameters: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Options that control the configuration. */
+                    opt?: {
+                        obscure?: boolean;
+                        noObscure?: boolean;
+                        noOutput?: boolean;
+                        nonInteractive?: boolean;
+                        continue?: boolean;
+                        all?: boolean;
+                        state?: string;
+                        result?: string;
+                    };
+                };
             };
         };
         responses: {
@@ -6598,12 +4920,7 @@ export interface operations {
     };
     coreVersion: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6613,7 +4930,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CoreVersionRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -6625,16 +4942,7 @@ export interface operations {
     };
     coreStats: {
         parameters: {
-            query?: {
-                /** @description Stats group identifier to return a snapshot for. Leave unset to include all groups. */
-                group?: components["parameters"]["Core_StatsPostGroupParam"];
-                /** @description When true, omit the `transferring` and `checking` arrays from the response. */
-                short?: components["parameters"]["Core_StatsPostShortParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6644,7 +4952,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CoreStatsRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Stats group identifier to return a snapshot for. Leave unset to include all groups. */
+                    group?: string;
+                    /** @description When true, omit the `transferring` and `checking` arrays from the response. */
+                    short?: boolean;
+                };
             };
         };
         responses: {
@@ -6656,14 +4969,7 @@ export interface operations {
     };
     jobBatch: {
         parameters: {
-            query?: {
-                /** @description Do this many commands concurrently. Defaults to --transfers if not set. */
-                concurrency?: components["parameters"]["Job_BatchPostConcurrencyParam"];
-                /** @description List of inputs to the commands with an extra _path parameter. */
-                inputs?: components["parameters"]["Job_BatchPostInputsParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6671,9 +4977,23 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["JobBatchRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Do this many commands concurrently. Defaults to --transfers if not set. */
+                    concurrency?: number;
+                    /** @description List of inputs to the commands with an extra _path parameter. */
+                    inputs: ({
+                        /** @description rc/path */
+                        _path: string;
+                        /** @description Stats group this input accumulates under. */
+                        _group?: string;
+                        /** @description Run this item in the background. Its entry in `results` is then a job ID. Items have no headers, so `Prefer` is not an option here. */
+                        _async?: boolean;
+                    } & {
+                        [key: string]: unknown;
+                    })[];
+                };
             };
         };
         responses: {
@@ -6685,10 +5005,7 @@ export interface operations {
     };
     jobList: {
         parameters: {
-            query?: {
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6698,7 +5015,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["JobListRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -6710,12 +5027,7 @@ export interface operations {
     };
     jobStatus: {
         parameters: {
-            query?: {
-                /** @description Numeric identifier of the job to query, as returned from an async call. */
-                jobid?: components["parameters"]["Job_StatusPostJobidParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6723,9 +5035,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["JobStatusRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Job id. */
+                    jobid: number;
+                };
             };
         };
         responses: {
@@ -6737,12 +5052,7 @@ export interface operations {
     };
     jobStop: {
         parameters: {
-            query?: {
-                /** @description Numeric identifier of the job to cancel. */
-                jobid?: components["parameters"]["Job_StopPostJobidParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6750,9 +5060,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["JobStopRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Job id. */
+                    jobid: number;
+                };
             };
         };
         responses: {
@@ -6764,12 +5077,7 @@ export interface operations {
     };
     jobStopgroup: {
         parameters: {
-            query?: {
-                /** @description Stats group name whose active jobs should be stopped. */
-                group?: components["parameters"]["Job_StopgroupPostGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6777,9 +5085,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["JobStopgroupRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Stats group name whose active jobs should be stopped. */
+                    group: string;
+                };
             };
         };
         responses: {
@@ -6791,42 +5102,7 @@ export interface operations {
     };
     operationsList: {
         parameters: {
-            query?: {
-                /** @description Remote name or path to list, for example `drive:`. */
-                fs?: components["parameters"]["Operations_ListPostFsParam"];
-                /** @description Directory path within `fs` to list; leave empty to target the root. */
-                remote?: components["parameters"]["Operations_ListPostRemoteParam"];
-                /** @description Optional JSON-encoded object of listing flags (e.g. `{ "recurse": true, "showHash": true }`). */
-                opt?: components["parameters"]["Operations_ListPostOptParam"];
-                /** @description Set to true to list directories recursively. */
-                recurse?: components["parameters"]["Operations_ListPostRecurseParam"];
-                /** @description Set to true to omit modification times for faster listings on some backends. */
-                noModTime?: components["parameters"]["Operations_ListPostNoModTimeParam"];
-                /** @description Set to true to include encrypted names when using crypt remotes. */
-                showEncrypted?: components["parameters"]["Operations_ListPostShowEncryptedParam"];
-                /** @description Set to true to include original backend identifiers where available. */
-                showOrigIDs?: components["parameters"]["Operations_ListPostShowOrigIDsParam"];
-                /** @description Set to true to include hash digests for each entry. */
-                showHash?: components["parameters"]["Operations_ListPostShowHashParam"];
-                /** @description Set to true to omit MIME type detection. */
-                noMimeType?: components["parameters"]["Operations_ListPostNoMimeTypeParam"];
-                /** @description Set to true to return only directory entries. */
-                dirsOnly?: components["parameters"]["Operations_ListPostDirsOnlyParam"];
-                /** @description Set to true to return only file entries. */
-                filesOnly?: components["parameters"]["Operations_ListPostFilesOnlyParam"];
-                /** @description Set to true to include backend-provided metadata maps. */
-                metadata?: components["parameters"]["Operations_ListPostMetadataParam"];
-                /** @description Specify one or more hash algorithms to include when `showHash` is true (e.g. `md5`). */
-                hashTypes?: components["parameters"]["Operations_ListPostHashTypesParam"];
-                /** @description JSON encoded config overrides applied for this call only. */
-                _config?: components["parameters"]["GlobalConfigParam"];
-                /** @description JSON encoded filter overrides applied for this call only. */
-                _filter?: components["parameters"]["GlobalFilterParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6834,9 +5110,27 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsListRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path to list, for example `drive:`. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Directory path within `fs` to list; leave empty to target the root. */
+                    remote: string;
+                    /** @description Options that control the listing. */
+                    opt?: {
+                        recurse?: boolean;
+                        noModTime?: boolean;
+                        noMimeType?: boolean;
+                        showEncrypted?: boolean;
+                        showOrigIDs?: boolean;
+                        showHash?: boolean;
+                        dirsOnly?: boolean;
+                        filesOnly?: boolean;
+                        metadata?: boolean;
+                        hashTypes?: string[];
+                    };
+                };
             };
         };
         responses: {
@@ -6848,18 +5142,7 @@ export interface operations {
     };
     operationsStat: {
         parameters: {
-            query?: {
-                /** @description Remote name or path that contains the item to inspect. */
-                fs?: components["parameters"]["Operations_StatPostFsParam"];
-                /** @description Path to the file or directory within `fs` to describe. */
-                remote?: components["parameters"]["Operations_StatPostRemoteParam"];
-                /** @description Optional JSON object of listing flags, matching those accepted by `operations/list`. */
-                opt?: components["parameters"]["Operations_StatPostOptParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6867,9 +5150,27 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsStatRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path that contains the item to inspect. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Path to the file or directory within `fs` to describe. */
+                    remote: string;
+                    /** @description Options that control the listing. */
+                    opt?: {
+                        recurse?: boolean;
+                        noModTime?: boolean;
+                        noMimeType?: boolean;
+                        showEncrypted?: boolean;
+                        showOrigIDs?: boolean;
+                        showHash?: boolean;
+                        dirsOnly?: boolean;
+                        filesOnly?: boolean;
+                        metadata?: boolean;
+                        hashTypes?: string[];
+                    };
+                };
             };
         };
         responses: {
@@ -6881,14 +5182,7 @@ export interface operations {
     };
     operationsAbout: {
         parameters: {
-            query?: {
-                /** @description Remote name or path to query for capacity information. */
-                fs?: components["parameters"]["Operations_AboutPostFsParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6896,9 +5190,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsAboutRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path to query for capacity information. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                };
             };
         };
         responses: {
@@ -6910,20 +5207,19 @@ export interface operations {
     };
     operationsUploadfile: {
         parameters: {
-            query?: {
+            query: {
                 /** @description Remote name or path where the uploaded file should be stored. */
-                fs?: components["parameters"]["Operations_UploadfilePostFsParam"];
+                fs: components["parameters"]["Operations_UploadfilePostFsParam"];
                 /** @description Destination path within `fs` for the uploaded file. */
-                remote?: components["parameters"]["Operations_UploadfilePostRemoteParam"];
+                remote: components["parameters"]["Operations_UploadfilePostRemoteParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
+                /** @description JSON encoded config overrides for this call only. */
+                _config?: components["parameters"]["UploadfileConfigParam"];
+                /** @description JSON encoded filter overrides for this call only. */
+                _filter?: components["parameters"]["UploadfileFilterParam"];
             };
-            header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
-                Prefer?: components["parameters"]["PreferAsyncHeader"];
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -6935,27 +5231,13 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
-            202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
     };
     operationsPurge: {
         parameters: {
-            query?: {
-                /** @description Remote name or path from which to remove all contents. */
-                fs?: components["parameters"]["Operations_PurgePostFsParam"];
-                /** @description Path within `fs` whose contents should be purged. */
-                remote?: components["parameters"]["Operations_PurgePostRemoteParam"];
-                /** @description JSON encoded config overrides applied for this call only. */
-                _config?: components["parameters"]["GlobalConfigParam"];
-                /** @description JSON encoded filter overrides applied for this call only. */
-                _filter?: components["parameters"]["GlobalFilterParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6963,9 +5245,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsPurgeRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path from which to remove all contents. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Path within `fs` whose contents should be purged. */
+                    remote: string;
+                };
             };
         };
         responses: {
@@ -6977,16 +5264,7 @@ export interface operations {
     };
     operationsMkdir: {
         parameters: {
-            query?: {
-                /** @description Remote name or path in which to create a directory. */
-                fs?: components["parameters"]["Operations_MkdirPostFsParam"];
-                /** @description Directory path within `fs` to create. */
-                remote?: components["parameters"]["Operations_MkdirPostRemoteParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -6994,9 +5272,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsMkdirRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path in which to create a directory. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Directory path within `fs` to create. */
+                    remote: string;
+                };
             };
         };
         responses: {
@@ -7008,16 +5291,7 @@ export interface operations {
     };
     operationsRmdir: {
         parameters: {
-            query?: {
-                /** @description Remote name or path containing the directory to remove. */
-                fs?: components["parameters"]["Operations_RmdirPostFsParam"];
-                /** @description Directory path within `fs` to delete. */
-                remote?: components["parameters"]["Operations_RmdirPostRemoteParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7025,9 +5299,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsRmdirRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path containing the directory to remove. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Directory path within `fs` to delete. */
+                    remote: string;
+                };
             };
         };
         responses: {
@@ -7039,38 +5318,7 @@ export interface operations {
     };
     operationsCheck: {
         parameters: {
-            query?: {
-                /** @description Source remote name or path to verify, e.g. `drive:`. */
-                srcFs?: components["parameters"]["Operations_CheckPostSrcFsParam"];
-                /** @description Destination remote name or path that should match the source. */
-                dstFs?: components["parameters"]["Operations_CheckPostDstFsParam"];
-                /** @description Set to true to read file contents during comparison instead of relying on hashes. */
-                download?: components["parameters"]["Operations_CheckPostDownloadParam"];
-                /** @description Hash name to expect in the supplied SUM file, such as `md5`. */
-                checkFileHash?: components["parameters"]["Operations_CheckPostCheckFileHashParam"];
-                /** @description Remote containing the checksum SUM file when using `checkFileHash`. */
-                checkFileFs?: components["parameters"]["Operations_CheckPostCheckFileFsParam"];
-                /** @description Path within `checkFileFs` to the checksum SUM file. */
-                checkFileRemote?: components["parameters"]["Operations_CheckPostCheckFileRemoteParam"];
-                /** @description Set to true to only ensure that source files exist on the destination. */
-                oneWay?: components["parameters"]["Operations_CheckPostOneWayParam"];
-                /** @description Set to true to include a combined summary report in the response. */
-                combined?: components["parameters"]["Operations_CheckPostCombinedParam"];
-                /** @description Set to true to report files missing from the source. */
-                missingOnSrc?: components["parameters"]["Operations_CheckPostMissingOnSrcParam"];
-                /** @description Set to true to report files missing from the destination. */
-                missingOnDst?: components["parameters"]["Operations_CheckPostMissingOnDstParam"];
-                /** @description Set to true to include matching files in the report. */
-                match?: components["parameters"]["Operations_CheckPostMatchParam"];
-                /** @description Set to true to include differing files in the report. */
-                differ?: components["parameters"]["Operations_CheckPostDifferParam"];
-                /** @description Set to true to include entries that encountered errors. */
-                error?: components["parameters"]["Operations_CheckPostErrorParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7078,9 +5326,36 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["OperationsCheckRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Source remote name or path to verify, e.g. `drive:`. */
+                    srcFs?: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Destination remote name or path that should match the source. */
+                    dstFs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Set to true to read file contents during comparison instead of relying on hashes. */
+                    download?: boolean;
+                    /** @description Hash name to expect in the supplied SUM file, such as `md5`. */
+                    checkFileHash?: string;
+                    /** @description Remote containing the checksum SUM file when using `checkFileHash`. */
+                    checkFileFs?: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Path within `checkFileFs` to the checksum SUM file. */
+                    checkFileRemote?: string;
+                    /** @description Set to true to only ensure that source files exist on the destination. */
+                    oneWay?: boolean;
+                    /** @description Set to true to include a combined summary report in the response. */
+                    combined?: boolean;
+                    /** @description Set to true to report files missing from the source. */
+                    missingOnSrc?: boolean;
+                    /** @description Set to true to report files missing from the destination. */
+                    missingOnDst?: boolean;
+                    /** @description Set to true to include matching files in the report. */
+                    match?: boolean;
+                    /** @description Set to true to include differing files in the report. */
+                    differ?: boolean;
+                    /** @description Set to true to include entries that encountered errors. */
+                    error?: boolean;
+                };
             };
         };
         responses: {
@@ -7092,22 +5367,7 @@ export interface operations {
     };
     syncSync: {
         parameters: {
-            query?: {
-                /** @description Source remote path to sync from, e.g. `drive:src`. */
-                srcFs?: components["parameters"]["Sync_SyncPostSrcFsParam"];
-                /** @description Destination remote path to sync to, e.g. `drive:dst`. */
-                dstFs?: components["parameters"]["Sync_SyncPostDstFsParam"];
-                /** @description Set to true to create empty source directories on the destination. */
-                createEmptySrcDirs?: components["parameters"]["Sync_SyncPostCreateEmptySrcDirsParam"];
-                /** @description JSON encoded config overrides applied for this call only. */
-                _config?: components["parameters"]["GlobalConfigParam"];
-                /** @description JSON encoded filter overrides applied for this call only. */
-                _filter?: components["parameters"]["GlobalFilterParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7115,9 +5375,16 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["SyncSyncRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Source remote path to sync from, e.g. `drive:src`. */
+                    srcFs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Destination remote path to sync to, e.g. `drive:dst`. */
+                    dstFs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Set to true to create empty source directories on the destination. */
+                    createEmptySrcDirs?: boolean;
+                };
             };
         };
         responses: {
@@ -7129,22 +5396,7 @@ export interface operations {
     };
     syncCopy: {
         parameters: {
-            query?: {
-                /** @description Source remote path to copy from. */
-                srcFs?: components["parameters"]["Sync_CopyPostSrcFsParam"];
-                /** @description Destination remote path to copy to. */
-                dstFs?: components["parameters"]["Sync_CopyPostDstFsParam"];
-                /** @description Set to true to replicate empty source directories on the destination. */
-                createEmptySrcDirs?: components["parameters"]["Sync_CopyPostCreateEmptySrcDirsParam"];
-                /** @description JSON encoded config overrides applied for this call only. */
-                _config?: components["parameters"]["GlobalConfigParam"];
-                /** @description JSON encoded filter overrides applied for this call only. */
-                _filter?: components["parameters"]["GlobalFilterParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7152,9 +5404,16 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["SyncCopyRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Source remote path to copy from. */
+                    srcFs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Destination remote path to copy to. */
+                    dstFs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Set to true to replicate empty source directories on the destination. */
+                    createEmptySrcDirs?: boolean;
+                };
             };
         };
         responses: {
@@ -7166,24 +5425,7 @@ export interface operations {
     };
     syncMove: {
         parameters: {
-            query?: {
-                /** @description Source remote path whose contents will be moved. */
-                srcFs?: components["parameters"]["Sync_MovePostSrcFsParam"];
-                /** @description Destination remote path that will receive moved files. */
-                dstFs?: components["parameters"]["Sync_MovePostDstFsParam"];
-                /** @description Set to true to create empty source directories on the destination. */
-                createEmptySrcDirs?: components["parameters"]["Sync_MovePostCreateEmptySrcDirsParam"];
-                /** @description Set to true to delete empty directories from the source after the move completes. */
-                deleteEmptySrcDirs?: components["parameters"]["Sync_MovePostDeleteEmptySrcDirsParam"];
-                /** @description JSON encoded config overrides applied for this call only. */
-                _config?: components["parameters"]["GlobalConfigParam"];
-                /** @description JSON encoded filter overrides applied for this call only. */
-                _filter?: components["parameters"]["GlobalFilterParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7191,9 +5433,18 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["SyncMoveRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Source remote path whose contents will be moved. */
+                    srcFs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Destination remote path that will receive moved files. */
+                    dstFs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Set to true to create empty source directories on the destination. */
+                    createEmptySrcDirs?: boolean;
+                    /** @description Set to true to delete empty directories from the source after the move completes. */
+                    deleteEmptySrcDirs?: boolean;
+                };
             };
         };
         responses: {
@@ -7205,52 +5456,7 @@ export interface operations {
     };
     syncBisync: {
         parameters: {
-            query?: {
-                /** @description First remote directory, e.g. `drive:path1`. */
-                path1?: components["parameters"]["Sync_BisyncPostPath1Param"];
-                /** @description Second remote directory, e.g. `drive:path2`. */
-                path2?: components["parameters"]["Sync_BisyncPostPath2Param"];
-                /** @description Set to true to simulate the bisync run without making changes. */
-                dryRun?: components["parameters"]["Sync_BisyncPostDryRunParam"];
-                /** @description Set to true to perform a one-time resync, rebuilding bisync history. */
-                resync?: components["parameters"]["Sync_BisyncPostResyncParam"];
-                /** @description Set to true to abort if `RCLONE_TEST` files are missing on either side. */
-                checkAccess?: components["parameters"]["Sync_BisyncPostCheckAccessParam"];
-                /** @description Override the access-check sentinel filename; defaults to `RCLONE_TEST`. */
-                checkFilename?: components["parameters"]["Sync_BisyncPostCheckFilenameParam"];
-                /** @description Abort the run if deletions exceed this percentage (default 50). */
-                maxDelete?: components["parameters"]["Sync_BisyncPostMaxDeleteParam"];
-                /** @description Set to true to bypass the `maxDelete` safety check. */
-                force?: components["parameters"]["Sync_BisyncPostForceParam"];
-                /** @description Controls final listing comparison; leave true for normal verification or set false to skip. */
-                checkSync?: components["parameters"]["Sync_BisyncPostCheckSyncParam"];
-                /** @description Set to true to mirror empty directories between the two paths. */
-                createEmptySrcDirs?: components["parameters"]["Sync_BisyncPostCreateEmptySrcDirsParam"];
-                /** @description Set to true to remove empty directories during cleanup. */
-                removeEmptyDirs?: components["parameters"]["Sync_BisyncPostRemoveEmptyDirsParam"];
-                /** @description Path to an rclone filters file applied to both paths. */
-                filtersFile?: components["parameters"]["Sync_BisyncPostFiltersFileParam"];
-                /** @description Set to true to ignore checksum differences when comparing listings. */
-                ignoreListingChecksum?: components["parameters"]["Sync_BisyncPostIgnoreListingChecksumParam"];
-                /** @description Set to true to allow retrying after certain recoverable errors. */
-                resilient?: components["parameters"]["Sync_BisyncPostResilientParam"];
-                /** @description Directory path used to store bisync working files. */
-                workdir?: components["parameters"]["Sync_BisyncPostWorkdirParam"];
-                /** @description Backup directory on the first remote for changed files. */
-                backupdir1?: components["parameters"]["Sync_BisyncPostBackupdir1Param"];
-                /** @description Backup directory on the second remote for changed files. */
-                backupdir2?: components["parameters"]["Sync_BisyncPostBackupdir2Param"];
-                /** @description Set to true to keep bisync working files after completion. */
-                noCleanup?: components["parameters"]["Sync_BisyncPostNoCleanupParam"];
-                /** @description JSON encoded config overrides applied for this call only. */
-                _config?: components["parameters"]["GlobalConfigParam"];
-                /** @description JSON encoded filter overrides applied for this call only. */
-                _filter?: components["parameters"]["GlobalFilterParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7258,9 +5464,53 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["SyncBisyncRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description First remote directory, e.g. `drive:path1`. */
+                    path1: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Second remote directory, e.g. `drive:path2`. */
+                    path2: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Set to true to simulate the bisync run without making changes. */
+                    dryRun?: boolean;
+                    /** @description Set to true to perform a one-time resync, rebuilding bisync history. */
+                    resync?: boolean;
+                    /** @description Set to true to abort if `RCLONE_TEST` files are missing on either side. */
+                    checkAccess?: boolean;
+                    /** @description Override the access-check sentinel filename; defaults to `RCLONE_TEST`. */
+                    checkFilename?: string;
+                    maxDelete?: number;
+                    /** @description Set to true to bypass the `maxDelete` safety check. */
+                    force?: boolean;
+                    /** @enum {string} */
+                    checkSync?: "true" | "false" | "only";
+                    /** @description Set to true to mirror empty directories between the two paths. */
+                    createEmptySrcDirs?: boolean;
+                    /** @description Set to true to remove empty directories during cleanup. */
+                    removeEmptyDirs?: boolean;
+                    /** @description Path to an rclone filters file applied to both paths. */
+                    filtersFile?: string;
+                    /** @description Set to true to ignore checksum differences when comparing listings. */
+                    ignoreListingChecksum?: boolean;
+                    /** @description Set to true to allow retrying after certain recoverable errors. */
+                    resilient?: boolean;
+                    /** @description Directory path used to store bisync working files. */
+                    workdir?: string;
+                    /** @description Set to true to keep bisync working files after completion. */
+                    noCleanup?: boolean;
+                    backupDir1?: string;
+                    backupDir2?: string;
+                    compare?: string;
+                    conflictLoser?: string;
+                    conflictResolve?: string;
+                    conflictSuffix?: string;
+                    downloadHash?: boolean;
+                    maxLock?: string;
+                    noSlowHash?: boolean;
+                    recover?: boolean;
+                    resyncMode?: string;
+                    slowHashSyncOnly?: boolean;
+                };
             };
         };
         responses: {
@@ -7272,12 +5522,7 @@ export interface operations {
     };
     optionsBlocks: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7287,7 +5532,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["OptionsBlocksRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -7299,14 +5544,7 @@ export interface operations {
     };
     optionsGet: {
         parameters: {
-            query?: {
-                /** @description Optional comma-separated list of option block names to return. */
-                blocks?: components["parameters"]["Options_GetPostBlocksParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7316,7 +5554,10 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["OptionsGetRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Optional comma-separated list of option block names to return. */
+                    blocks?: string;
+                };
             };
         };
         responses: {
@@ -7328,14 +5569,7 @@ export interface operations {
     };
     optionsInfo: {
         parameters: {
-            query?: {
-                /** @description Optional comma-separated list of option block names to describe. */
-                blocks?: components["parameters"]["Options_InfoPostBlocksParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7345,7 +5579,10 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["OptionsInfoRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Optional comma-separated list of option block names to describe. */
+                    blocks?: string;
+                };
             };
         };
         responses: {
@@ -7357,42 +5594,7 @@ export interface operations {
     };
     optionsSet: {
         parameters: {
-            query?: {
-                /** @description Overrides for the `dlna` option block. */
-                dlna?: components["parameters"]["Options_SetPostDlnaParam"];
-                /** @description Overrides for the `filter` option block. */
-                filter?: components["parameters"]["Options_SetPostFilterParam"];
-                /** @description Overrides for the `ftp` option block. */
-                ftp?: components["parameters"]["Options_SetPostFtpParam"];
-                /** @description Overrides for the `main` option block. */
-                main?: components["parameters"]["Options_SetPostMainParam"];
-                /** @description Overrides for the `http` option block. */
-                http?: components["parameters"]["Options_SetPostHttpParam"];
-                /** @description Overrides for the `log` option block. */
-                log?: components["parameters"]["Options_SetPostLogParam"];
-                /** @description Overrides for the `mount` option block. */
-                mount?: components["parameters"]["Options_SetPostMountParam"];
-                /** @description Overrides for the `nfs` option block. */
-                nfs?: components["parameters"]["Options_SetPostNfsParam"];
-                /** @description Overrides for the `proxy` option block. */
-                proxy?: components["parameters"]["Options_SetPostProxyParam"];
-                /** @description Overrides for the `rc` option block. */
-                rc?: components["parameters"]["Options_SetPostRcParam"];
-                /** @description Overrides for the `restic` option block. */
-                restic?: components["parameters"]["Options_SetPostResticParam"];
-                /** @description Overrides for the `s3` option block. */
-                s3?: components["parameters"]["Options_SetPostS3Param"];
-                /** @description Overrides for the `sftp` option block. */
-                sftp?: components["parameters"]["Options_SetPostSftpParam"];
-                /** @description Overrides for the `vfs` option block. */
-                vfs?: components["parameters"]["Options_SetPostVfsParam"];
-                /** @description Overrides for the `webdav` option block. */
-                webdav?: components["parameters"]["Options_SetPostWebdavParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7402,7 +5604,72 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["OptionsSetRequest"];
+                "application/json": {
+                    /** @description Overrides for the `dlna` option block. */
+                    dlna?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `filter` option block. */
+                    filter?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `ftp` option block. */
+                    ftp?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `main` option block. */
+                    main?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `http` option block. */
+                    http?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `log` option block. */
+                    log?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `mount` option block. */
+                    mount?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `nfs` option block. */
+                    nfs?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `proxy` option block. */
+                    proxy?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `rc` option block. */
+                    rc?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `restic` option block. */
+                    restic?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `s3` option block. */
+                    s3?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `sftp` option block. */
+                    sftp?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `vfs` option block. */
+                    vfs?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Overrides for the `webdav` option block. */
+                    webdav?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Stats group for this call. */
+                    _group?: string;
+                } & {
+                    [key: string]: unknown;
+                };
             };
         };
         responses: {
@@ -7414,16 +5681,7 @@ export interface operations {
     };
     optionsLocal: {
         parameters: {
-            query?: {
-                /** @description JSON encoded config overrides applied for this call only. */
-                _config?: components["parameters"]["GlobalConfigParam"];
-                /** @description JSON encoded filter overrides applied for this call only. */
-                _filter?: components["parameters"]["GlobalFilterParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7433,7 +5691,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["OptionsLocalRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -7445,12 +5703,7 @@ export interface operations {
     };
     serveList: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7460,7 +5713,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["ServeListRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -7472,24 +5725,7 @@ export interface operations {
     };
     serveStart: {
         parameters: {
-            query?: {
-                /** @description Type of server to start (e.g. `http`, `webdav`, `ftp`, `sftp`). */
-                type?: components["parameters"]["Serve_StartPostTypeParam"];
-                /** @description Remote path that will be served. */
-                fs?: components["parameters"]["Serve_StartPostFsParam"];
-                /** @description Address and port to bind the server to, such as `:5572` or `localhost:8080`. */
-                addr?: components["parameters"]["Serve_StartPostAddrParam"];
-                /** @description Additional arbitrary parameters allowed. */
-                params?: components["parameters"]["Serve_StartPostAdditionalParam"];
-                /** @description JSON encoded config overrides applied for this call only. */
-                _config?: components["parameters"]["GlobalConfigParam"];
-                /** @description JSON encoded filter overrides applied for this call only. */
-                _filter?: components["parameters"]["GlobalFilterParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7497,9 +5733,18 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["ServeStartRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & ({
+                    /** @description Type of server to start (e.g. `http`, `webdav`, `ftp`, `sftp`). */
+                    type: string;
+                    /** @description Remote path that will be served. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Address and port to bind the server to, such as `:5572` or `localhost:8080`. */
+                    addr?: string;
+                } & {
+                    [key: string]: unknown;
+                });
             };
         };
         responses: {
@@ -7511,14 +5756,7 @@ export interface operations {
     };
     serveStop: {
         parameters: {
-            query?: {
-                /** @description Identifier of the running serve instance returned by `serve/start`. */
-                id?: components["parameters"]["Serve_StopPostIdParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7526,9 +5764,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["ServeStopRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Identifier of the running serve instance returned by `serve/start`. */
+                    id: string;
+                };
             };
         };
         responses: {
@@ -7540,12 +5781,7 @@ export interface operations {
     };
     serveStopall: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7555,7 +5791,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["ServeStopallRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -7567,12 +5803,7 @@ export interface operations {
     };
     serveTypes: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7582,7 +5813,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["ServeTypesRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -7594,16 +5825,7 @@ export interface operations {
     };
     vfsForget: {
         parameters: {
-            query?: {
-                /** @description Optional VFS identifier to target; required when more than one VFS is active. */
-                fs?: components["parameters"]["Vfs_ForgetPostFsParam"];
-                /** @description Additional arbitrary parameters allowed. */
-                params?: components["parameters"]["Vfs_ForgetPostAdditionalParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7613,7 +5835,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["VfsForgetRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & ({
+                    /** @description Optional VFS identifier to target; required when more than one VFS is active. */
+                    fs?: string;
+                } & {
+                    [key: string]: unknown;
+                });
             };
         };
         responses: {
@@ -7625,14 +5852,7 @@ export interface operations {
     };
     vfsList: {
         parameters: {
-            query?: {
-                /** @description Optional VFS identifier; omit to list all active VFS instances. */
-                fs?: components["parameters"]["Vfs_ListPostFsParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7642,7 +5862,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["VfsListRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -7654,18 +5874,7 @@ export interface operations {
     };
     vfsPollInterval: {
         parameters: {
-            query?: {
-                /** @description Optional VFS identifier whose poll interval should be queried or modified. */
-                fs?: components["parameters"]["Vfs_PollIntervalPostFsParam"];
-                /** @description Duration string (e.g. `5m`) to set as the new poll interval. */
-                interval?: components["parameters"]["Vfs_PollIntervalPostIntervalParam"];
-                /** @description Duration to wait for the poll interval change to take effect; `0` waits indefinitely. */
-                timeout?: components["parameters"]["Vfs_PollIntervalPostTimeoutParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7675,7 +5884,14 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["VfsPollIntervalRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Optional VFS identifier whose poll interval should be queried or modified. */
+                    fs?: string;
+                    /** @description Duration string (e.g. `5m`) to set as the new poll interval. */
+                    interval?: string;
+                    /** @description Duration to wait for the poll interval change to take effect; `0` waits indefinitely. */
+                    timeout?: string;
+                };
             };
         };
         responses: {
@@ -7687,14 +5903,7 @@ export interface operations {
     };
     vfsQueue: {
         parameters: {
-            query?: {
-                /** @description Optional VFS identifier whose upload queue should be inspected. */
-                fs?: components["parameters"]["Vfs_QueuePostFsParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7704,7 +5913,10 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["VfsQueueRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Optional VFS identifier whose upload queue should be inspected. */
+                    fs?: string;
+                };
             };
         };
         responses: {
@@ -7716,20 +5928,7 @@ export interface operations {
     };
     vfsQueueSetExpiry: {
         parameters: {
-            query?: {
-                /** @description Optional VFS identifier for the queued item. */
-                fs?: components["parameters"]["Vfs_QueueSetExpiryPostFsParam"];
-                /** @description Queue item ID as returned by `vfs/queue`. */
-                id?: components["parameters"]["Vfs_QueueSetExpiryPostIdParam"];
-                /** @description New eligibility time in seconds (may be negative for immediate upload). */
-                expiry?: components["parameters"]["Vfs_QueueSetExpiryPostExpiryParam"];
-                /** @description Set to true to treat `expiry` as relative to the current value. */
-                relative?: components["parameters"]["Vfs_QueueSetExpiryPostRelativeParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7737,9 +5936,18 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["VfsQueueSetExpiryRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Optional VFS identifier for the queued item. */
+                    fs?: string;
+                    /** @description Queue item ID as returned by `vfs/queue`. */
+                    id: number;
+                    /** @description New eligibility time in seconds (may be negative for immediate upload). */
+                    expiry: number;
+                    /** @description Set to true to treat `expiry` as relative to the current value. */
+                    relative?: boolean;
+                };
             };
         };
         responses: {
@@ -7751,18 +5959,7 @@ export interface operations {
     };
     vfsRefresh: {
         parameters: {
-            query?: {
-                /** @description Optional VFS identifier whose directory cache should be refreshed. */
-                fs?: components["parameters"]["Vfs_RefreshPostFsParam"];
-                /** @description Set to true to refresh entire directory trees. */
-                recursive?: components["parameters"]["Vfs_RefreshPostRecursiveParam"];
-                /** @description Additional arbitrary parameters allowed. */
-                params?: components["parameters"]["Vfs_RefreshPostAdditionalParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7772,7 +5969,17 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["VfsRefreshRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & ({
+                    /** @description Optional VFS identifier whose directory cache should be refreshed. */
+                    fs?: string;
+                    /**
+                     * @description Must be the string `true` or `false`, not a JSON boolean.
+                     * @enum {string}
+                     */
+                    recursive?: "true" | "false";
+                } & {
+                    [key: string]: unknown;
+                });
             };
         };
         responses: {
@@ -7784,14 +5991,7 @@ export interface operations {
     };
     vfsStats: {
         parameters: {
-            query?: {
-                /** @description Optional VFS identifier whose statistics should be returned. */
-                fs?: components["parameters"]["Vfs_StatsPostFsParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7801,7 +6001,10 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["VfsStatsRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Optional VFS identifier whose statistics should be returned. */
+                    fs?: string;
+                };
             };
         };
         responses: {
@@ -7813,14 +6016,7 @@ export interface operations {
     };
     pluginsctlAddPlugin: {
         parameters: {
-            query?: {
-                /** @description Repository URL of the plugin to install. */
-                url?: components["parameters"]["Pluginsctl_AddPluginPostUrlParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7828,9 +6024,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["PluginsctlAddPluginRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Repository URL of the plugin to install. */
+                    url: string;
+                    branch?: string;
+                    version?: string;
+                };
             };
         };
         responses: {
@@ -7842,16 +6043,7 @@ export interface operations {
     };
     pluginsctlGetPluginsForType: {
         parameters: {
-            query?: {
-                /** @description MIME type to match when listing plugins. */
-                type?: components["parameters"]["Pluginsctl_GetPluginsForTypePostTypeParam"];
-                /** @description Filter results by plugin type (e.g. `test`). */
-                pluginType?: components["parameters"]["Pluginsctl_GetPluginsForTypePostPluginTypeParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7861,7 +6053,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["PluginsctlGetPluginsForTypeRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description MIME type to match when listing plugins. */
+                    type?: string;
+                    /** @description Filter results by plugin type (e.g. `test`). */
+                    pluginType?: string;
+                };
             };
         };
         responses: {
@@ -7873,12 +6070,7 @@ export interface operations {
     };
     pluginsctlListPlugins: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7888,7 +6080,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["PluginsctlListPluginsRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -7900,12 +6092,7 @@ export interface operations {
     };
     pluginsctlListTestPlugins: {
         parameters: {
-            query?: {
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7915,7 +6102,7 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["PluginsctlListTestPluginsRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"];
             };
         };
         responses: {
@@ -7927,14 +6114,7 @@ export interface operations {
     };
     pluginsctlRemovePlugin: {
         parameters: {
-            query?: {
-                /** @description Name of the plugin to uninstall. */
-                name?: components["parameters"]["Pluginsctl_RemovePluginPostNameParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7942,9 +6122,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["PluginsctlRemovePluginRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Name of the plugin to uninstall. */
+                    name: string;
+                };
             };
         };
         responses: {
@@ -7956,14 +6139,7 @@ export interface operations {
     };
     pluginsctlRemoveTestPlugin: {
         parameters: {
-            query?: {
-                /** @description Name of the test plugin to uninstall. */
-                name?: components["parameters"]["Pluginsctl_RemoveTestPluginPostNameParam"];
-                /** @description Assign the request to a custom stats group. */
-                _group?: components["parameters"]["GlobalGroupParam"];
-                /** @description Run the command asynchronously. Returns a job id immediately. */
-                _async?: components["parameters"]["GlobalAsyncParam"];
-            };
+            query?: never;
             header?: {
                 /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
@@ -7971,13 +6147,53 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "application/json": components["schemas"]["PluginsctlRemoveTestPluginRequest"];
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Name of the test plugin to uninstall. */
+                    name: string;
+                };
             };
         };
         responses: {
             200: components["responses"]["EmptyResponse"];
+            202: components["responses"]["AsyncJobResponse"];
+            "4XX": components["responses"]["RcError"];
+            "5XX": components["responses"]["RcError"];
+        };
+    };
+    configUnset: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Name of the remote. */
+                    name: string;
+                    /** @description Key names to remove. */
+                    keys: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description The keys that were removed. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        removed?: string[];
+                    };
+                };
+            };
             202: components["responses"]["AsyncJobResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
