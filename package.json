@@ -35,11 +35,19 @@
     "gen:types": "openapi-typescript openapi.yaml -o types.d.ts",
     "gen": "npm run gen:json && npm run gen:types",
     "bump": "npm version patch --no-git-tag-version",
-    "pub": "npm run gen && npm publish"
+    "pub": "npm run gen && npm publish",
+    "check:lint": "redocly lint openapi.yaml",
+    "check:types": "tsc --noEmit --strict --skipLibCheck --target es2022 --module esnext --moduleResolution bundler scripts/check-types.ts",
+    "check:contract": "node scripts/check-contract.mjs",
+    "check:source": "go run scripts/audit-source.go",
+    "check": "npm run check:lint && npm run check:types && npm run check:contract && npm run check:source"
   },
   "devDependencies": {
     "@redocly/cli": "^2.72.1",
+    "ajv": "^8.20.0",
+    "openapi-fetch": "^0.17.0",
     "openapi-typescript": "^7.13.0",
+    "typescript": "^5.9.3",
     "yaml": "^2.9.1"
   }
 }

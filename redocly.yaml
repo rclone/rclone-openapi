@@ -1,0 +1,6 @@
+extends:
+  - recommended
+rules:
+  no-server-example.com: off
+  security-defined: warn
+  operation-summary: warn
