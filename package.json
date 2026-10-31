@@ -39,8 +39,8 @@
     "pub": "npm run gen && npm publish"
   },
   "devDependencies": {
-    "@redocly/cli": "^2.26.0",
+    "@redocly/cli": "^2.72.1",
     "openapi-typescript": "^7.13.0",
-    "yaml": "^2.8.3"
+    "yaml": "^2.9.1"
   }
 }
