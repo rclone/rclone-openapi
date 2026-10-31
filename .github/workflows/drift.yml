@@ -1,0 +1,33 @@
+name: Rclone drift
+
+# Checks the spec against the latest rclone release, to show what a new release
+# changes before the next version bump.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: rclone version to check, or latest
+        default: latest
+
+env:
+  OPENAPI_RCLONE_VERSION: ${{ inputs.version || 'latest' }}
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+      - uses: actions/setup-go@v7
+        with:
+          go-version: stable
+          cache: false
+      - run: npm ci
+      - run: npm run check:contract
+      - run: npm run check:source
+        if: ${{ !cancelled() }}
