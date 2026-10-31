@@ -3456,7 +3456,7 @@
     "/cache/fetch": {
       "post": {
         "summary": "Prefetch cache chunks",
-        "description": "Ensures specified file chunks are cached locally for a cache remote.",
+        "description": "Ensures specified file chunks are cached locally for a cache remote. Rclone also accepts `_config` and `_filter` objects here, but this schema leaves them out, because it can't allow objects for only those two keys.",
         "tags": [
           "cache"
         ],
@@ -3469,29 +3469,26 @@
           "content": {
             "application/json": {
               "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/RcGlobalOptions"
+                "type": "object",
+                "properties": {
+                  "_group": {
+                    "type": "string",
+                    "description": "Stats group for this call."
                   },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "chunks": {
-                        "type": "string",
-                        "description": "Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch."
-                      },
-                      "file": {
-                        "type": "string",
-                        "description": "File to fetch chunks of. Add more with keys that start with `file`, such as `file2`."
-                      }
-                    },
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "required": [
-                      "chunks"
-                    ]
+                  "chunks": {
+                    "type": "string",
+                    "description": "Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch."
+                  },
+                  "file": {
+                    "type": "string",
+                    "description": "File to fetch chunks of. Add more with keys that start with `file`, such as `file2`."
                   }
+                },
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "required": [
+                  "chunks"
                 ]
               }
             }
@@ -3881,14 +3878,11 @@
         },
         "responses": {
           "200": {
-            "description": "Configuration key/value pairs for the requested remote.",
+            "description": "Configuration key/value pairs for the requested remote. An empty object if there's no remote with that name.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "type"
-                  ],
                   "properties": {
                     "type": {
                       "type": "string"
@@ -8221,7 +8215,7 @@
     "/vfs/forget": {
       "post": {
         "summary": "Forget cached paths",
-        "description": "Evicts specific files or directories from the VFS directory cache. All values must be strings.",
+        "description": "Evicts specific files or directories from the VFS directory cache. All values must be strings. Rclone also accepts `_config` and `_filter` objects here, but this schema leaves them out, because it can't allow objects for only those two keys.",
         "tags": [
           "vfs"
         ],
@@ -8234,31 +8228,28 @@
           "content": {
             "application/json": {
               "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/RcGlobalOptions"
+                "type": "object",
+                "properties": {
+                  "_group": {
+                    "type": "string",
+                    "description": "Stats group for this call."
                   },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "fs": {
-                        "type": "string",
-                        "description": "Optional VFS identifier to target; required when more than one VFS is active."
-                      },
-                      "file": {
-                        "type": "string",
-                        "description": "File to forget. Add more with keys that start with `file`, such as `file2`."
-                      },
-                      "dir": {
-                        "type": "string",
-                        "description": "Directory to forget. Add more with keys that start with `dir`, such as `dir2`."
-                      }
-                    },
-                    "additionalProperties": {
-                      "type": "string"
-                    }
+                  "fs": {
+                    "type": "string",
+                    "description": "Optional VFS identifier to target; required when more than one VFS is active."
+                  },
+                  "file": {
+                    "type": "string",
+                    "description": "File to forget. Add more with keys that start with `file`, such as `file2`."
+                  },
+                  "dir": {
+                    "type": "string",
+                    "description": "Directory to forget. Add more with keys that start with `dir`, such as `dir2`."
                   }
-                ]
+                },
+                "additionalProperties": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -8678,7 +8669,7 @@
     "/vfs/refresh": {
       "post": {
         "summary": "Refresh directory cache",
-        "description": "Refreshes one or more directories in the VFS cache, optionally recursively. All values must be strings.",
+        "description": "Refreshes one or more directories in the VFS cache, optionally recursively. All values must be strings. Rclone also accepts `_config` and `_filter` objects here, but this schema leaves them out, because it can't allow objects for only those two keys.",
         "tags": [
           "vfs"
         ],
@@ -8691,35 +8682,32 @@
           "content": {
             "application/json": {
               "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/RcGlobalOptions"
+                "type": "object",
+                "properties": {
+                  "_group": {
+                    "type": "string",
+                    "description": "Stats group for this call."
                   },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "fs": {
-                        "type": "string",
-                        "description": "Optional VFS identifier whose directory cache should be refreshed."
-                      },
-                      "recursive": {
-                        "type": "string",
-                        "enum": [
-                          "true",
-                          "false"
-                        ],
-                        "description": "Must be the string `true` or `false`, not a JSON boolean."
-                      },
-                      "dir": {
-                        "type": "string",
-                        "description": "Directory to refresh. Add more with keys that start with `dir`, such as `dir2`."
-                      }
-                    },
-                    "additionalProperties": {
-                      "type": "string"
-                    }
+                  "fs": {
+                    "type": "string",
+                    "description": "Optional VFS identifier whose directory cache should be refreshed."
+                  },
+                  "recursive": {
+                    "type": "string",
+                    "enum": [
+                      "true",
+                      "false"
+                    ],
+                    "description": "Must be the string `true` or `false`, not a JSON boolean."
+                  },
+                  "dir": {
+                    "type": "string",
+                    "description": "Directory to refresh. Add more with keys that start with `dir`, such as `dir2`."
                   }
-                ]
+                },
+                "additionalProperties": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -9555,7 +9543,7 @@
       "Operations_UploadfilePostRemoteParam": {
         "name": "remote",
         "in": "query",
-        "description": "Destination path within `fs` for the uploaded file.",
+        "description": "Directory within `fs` to upload into. Use an empty string for the top of `fs`. Each file takes its name from its form part, and rclone skips parts with no file name.",
         "schema": {
           "type": "string"
         },

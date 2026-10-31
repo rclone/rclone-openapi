@@ -585,6 +585,7 @@ for (const [path, item] of Object.entries(doc.paths)) {
     if (!schema || SKIP_SWEEP.has(path)) continue
     const { props, required } = collect(schema)
     const base = BASES[path] ?? Object.fromEntries(required.map(k => [k, /remote/i.test(k) ? 'none.txt' : sample(k, props[k])]))
+    checkResponse(path.slice(1), await call(path.slice(1), base), `${path} with sample values`)
 
     // Omitting a required field has to be an error
     for (const key of required) {
@@ -599,6 +600,7 @@ for (const [path, item] of Object.entries(doc.paths)) {
         sent++
         const value = sample(key, s)
         const r = await call(path.slice(1), { ...base, [key]: value })
+        checkResponse(path.slice(1), r, `${path} with ${key}`)
         const error = String(r.json?.error ?? '')
         if (TYPE_ERROR.test(error)) problem(`${path}: ${key} = ${JSON.stringify(value)} was rejected: ${error.slice(0, 100)}`)
     }

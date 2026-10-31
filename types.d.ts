@@ -895,7 +895,7 @@ export interface paths {
         put?: never;
         /**
          * Prefetch cache chunks
-         * @description Ensures specified file chunks are cached locally for a cache remote.
+         * @description Ensures specified file chunks are cached locally for a cache remote. Rclone also accepts `_config` and `_filter` objects here, but this schema leaves them out, because it can't allow objects for only those two keys.
          */
         post: operations["cacheFetch"];
         delete?: never;
@@ -1775,7 +1775,7 @@ export interface paths {
         put?: never;
         /**
          * Forget cached paths
-         * @description Evicts specific files or directories from the VFS directory cache. All values must be strings.
+         * @description Evicts specific files or directories from the VFS directory cache. All values must be strings. Rclone also accepts `_config` and `_filter` objects here, but this schema leaves them out, because it can't allow objects for only those two keys.
          */
         post: operations["vfsForget"];
         delete?: never;
@@ -1875,7 +1875,7 @@ export interface paths {
         put?: never;
         /**
          * Refresh directory cache
-         * @description Refreshes one or more directories in the VFS cache, optionally recursively. All values must be strings.
+         * @description Refreshes one or more directories in the VFS cache, optionally recursively. All values must be strings. Rclone also accepts `_config` and `_filter` objects here, but this schema leaves them out, because it can't allow objects for only those two keys.
          */
         post: operations["vfsRefresh"];
         delete?: never;
@@ -2335,7 +2335,7 @@ export interface components {
         GlobalGroupParam: string;
         /** @description Remote name or path where the uploaded file should be stored. */
         Operations_UploadfilePostFsParam: string;
-        /** @description Destination path within `fs` for the uploaded file. */
+        /** @description Directory within `fs` to upload into. Use an empty string for the top of `fs`. Each file takes its name from its form part, and rclone skips parts with no file name. */
         Operations_UploadfilePostRemoteParam: string;
         /** @description JSON encoded config overrides for this call only. */
         UploadfileConfigParam: string;
@@ -3914,14 +3914,16 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RcGlobalOptions"] & ({
+                "application/json": {
+                    /** @description Stats group for this call. */
+                    _group?: string;
                     /** @description Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch. */
                     chunks: string;
                     /** @description File to fetch chunks of. Add more with keys that start with `file`, such as `file2`. */
                     file?: string;
                 } & {
                     [key: string]: string;
-                });
+                };
             };
         };
         responses: {
@@ -4114,7 +4116,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Configuration key/value pairs for the requested remote. */
+            /** @description Configuration key/value pairs for the requested remote. An empty object if there's no remote with that name. */
             200: {
                 headers: {
                     "x-rclone-jobid": components["headers"]["RcloneJobId"];
@@ -4122,7 +4124,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        type: string;
+                        type?: string;
                     } & {
                         [key: string]: string;
                     };
@@ -4967,7 +4969,7 @@ export interface operations {
             query: {
                 /** @description Remote name or path where the uploaded file should be stored. */
                 fs: components["parameters"]["Operations_UploadfilePostFsParam"];
-                /** @description Destination path within `fs` for the uploaded file. */
+                /** @description Directory within `fs` to upload into. Use an empty string for the top of `fs`. Each file takes its name from its form part, and rclone skips parts with no file name. */
                 remote: components["parameters"]["Operations_UploadfilePostRemoteParam"];
                 /** @description Assign the request to a custom stats group. */
                 _group?: components["parameters"]["GlobalGroupParam"];
@@ -5961,7 +5963,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["RcGlobalOptions"] & ({
+                "application/json": {
+                    /** @description Stats group for this call. */
+                    _group?: string;
                     /** @description Optional VFS identifier to target; required when more than one VFS is active. */
                     fs?: string;
                     /** @description File to forget. Add more with keys that start with `file`, such as `file2`. */
@@ -5970,7 +5974,7 @@ export interface operations {
                     dir?: string;
                 } & {
                     [key: string]: string;
-                });
+                };
             };
         };
         responses: {
@@ -6180,7 +6184,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["RcGlobalOptions"] & ({
+                "application/json": {
+                    /** @description Stats group for this call. */
+                    _group?: string;
                     /** @description Optional VFS identifier whose directory cache should be refreshed. */
                     fs?: string;
                     /**
@@ -6192,7 +6198,7 @@ export interface operations {
                     dir?: string;
                 } & {
                     [key: string]: string;
-                });
+                };
             };
         };
         responses: {

@@ -52,6 +52,9 @@ export async function requestTypes() {
     // @ts-expect-error recursive must be a string
     await client.POST('/vfs/refresh', { body: { recursive: true } })
     await client.POST('/vfs/refresh', { body: { recursive: 'true' } })
+    await client.POST('/vfs/refresh', { body: { _group: 'g', dir: '/a', dir2: '/b' } })
+    // @ts-expect-error the extra keys on this route are strings, so the schema leaves _config out
+    await client.POST('/vfs/refresh', { body: { _config: { Transfers: 2 } } })
 }
 
 // openapi-fetch doesn't reject extra body fields, but a direct annotation does
