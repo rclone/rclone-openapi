@@ -1,0 +1,10297 @@
+export default {
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Rclone RC API",
+    "version": "1.75.0",
+    "description": "OpenAPI specification for the rclone RC API. Each release describes exactly one rclone version, shown in `info.version`.\n\n## Scope\n\nThis covers the `POST` RC commands with JSON bodies. It doesn't cover rclone's file serving, `/metrics` or the web GUI.\n\nRclone also accepts these params in the query string or a form-encoded body, and an `_async` param. This spec leaves those out on purpose, so that each field has one documented form and `required` can be enforced. The exception is `operations/uploadfile`, whose params can only go in the query string.\n\nA request with `Content-Type: application/json` and an empty body returns a 400. Send `{}`, or leave the header out. JSON bodies always cause a browser preflight, which rclone answers when `--rc-allow-origin` is set.\n\n## Running calls in the background\n\nSend `Prefer: respond-async` to run a call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. Rclone's `_async` param has the same effect, but on its own it returns a 200 with the job ID rather than the route's normal body. That can't be described here, so routes don't list it. The exception is `job/batch` inputs, which have no headers and use `_async` instead.\n\n## What depends on the server\n\n- `cache/*` only exists after a cache remote is created.\n- `pluginsctl/*` only works with the web GUI.\n- `mount/*` and the option blocks depend on how rclone was built.\n- `backend/command` results depend on the backend.\n",
+    "contact": {
+      "name": "GitHub Repository",
+      "url": "https://github.com/rclone/rclone-openapi"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5572",
+      "description": "Local rclone RC endpoint"
+    }
+  ],
+  "paths": {
+    "/rc/noop": {
+      "post": {
+        "summary": "Echo request parameters",
+        "description": "Returns all supplied parameters unchanged so you can verify RC connectivity.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RcNoopResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "rcNoop"
+      }
+    },
+    "/operations/cleanup": {
+      "post": {
+        "summary": "Remove trashed files",
+        "description": "Permanently removes trashed objects from the specified remote path.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path to clean up, for example `drive:`."
+                      }
+                    },
+                    "required": [
+                      "fs"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsCleanup"
+      }
+    },
+    "/operations/copyfile": {
+      "post": {
+        "summary": "Copy a single file",
+        "description": "Copies one object from a source remote and path to a destination remote and path.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "srcFs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Source remote name or path, such as `drive:` or `/` for the local filesystem."
+                      },
+                      "srcRemote": {
+                        "type": "string",
+                        "description": "Path to the source object within `srcFs`, for example `dir/file.txt`."
+                      },
+                      "dstFs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Destination remote name or path, such as `drive2:` or `/` for local filesystem."
+                      },
+                      "dstRemote": {
+                        "type": "string",
+                        "description": "Target path within `dstFs` where the file should be written."
+                      }
+                    },
+                    "required": [
+                      "srcFs",
+                      "srcRemote",
+                      "dstFs",
+                      "dstRemote"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsCopyfile"
+      }
+    },
+    "/operations/copyurl": {
+      "post": {
+        "summary": "Copy from URL",
+        "description": "Downloads a public URL and stores it at the requested remote path.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path that will receive the downloaded file, e.g. `drive:`."
+                      },
+                      "remote": {
+                        "type": "string",
+                        "description": "Destination path within `fs` where the fetched object will be stored."
+                      },
+                      "url": {
+                        "type": "string",
+                        "description": "Source URL to fetch the object from."
+                      },
+                      "autoFilename": {
+                        "type": "boolean",
+                        "description": "Set to true to derive the destination filename from the URL."
+                      },
+                      "noClobber": {
+                        "type": "boolean"
+                      },
+                      "headerFilename": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "remote",
+                      "url"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsCopyurl"
+      }
+    },
+    "/operations/delete": {
+      "post": {
+        "summary": "Delete objects in path",
+        "description": "Deletes matching files and directories for the provided remote, honouring filters and config overrides.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path whose contents should be removed."
+                      }
+                    },
+                    "required": [
+                      "fs"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsDelete"
+      }
+    },
+    "/operations/deletefile": {
+      "post": {
+        "summary": "Delete single file",
+        "description": "Removes a specific object from the remote.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path that contains the file to delete."
+                      },
+                      "remote": {
+                        "type": "string",
+                        "description": "Exact path to the file within `fs` that should be deleted."
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "remote"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsDeletefile"
+      }
+    },
+    "/operations/fsinfo": {
+      "post": {
+        "summary": "Describe remote capabilities",
+        "description": "Returns backend features, hash support, metadata descriptions, and other info for the remote.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path to inspect, e.g. `drive:`."
+                      }
+                    },
+                    "required": [
+                      "fs"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OperationsFsinfoResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsFsinfo"
+      }
+    },
+    "/operations/hashsum": {
+      "post": {
+        "summary": "Generate hash sums",
+        "description": "Produces a hash sum listing for files under the given path using the requested hash algorithm.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path to hash, such as `drive:` or `/`."
+                      },
+                      "hashType": {
+                        "type": "string",
+                        "description": "Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name."
+                      },
+                      "download": {
+                        "type": "boolean",
+                        "description": "Set to true to force reading the data instead of using remote checksums."
+                      },
+                      "base64": {
+                        "type": "boolean",
+                        "description": "Set to true to emit hash values in base64 rather than hexadecimal."
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "hashType"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OperationsHashsumResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsHashsum"
+      }
+    },
+    "/operations/hashsumfile": {
+      "post": {
+        "summary": "Hash a single file",
+        "description": "Returns the hash of a single file using the specified hash algorithm.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path containing the file to hash."
+                      },
+                      "remote": {
+                        "type": "string",
+                        "description": "Path to the specific file within `fs` to hash."
+                      },
+                      "hashType": {
+                        "type": "string",
+                        "description": "Hash algorithm to use, e.g. `md5`, `sha1`, or another supported name."
+                      },
+                      "download": {
+                        "type": "boolean",
+                        "description": "Set to true to force reading the data instead of using remote checksums."
+                      },
+                      "base64": {
+                        "type": "boolean",
+                        "description": "Set to true to emit the hash value in base64 rather than hexadecimal."
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "remote",
+                      "hashType"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OperationsHashsumfileResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsHashsumfile"
+      }
+    },
+    "/operations/movefile": {
+      "post": {
+        "summary": "Move a single file",
+        "description": "Moves one object from a source remote and path to a destination remote and path.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "srcFs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Source remote name or path containing the file to move."
+                      },
+                      "srcRemote": {
+                        "type": "string",
+                        "description": "Path to the source object within `srcFs`."
+                      },
+                      "dstFs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Destination remote name or path where the file will be moved."
+                      },
+                      "dstRemote": {
+                        "type": "string",
+                        "description": "Destination path within `dstFs` for the moved object."
+                      }
+                    },
+                    "required": [
+                      "srcFs",
+                      "srcRemote",
+                      "dstFs",
+                      "dstRemote"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsMovefile"
+      }
+    },
+    "/operations/publiclink": {
+      "post": {
+        "summary": "Create or remove public link",
+        "description": "Creates a share URL for an object or removes an existing link when `unlink=true`.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path hosting the object for which to manage a public link."
+                      },
+                      "remote": {
+                        "type": "string",
+                        "description": "Path within `fs` to the object for which to create or remove a public link."
+                      },
+                      "unlink": {
+                        "type": "boolean",
+                        "description": "Set to true to remove an existing public link instead of creating one."
+                      },
+                      "expire": {
+                        "type": "string",
+                        "description": "Optional expiration time for the public link, formatted as supported by the backend."
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "remote"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OperationsPubliclinkResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsPubliclink"
+      }
+    },
+    "/operations/rmdirs": {
+      "post": {
+        "summary": "Remove empty directories",
+        "description": "Deletes empty subdirectories beneath the specified path, optionally leaving the root.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path to scan for empty directories."
+                      },
+                      "remote": {
+                        "type": "string",
+                        "description": "Path within `fs` whose empty subdirectories should be removed."
+                      },
+                      "leaveRoot": {
+                        "type": "boolean",
+                        "description": "Set to true to preserve the top-level directory even if empty."
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "remote"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsRmdirs"
+      }
+    },
+    "/operations/settier": {
+      "post": {
+        "summary": "Change storage tier",
+        "description": "Updates the storage class or tier for every object in the specified remote path.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path whose storage class tier should be changed."
+                      },
+                      "tier": {
+                        "type": "string",
+                        "description": "Storage tier or class."
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "tier"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsSettier"
+      }
+    },
+    "/operations/settierfile": {
+      "post": {
+        "summary": "Change file storage tier",
+        "description": "Updates the storage class or tier for a single object.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path that contains the object whose tier should change."
+                      },
+                      "remote": {
+                        "type": "string",
+                        "description": "Path within `fs` to the object whose storage class tier should be updated."
+                      },
+                      "tier": {
+                        "type": "string",
+                        "description": "Storage tier or class."
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "remote",
+                      "tier"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsSettierfile"
+      }
+    },
+    "/operations/size": {
+      "post": {
+        "summary": "Count remote size",
+        "description": "Reports total size, file count, and number of objects without size metadata.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path to measure aggregate size information for."
+                      }
+                    },
+                    "required": [
+                      "fs"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OperationsSizeResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsSize"
+      }
+    },
+    "/core/bwlimit": {
+      "post": {
+        "summary": "Get or update bandwidth limits",
+        "description": "Reads the current bandwidth limit or applies a new schedule string, just like `rclone rc core/bwlimit`.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "rate": {
+                        "type": "string",
+                        "description": "Bandwidth limit to apply, for example `off`, `5M`, or a schedule string."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CoreBwlimitResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreBwlimit"
+      }
+    },
+    "/core/command": {
+      "post": {
+        "summary": "Run an rclone command",
+        "description": "Executes a standard rclone CLI command remotely and streams or returns its output. Don't combine the `STREAM` return types with `Prefer: respond-async`, because the 202 is sent before the command runs.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "command": {
+                        "type": "string",
+                        "description": "Name of the rclone command to execute, for example `ls` or `lsf`."
+                      },
+                      "arg": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Arguments passed to the command."
+                      },
+                      "opt": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "string"
+                        },
+                        "description": "Flags passed to the command."
+                      },
+                      "returnType": {
+                        "type": "string",
+                        "enum": [
+                          "COMBINED_OUTPUT",
+                          "STREAM",
+                          "STREAM_ONLY_STDOUT",
+                          "STREAM_ONLY_STDERR"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CoreCommandResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreCommand"
+      }
+    },
+    "/core/disks": {
+      "post": {
+        "summary": "List locally accessible paths",
+        "description": "Returns a list of locally accessible paths including mount points, user directories, and removable volumes.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CoreDisksResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreDisks"
+      }
+    },
+    "/core/du": {
+      "post": {
+        "summary": "Report disk usage",
+        "description": "Returns disk usage statistics for the supplied local directory (defaults to the cache dir).",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "dir": {
+                        "type": "string",
+                        "description": "Local directory path to report disk usage for. Defaults to the rclone cache directory when omitted."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CoreDuResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreDu"
+      }
+    },
+    "/core/gc": {
+      "post": {
+        "summary": "Force garbage collection",
+        "description": "Triggers Go's garbage collector to release unused memory.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreGc"
+      }
+    },
+    "/core/group-list": {
+      "post": {
+        "summary": "List stats groups",
+        "description": "Lists stats groups currently tracked by rclone.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Names of stats groups.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "groups": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Names of the stats groups, or null when there are none."
+                    }
+                  },
+                  "required": [
+                    "groups"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "x-rclone-jobid": {
+                "$ref": "#/components/headers/RcloneJobId"
+              }
+            }
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreGroupList"
+      }
+    },
+    "/core/memstats": {
+      "post": {
+        "summary": "Fetch runtime memory stats",
+        "description": "Returns Go runtime memory statistics similar to `runtime.ReadMemStats`.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Memory statistics fields from the Go runtime.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Alloc": {
+                      "type": "integer"
+                    },
+                    "BuckHashSys": {
+                      "type": "integer"
+                    },
+                    "Frees": {
+                      "type": "integer"
+                    },
+                    "GCSys": {
+                      "type": "integer"
+                    },
+                    "HeapAlloc": {
+                      "type": "integer"
+                    },
+                    "HeapIdle": {
+                      "type": "integer"
+                    },
+                    "HeapInuse": {
+                      "type": "integer"
+                    },
+                    "HeapObjects": {
+                      "type": "integer"
+                    },
+                    "HeapReleased": {
+                      "type": "integer"
+                    },
+                    "HeapSys": {
+                      "type": "integer"
+                    },
+                    "MCacheInuse": {
+                      "type": "integer"
+                    },
+                    "MCacheSys": {
+                      "type": "integer"
+                    },
+                    "MSpanInuse": {
+                      "type": "integer"
+                    },
+                    "MSpanSys": {
+                      "type": "integer"
+                    },
+                    "Mallocs": {
+                      "type": "integer"
+                    },
+                    "OtherSys": {
+                      "type": "integer"
+                    },
+                    "StackInuse": {
+                      "type": "integer"
+                    },
+                    "StackSys": {
+                      "type": "integer"
+                    },
+                    "Sys": {
+                      "type": "integer"
+                    },
+                    "TotalAlloc": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "Alloc",
+                    "BuckHashSys",
+                    "Frees",
+                    "GCSys",
+                    "HeapAlloc",
+                    "HeapIdle",
+                    "HeapInuse",
+                    "HeapObjects",
+                    "HeapReleased",
+                    "HeapSys",
+                    "MCacheInuse",
+                    "MCacheSys",
+                    "MSpanInuse",
+                    "MSpanSys",
+                    "Mallocs",
+                    "OtherSys",
+                    "StackInuse",
+                    "StackSys",
+                    "Sys",
+                    "TotalAlloc"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "x-rclone-jobid": {
+                "$ref": "#/components/headers/RcloneJobId"
+              }
+            }
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreMemstats"
+      }
+    },
+    "/core/obscure": {
+      "post": {
+        "summary": "Obscure a clear string",
+        "description": "Obscures a plain-text secret for inclusion in `rclone.conf`.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "clear": {
+                        "type": "string",
+                        "description": "Plain-text string to obscure for storage in the config file."
+                      }
+                    },
+                    "required": [
+                      "clear"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Obscured string result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "obscured": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "obscured"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "x-rclone-jobid": {
+                "$ref": "#/components/headers/RcloneJobId"
+              }
+            }
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreObscure"
+      }
+    },
+    "/core/pid": {
+      "post": {
+        "summary": "Return rclone PID",
+        "description": "Returns the process ID of the running rclone instance.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Process ID payload.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pid": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "pid"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "x-rclone-jobid": {
+                "$ref": "#/components/headers/RcloneJobId"
+              }
+            }
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "corePid"
+      }
+    },
+    "/core/quit": {
+      "post": {
+        "summary": "Terminate rclone",
+        "description": "Stops the rclone process, optionally supplying an exit code.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "exitCode": {
+                        "type": "integer",
+                        "description": "Optional exit code to use when terminating the rclone process."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreQuit"
+      }
+    },
+    "/core/stats-delete": {
+      "post": {
+        "summary": "Delete stats group",
+        "description": "Deletes the counters associated with a specific stats group.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "group": {
+                        "type": "string",
+                        "description": "Stats group identifier to remove."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreStatsDelete"
+      }
+    },
+    "/core/stats-reset": {
+      "post": {
+        "summary": "Reset stats counters",
+        "description": "Clears counters, errors, and finished transfers for the provided stats group or all groups.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "group": {
+                        "type": "string",
+                        "description": "Stats group identifier whose counters should be reset. Leave unset to reset all groups."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreStatsReset"
+      }
+    },
+    "/core/transferred": {
+      "post": {
+        "summary": "List completed transfers",
+        "description": "Returns up to 100 recently completed transfers for the requested stats group.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "group": {
+                        "type": "string",
+                        "description": "Stats group identifier to filter the completed transfer list. Leave unset for all groups."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CoreTransferredResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreTransferred"
+      }
+    },
+    "/debug/set-block-profile-rate": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "rate": {
+                        "type": "integer",
+                        "description": "Sampling interval in nanoseconds for blocking profile collection; use 1 to capture all events."
+                      }
+                    },
+                    "required": [
+                      "rate"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "debugSetBlockProfileRate"
+      }
+    },
+    "/debug/set-gc-percent": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "gc-percent": {
+                        "type": "integer",
+                        "description": "Target percentage of newly allocated data to trigger garbage collection."
+                      }
+                    },
+                    "required": [
+                      "gc-percent"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DebugSetGcPercentResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "debugSetGcPercent"
+      }
+    },
+    "/debug/set-mutex-profile-fraction": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "rate": {
+                        "type": "integer",
+                        "description": "Sampling fraction for mutex contention profiling; set to 0 to disable."
+                      }
+                    },
+                    "required": [
+                      "rate"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DebugSetMutexProfileFractionResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "debugSetMutexProfileFraction"
+      }
+    },
+    "/debug/set-soft-memory-limit": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mem-limit": {
+                        "anyOf": [
+                          {
+                            "type": "integer"
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ],
+                        "description": "Memory limit in bytes. Use a string for values above 2^53, such as the default of 9223372036854775807."
+                      }
+                    },
+                    "required": [
+                      "mem-limit"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DebugSetSoftMemoryLimitResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "debugSetSoftMemoryLimit"
+      }
+    },
+    "/fscache/clear": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "fscacheClear"
+      }
+    },
+    "/fscache/entries": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/FscacheEntriesResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "fscacheEntries"
+      }
+    },
+    "/mount/listmounts": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MountListmountsResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "mountListmounts"
+      }
+    },
+    "/mount/mount": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote path to mount, such as `drive:` or `remote:subdir`."
+                      },
+                      "mountPoint": {
+                        "type": "string",
+                        "description": "Absolute local path where the remote should be mounted."
+                      },
+                      "mountType": {
+                        "type": "string",
+                        "description": "Optional mount implementation to use (`mount`, `cmount`, or `mount2`)."
+                      },
+                      "mountOpt": {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "description": "Mount options, using the option names from `options/info`."
+                      },
+                      "vfsOpt": {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "description": "VFS options, using the option names from `options/info`."
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "mountPoint"
+                    ],
+                    "additionalProperties": true
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MountMountResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "mountMount",
+        "description": " Mount and VFS options can also be given as top-level keys. Rclone rejects any other key."
+      }
+    },
+    "/mount/types": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MountTypesResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "mountTypes"
+      }
+    },
+    "/mount/unmount": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mountPoint": {
+                        "type": "string",
+                        "description": "Local mount point path to unmount."
+                      }
+                    },
+                    "required": [
+                      "mountPoint"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "mountUnmount"
+      }
+    },
+    "/mount/unmountall": {
+      "post": {
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "mountUnmountall"
+      }
+    },
+    "/rc/noopauth": {
+      "post": {
+        "summary": "Echo parameters (auth required)",
+        "description": "Same as `rc/noop`, but requires authentication to validate access control.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RcNoopResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "rcNoopAuth"
+      }
+    },
+    "/rc/error": {
+      "post": {
+        "summary": "Return a test error",
+        "description": "Always returns an error response incorporating the supplied parameters, useful for testing error handling.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "rcError"
+      }
+    },
+    "/rc/list": {
+      "post": {
+        "summary": "List RC commands",
+        "description": "Returns metadata about every available RC command, including whether authentication is required.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RcListResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "rcList"
+      }
+    },
+    "/backend/command": {
+      "post": {
+        "summary": "Run backend command",
+        "description": "Invokes a backend-specific management command against an optional remote.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "command": {
+                        "type": "string",
+                        "description": "Backend-specific command to invoke."
+                      },
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path the backend command should target."
+                      },
+                      "arg": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Arguments passed to the backend command."
+                      },
+                      "opt": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "string"
+                        },
+                        "description": "Options passed to the backend command."
+                      }
+                    },
+                    "required": [
+                      "command",
+                      "fs"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/BackendCommandResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "backendCommand"
+      }
+    },
+    "/cache/expire": {
+      "post": {
+        "summary": "Expire cache entries",
+        "description": "Drops cached directory entries, and optionally cached file data, for the cache backend.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "remote": {
+                        "type": "string",
+                        "description": "Remote path to expire from the cache, e.g. `remote:path/to/dir`."
+                      },
+                      "withData": {
+                        "type": "boolean",
+                        "description": "Set this to drop cached chunk data along with directory entries. Rclone only checks whether the key is present, so any value turns it on, including `false`."
+                      }
+                    },
+                    "required": [
+                      "remote"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CacheExpireResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "cacheExpire"
+      }
+    },
+    "/cache/fetch": {
+      "post": {
+        "summary": "Prefetch cache chunks",
+        "description": "Ensures specified file chunks are cached locally for a cache remote.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "chunks": {
+                        "type": "string",
+                        "description": "Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch."
+                      },
+                      "file": {
+                        "type": "string",
+                        "description": "File to fetch chunks of. Add more with keys that start with `file`, such as `file2`."
+                      }
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "required": [
+                      "chunks"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CacheFetchResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "cacheFetch"
+      }
+    },
+    "/cache/stats": {
+      "post": {
+        "summary": "Show cache stats",
+        "description": "Returns runtime statistics for the cache backend.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CacheStatsResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "cacheStats"
+      }
+    },
+    "/config/create": {
+      "post": {
+        "summary": "Create remote configuration",
+        "description": "Creates a new remote in `rclone.conf`, mirroring `rclone config create`.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Name of the new remote configuration."
+                      },
+                      "parameters": {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "description": "Backend options for the remote."
+                      },
+                      "type": {
+                        "type": "string",
+                        "description": "Backend type identifier, such as `drive`, `s3`, or `dropbox`."
+                      },
+                      "opt": {
+                        "type": "object",
+                        "description": "Options that control the configuration.",
+                        "properties": {
+                          "obscure": {
+                            "type": "boolean"
+                          },
+                          "noObscure": {
+                            "type": "boolean"
+                          },
+                          "noOutput": {
+                            "type": "boolean"
+                          },
+                          "nonInteractive": {
+                            "type": "boolean"
+                          },
+                          "continue": {
+                            "type": "boolean"
+                          },
+                          "all": {
+                            "type": "boolean"
+                          },
+                          "state": {
+                            "type": "string"
+                          },
+                          "result": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "parameters",
+                      "type"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConfigStepResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configCreate"
+      }
+    },
+    "/config/delete": {
+      "post": {
+        "summary": "Delete remote configuration",
+        "description": "Removes an existing remote from `rclone.conf`.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Name of the remote configuration to delete."
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configDelete"
+      }
+    },
+    "/config/dump": {
+      "post": {
+        "summary": "Dump configuration",
+        "description": "Returns the contents of the config file as a JSON object keyed by remote name.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConfigDumpResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configDump"
+      }
+    },
+    "/config/get": {
+      "post": {
+        "summary": "Get remote configuration",
+        "description": "Returns the key/value settings for a single remote.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Name of the remote configuration to fetch."
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConfigGetResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configGet"
+      }
+    },
+    "/config/listremotes": {
+      "post": {
+        "summary": "List configured remotes",
+        "description": "Returns the names of all remotes defined in the config file.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConfigListremotesResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configListremotes"
+      }
+    },
+    "/config/oauthstatus": {
+      "post": {
+        "summary": "Get OAuth server status",
+        "description": "Returns the status of the interactive OAuth authentication server, including the authorization URL when it is running.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConfigOauthstatusResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configOauthstatus"
+      }
+    },
+    "/config/oauthstop": {
+      "post": {
+        "summary": "Stop OAuth server",
+        "description": "Stops the interactive OAuth authentication server if one is running. Returns an error if no OAuth flow is in progress.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configOauthstop"
+      }
+    },
+    "/config/password": {
+      "post": {
+        "summary": "Update remote secrets",
+        "description": "Sets obscured password fields for a remote configuration.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Name of the remote whose secrets should be updated."
+                      },
+                      "parameters": {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "description": "Password options for the remote."
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "parameters"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configPassword"
+      }
+    },
+    "/config/paths": {
+      "post": {
+        "summary": "Show config paths",
+        "description": "Returns the paths to the config file, cache directory, and temporary directory.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConfigPathsResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configPaths"
+      }
+    },
+    "/config/providers": {
+      "post": {
+        "summary": "List backend providers",
+        "description": "Returns metadata describing each supported storage provider.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConfigProvidersResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configProviders"
+      }
+    },
+    "/config/setpath": {
+      "post": {
+        "summary": "Set config path",
+        "description": "Points rclone at a specific `rclone.conf` file.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "path": {
+                        "type": "string",
+                        "description": "Absolute path to the `rclone.conf` file that rclone should use."
+                      }
+                    },
+                    "required": [
+                      "path"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configSetpath"
+      }
+    },
+    "/config/unlock": {
+      "post": {
+        "summary": "Unlock encrypted config",
+        "description": "Unlocks the configuration file using the provided password.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "configPassword": {
+                        "type": "string",
+                        "description": "Password used to unlock an encrypted config file."
+                      }
+                    },
+                    "required": [
+                      "configPassword"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configUnlock"
+      }
+    },
+    "/config/update": {
+      "post": {
+        "summary": "Update remote configuration",
+        "description": "Updates an existing remote with new parameter values.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Name of the remote configuration to update."
+                      },
+                      "parameters": {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "description": "Backend options for the remote."
+                      },
+                      "opt": {
+                        "type": "object",
+                        "description": "Options that control the configuration.",
+                        "properties": {
+                          "obscure": {
+                            "type": "boolean"
+                          },
+                          "noObscure": {
+                            "type": "boolean"
+                          },
+                          "noOutput": {
+                            "type": "boolean"
+                          },
+                          "nonInteractive": {
+                            "type": "boolean"
+                          },
+                          "continue": {
+                            "type": "boolean"
+                          },
+                          "all": {
+                            "type": "boolean"
+                          },
+                          "state": {
+                            "type": "string"
+                          },
+                          "result": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "parameters"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ConfigStepResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configUpdate"
+      }
+    },
+    "/core/version": {
+      "post": {
+        "summary": "Report rclone version",
+        "description": "Returns the running rclone version, build metadata, and Go runtime details.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CoreVersionResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreVersion"
+      }
+    },
+    "/core/stats": {
+      "post": {
+        "summary": "Current stats snapshot",
+        "description": "Returns active transfer statistics including bytes transferred, speed, and error counts.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "group": {
+                        "type": "string",
+                        "description": "Stats group identifier to return a snapshot for. Leave unset to include all groups."
+                      },
+                      "short": {
+                        "type": "boolean",
+                        "description": "When true, omit the `transferring` and `checking` arrays from the response."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CoreStatsResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "coreStats"
+      }
+    },
+    "/job/batch": {
+      "post": {
+        "summary": "Run batch of commands",
+        "description": "Run a batch of rclone rc commands concurrently. An input can set `_async` to run in the background, and its entry in `results` is then a job ID. Inputs have no headers, so they can't use `Prefer`.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "concurrency": {
+                        "type": "integer",
+                        "description": "Do this many commands concurrently. Defaults to --transfers if not set."
+                      },
+                      "inputs": {
+                        "type": "array",
+                        "description": "List of inputs to the commands with an extra _path parameter.",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "_path"
+                          ],
+                          "properties": {
+                            "_path": {
+                              "type": "string",
+                              "description": "rc/path"
+                            },
+                            "_group": {
+                              "type": "string",
+                              "description": "Stats group this input accumulates under."
+                            },
+                            "_async": {
+                              "type": "boolean",
+                              "description": "Run this item in the background. Its entry in `results` is then a job ID. Items have no headers, so `Prefer` is not an option here."
+                            }
+                          },
+                          "additionalProperties": true
+                        }
+                      }
+                    },
+                    "required": [
+                      "inputs"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JobBatchResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "jobBatch"
+      }
+    },
+    "/job/list": {
+      "post": {
+        "summary": "List jobs",
+        "description": "Returns identifiers of active and recently completed asynchronous jobs. Since rclone 1.75.2 this call requires authentication, so a server with no credentials set up returns 403 unless it runs with `--rc-no-auth`.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JobListResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "jobList"
+      }
+    },
+    "/job/status": {
+      "post": {
+        "summary": "Get job status",
+        "description": "Returns timing, success state, output, and progress for a specific job. Since rclone 1.75.2 this call requires authentication, so a server with no credentials set up returns 403 unless it runs with `--rc-no-auth`.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "jobid": {
+                        "type": "integer",
+                        "description": "Job id."
+                      }
+                    },
+                    "required": [
+                      "jobid"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/JobStatusResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "jobStatus"
+      }
+    },
+    "/job/stop": {
+      "post": {
+        "summary": "Stop job",
+        "description": "Attempts to cancel a running job by ID.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "jobid": {
+                        "type": "integer",
+                        "description": "Job id."
+                      }
+                    },
+                    "required": [
+                      "jobid"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "jobStop"
+      }
+    },
+    "/job/stopgroup": {
+      "post": {
+        "summary": "Stop jobs in group",
+        "description": "Cancels all active jobs associated with the provided stats group.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "group": {
+                        "type": "string",
+                        "description": "Stats group name whose active jobs should be stopped."
+                      }
+                    },
+                    "required": [
+                      "group"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "jobStopgroup"
+      }
+    },
+    "/operations/list": {
+      "post": {
+        "summary": "List objects",
+        "description": "Lists objects and directories for a remote path, returning the same fields as `rclone lsjson`.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path to list, for example `drive:`."
+                      },
+                      "remote": {
+                        "type": "string",
+                        "description": "Directory path within `fs` to list; leave empty to target the root."
+                      },
+                      "opt": {
+                        "type": "object",
+                        "description": "Options that control the listing.",
+                        "properties": {
+                          "recurse": {
+                            "type": "boolean"
+                          },
+                          "noModTime": {
+                            "type": "boolean"
+                          },
+                          "noMimeType": {
+                            "type": "boolean"
+                          },
+                          "showEncrypted": {
+                            "type": "boolean"
+                          },
+                          "showOrigIDs": {
+                            "type": "boolean"
+                          },
+                          "showHash": {
+                            "type": "boolean"
+                          },
+                          "dirsOnly": {
+                            "type": "boolean"
+                          },
+                          "filesOnly": {
+                            "type": "boolean"
+                          },
+                          "metadata": {
+                            "type": "boolean"
+                          },
+                          "hashTypes": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "remote"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OperationsListResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsList"
+      }
+    },
+    "/operations/stat": {
+      "post": {
+        "summary": "Stat an object",
+        "description": "Returns metadata for a single file or directory, mirroring `rclone lsjson` on one entry.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path that contains the item to inspect."
+                      },
+                      "remote": {
+                        "type": "string",
+                        "description": "Path to the file or directory within `fs` to describe."
+                      },
+                      "opt": {
+                        "type": "object",
+                        "description": "Options that control the listing.",
+                        "properties": {
+                          "recurse": {
+                            "type": "boolean"
+                          },
+                          "noModTime": {
+                            "type": "boolean"
+                          },
+                          "noMimeType": {
+                            "type": "boolean"
+                          },
+                          "showEncrypted": {
+                            "type": "boolean"
+                          },
+                          "showOrigIDs": {
+                            "type": "boolean"
+                          },
+                          "showHash": {
+                            "type": "boolean"
+                          },
+                          "dirsOnly": {
+                            "type": "boolean"
+                          },
+                          "filesOnly": {
+                            "type": "boolean"
+                          },
+                          "metadata": {
+                            "type": "boolean"
+                          },
+                          "hashTypes": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "remote"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OperationsStatResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsStat"
+      }
+    },
+    "/operations/about": {
+      "post": {
+        "summary": "Get remote quota",
+        "description": "Returns storage quota and usage details for the remote, equivalent to `rclone about`.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path to query for capacity information."
+                      }
+                    },
+                    "required": [
+                      "fs"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OperationsAboutResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsAbout"
+      }
+    },
+    "/operations/uploadfile": {
+      "post": {
+        "summary": "Upload files via multipart",
+        "description": "Accepts multipart/form-data payloads and writes the uploaded files to the specified remote path. Its parameters go in the query string, because rclone doesn't read them from a multipart body. A JSON body returns 200 and uploads nothing. This route can't run in the background.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Operations_UploadfilePostFsParam"
+          },
+          {
+            "$ref": "#/components/parameters/Operations_UploadfilePostRemoteParam"
+          },
+          {
+            "$ref": "#/components/parameters/GlobalGroupParam"
+          },
+          {
+            "$ref": "#/components/parameters/UploadfileConfigParam"
+          },
+          {
+            "$ref": "#/components/parameters/UploadfileFilterParam"
+          }
+        ],
+        "requestBody": {
+          "description": "Multipart form payload containing one or more files to upload.",
+          "content": {
+            "multipart/form-data": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsUploadfile"
+      }
+    },
+    "/operations/purge": {
+      "post": {
+        "summary": "Purge directory",
+        "description": "Deletes a directory or container and all of its contents. This can take a long time, so run it in the background with `Prefer: respond-async` to avoid HTTP timeouts.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path from which to remove all contents."
+                      },
+                      "remote": {
+                        "type": "string",
+                        "description": "Path within `fs` whose contents should be purged."
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "remote"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsPurge"
+      }
+    },
+    "/operations/mkdir": {
+      "post": {
+        "summary": "Create directory",
+        "description": "Creates the target directory or container if it does not exist.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path in which to create a directory."
+                      },
+                      "remote": {
+                        "type": "string",
+                        "description": "Directory path within `fs` to create."
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "remote"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsMkdir"
+      }
+    },
+    "/operations/rmdir": {
+      "post": {
+        "summary": "Remove empty directory",
+        "description": "Deletes an empty directory or container.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path containing the directory to remove."
+                      },
+                      "remote": {
+                        "type": "string",
+                        "description": "Directory path within `fs` to delete."
+                      }
+                    },
+                    "required": [
+                      "fs",
+                      "remote"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsRmdir"
+      }
+    },
+    "/operations/check": {
+      "post": {
+        "summary": "Compare source and destination",
+        "description": "Compares source and destination trees, reporting matches, differences, and missing files.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "srcFs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Source remote name or path to verify, e.g. `drive:`. Required unless `checkFileHash` is set."
+                      },
+                      "dstFs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Destination remote name or path that should match the source."
+                      },
+                      "download": {
+                        "type": "boolean",
+                        "description": "Set to true to read file contents during comparison instead of relying on hashes."
+                      },
+                      "checkFileHash": {
+                        "type": "string",
+                        "description": "Hash name to expect in the supplied SUM file, such as `md5`."
+                      },
+                      "checkFileFs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote containing the checksum SUM file when using `checkFileHash`."
+                      },
+                      "checkFileRemote": {
+                        "type": "string",
+                        "description": "Path within `checkFileFs` to the checksum SUM file."
+                      },
+                      "oneWay": {
+                        "type": "boolean",
+                        "description": "Set to true to only ensure that source files exist on the destination."
+                      },
+                      "combined": {
+                        "type": "boolean",
+                        "description": "Set to true to include a combined summary report in the response."
+                      },
+                      "missingOnSrc": {
+                        "type": "boolean",
+                        "description": "Set to true to report files missing from the source."
+                      },
+                      "missingOnDst": {
+                        "type": "boolean",
+                        "description": "Set to true to report files missing from the destination."
+                      },
+                      "match": {
+                        "type": "boolean",
+                        "description": "Set to true to include matching files in the report."
+                      },
+                      "differ": {
+                        "type": "boolean",
+                        "description": "Set to true to include differing files in the report."
+                      },
+                      "error": {
+                        "type": "boolean",
+                        "description": "Set to true to include entries that encountered errors."
+                      }
+                    },
+                    "required": [
+                      "dstFs"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OperationsCheckResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsCheck"
+      }
+    },
+    "/sync/sync": {
+      "post": {
+        "summary": "Sync source to destination",
+        "description": "Synchronises a source remote to a destination remote, making the destination match the source. This can take a long time, so run it in the background with `Prefer: respond-async` to avoid HTTP timeouts.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "srcFs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Source remote path to sync from, e.g. `drive:src`."
+                      },
+                      "dstFs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Destination remote path to sync to, e.g. `drive:dst`."
+                      },
+                      "createEmptySrcDirs": {
+                        "type": "boolean",
+                        "description": "Set to true to create empty source directories on the destination."
+                      }
+                    },
+                    "required": [
+                      "srcFs",
+                      "dstFs"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "syncSync"
+      }
+    },
+    "/sync/copy": {
+      "post": {
+        "summary": "Copy source to destination",
+        "description": "Copies objects from a source remote to a destination remote without deleting destination files. This can take a long time, so run it in the background with `Prefer: respond-async` to avoid HTTP timeouts.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "srcFs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Source remote path to copy from."
+                      },
+                      "dstFs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Destination remote path to copy to."
+                      },
+                      "createEmptySrcDirs": {
+                        "type": "boolean",
+                        "description": "Set to true to replicate empty source directories on the destination."
+                      }
+                    },
+                    "required": [
+                      "srcFs",
+                      "dstFs"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "syncCopy"
+      }
+    },
+    "/sync/move": {
+      "post": {
+        "summary": "Move source to destination",
+        "description": "Moves objects from a source remote to a destination remote, optionally cleaning up empty directories. This can take a long time, so run it in the background with `Prefer: respond-async` to avoid HTTP timeouts.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "srcFs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Source remote path whose contents will be moved."
+                      },
+                      "dstFs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Destination remote path that will receive moved files."
+                      },
+                      "createEmptySrcDirs": {
+                        "type": "boolean",
+                        "description": "Set to true to create empty source directories on the destination."
+                      },
+                      "deleteEmptySrcDirs": {
+                        "type": "boolean",
+                        "description": "Set to true to delete empty directories from the source after the move completes."
+                      }
+                    },
+                    "required": [
+                      "srcFs",
+                      "dstFs"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "syncMove"
+      }
+    },
+    "/sync/bisync": {
+      "post": {
+        "summary": "Bidirectional sync",
+        "description": "Performs a bidirectional synchronisation between two paths, supporting safety checks and recovery options.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "path1": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "First remote directory, e.g. `drive:path1`."
+                      },
+                      "path2": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Second remote directory, e.g. `drive:path2`."
+                      },
+                      "dryRun": {
+                        "type": "boolean",
+                        "description": "Set to true to simulate the bisync run without making changes."
+                      },
+                      "resync": {
+                        "type": "boolean",
+                        "description": "Set to true to perform a one-time resync, rebuilding bisync history."
+                      },
+                      "checkAccess": {
+                        "type": "boolean",
+                        "description": "Set to true to abort if `RCLONE_TEST` files are missing on either side."
+                      },
+                      "checkFilename": {
+                        "type": "string",
+                        "description": "Override the access-check sentinel filename; defaults to `RCLONE_TEST`."
+                      },
+                      "maxDelete": {
+                        "type": "integer"
+                      },
+                      "force": {
+                        "type": "boolean",
+                        "description": "Set to true to bypass the `maxDelete` safety check."
+                      },
+                      "checkSync": {
+                        "type": "string",
+                        "enum": [
+                          "true",
+                          "false",
+                          "only"
+                        ]
+                      },
+                      "createEmptySrcDirs": {
+                        "type": "boolean",
+                        "description": "Set to true to mirror empty directories between the two paths."
+                      },
+                      "removeEmptyDirs": {
+                        "type": "boolean",
+                        "description": "Set to true to remove empty directories during cleanup."
+                      },
+                      "filtersFile": {
+                        "type": "string",
+                        "description": "Path to an rclone filters file applied to both paths."
+                      },
+                      "ignoreListingChecksum": {
+                        "type": "boolean",
+                        "description": "Set to true to ignore checksum differences when comparing listings."
+                      },
+                      "resilient": {
+                        "type": "boolean",
+                        "description": "Set to true to allow retrying after certain recoverable errors."
+                      },
+                      "workdir": {
+                        "type": "string",
+                        "description": "Directory path used to store bisync working files."
+                      },
+                      "noCleanup": {
+                        "type": "boolean",
+                        "description": "Set to true to keep bisync working files after completion."
+                      },
+                      "backupDir1": {
+                        "type": "string"
+                      },
+                      "backupDir2": {
+                        "type": "string"
+                      },
+                      "compare": {
+                        "type": "string"
+                      },
+                      "conflictLoser": {
+                        "type": "string"
+                      },
+                      "conflictResolve": {
+                        "type": "string"
+                      },
+                      "conflictSuffix": {
+                        "type": "string"
+                      },
+                      "downloadHash": {
+                        "type": "boolean"
+                      },
+                      "maxLock": {
+                        "type": "string"
+                      },
+                      "noSlowHash": {
+                        "type": "boolean"
+                      },
+                      "recover": {
+                        "type": "boolean"
+                      },
+                      "resyncMode": {
+                        "type": "string"
+                      },
+                      "slowHashSyncOnly": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "path1",
+                      "path2"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SyncBisyncResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "syncBisync"
+      }
+    },
+    "/options/blocks": {
+      "post": {
+        "summary": "List option blocks",
+        "description": "Returns the names of option blocks that can be queried or updated.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsBlocksResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "optionsBlocks"
+      }
+    },
+    "/options/get": {
+      "post": {
+        "summary": "Get option values",
+        "description": "Returns the current global option values, optionally filtered by block.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "blocks": {
+                        "type": "string",
+                        "description": "Optional comma-separated list of option block names to return."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsGetResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "optionsGet"
+      }
+    },
+    "/options/info": {
+      "post": {
+        "summary": "Describe options",
+        "description": "Returns metadata for options, including help text and defaults, grouped by block.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "blocks": {
+                        "type": "string",
+                        "description": "Optional comma-separated list of option block names to describe."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsInfoResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "optionsInfo"
+      }
+    },
+    "/options/set": {
+      "post": {
+        "summary": "Set option values",
+        "description": "Sets temporary option overrides for the running process by supplying key/value pairs grouped under option block names. Provide one or more query parameters whose names match the blocks you want to modify (for example `main`, `rc`, `http`). Each block parameter carries an object of option overrides.\n",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dlna": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `dlna` option block."
+                  },
+                  "filter": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `filter` option block."
+                  },
+                  "ftp": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `ftp` option block."
+                  },
+                  "main": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `main` option block."
+                  },
+                  "http": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `http` option block."
+                  },
+                  "log": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `log` option block."
+                  },
+                  "mount": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `mount` option block."
+                  },
+                  "nfs": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `nfs` option block."
+                  },
+                  "proxy": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `proxy` option block."
+                  },
+                  "rc": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `rc` option block."
+                  },
+                  "restic": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `restic` option block."
+                  },
+                  "s3": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `s3` option block."
+                  },
+                  "sftp": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `sftp` option block."
+                  },
+                  "vfs": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `vfs` option block."
+                  },
+                  "webdav": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Overrides for the `webdav` option block."
+                  },
+                  "_group": {
+                    "type": "string",
+                    "description": "Stats group for this call."
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "optionsSet"
+      }
+    },
+    "/options/local": {
+      "post": {
+        "summary": "Show effective options",
+        "description": "Returns the current effective options for this request, including `_config` and `_filter` overrides.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsLocalResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "optionsLocal"
+      }
+    },
+    "/serve/list": {
+      "post": {
+        "summary": "List serve instances",
+        "description": "Returns all running `rclone serve` instances with their IDs and options.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ServeListResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "serveList"
+      }
+    },
+    "/serve/start": {
+      "post": {
+        "summary": "Start serve instance",
+        "description": "Launches a new `rclone serve` endpoint (http, webdav, ftp, etc.) with the provided parameters. It also takes the options of the chosen server type, using the option names from `options/info`. Rclone rejects any other key.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Type of server to start (e.g. `http`, `webdav`, `ftp`, `sftp`)."
+                      },
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote path that will be served."
+                      },
+                      "addr": {
+                        "type": "string",
+                        "description": "Address and port to bind the server to, such as `:5572` or `localhost:8080`."
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "fs"
+                    ],
+                    "additionalProperties": true
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ServeStartResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "serveStart"
+      }
+    },
+    "/serve/stop": {
+      "post": {
+        "summary": "Stop serve instance",
+        "description": "Stops a running `serve` instance identified by its ID.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Identifier of the running serve instance returned by `serve/start`."
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "serveStop"
+      }
+    },
+    "/serve/stopall": {
+      "post": {
+        "summary": "Stop all serve instances",
+        "description": "Stops every active `serve` instance.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "serveStopall"
+      }
+    },
+    "/serve/types": {
+      "post": {
+        "summary": "List serve types",
+        "description": "Returns the list of supported `rclone serve` protocols.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ServeTypesResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "serveTypes"
+      }
+    },
+    "/vfs/forget": {
+      "post": {
+        "summary": "Forget cached paths",
+        "description": "Evicts specific files or directories from the VFS directory cache. All values must be strings.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "type": "string",
+                        "description": "Optional VFS identifier to target; required when more than one VFS is active."
+                      },
+                      "file": {
+                        "type": "string",
+                        "description": "File to forget. Add more with keys that start with `file`, such as `file2`."
+                      },
+                      "dir": {
+                        "type": "string",
+                        "description": "Directory to forget. Add more with keys that start with `dir`, such as `dir2`."
+                      }
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/VfsForgetResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "vfsForget"
+      }
+    },
+    "/vfs/list": {
+      "post": {
+        "summary": "List VFS instances",
+        "description": "Lists the active VFS instances and their identifiers.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/VfsListResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "vfsList"
+      }
+    },
+    "/vfs/poll-interval": {
+      "post": {
+        "summary": "Get or set poll interval",
+        "description": "Reads or updates the VFS poll interval duration, optionally waiting for the change to apply.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "type": "string",
+                        "description": "Optional VFS identifier whose poll interval should be queried or modified."
+                      },
+                      "interval": {
+                        "type": "string",
+                        "description": "Duration string (e.g. `5m`) to set as the new poll interval."
+                      },
+                      "timeout": {
+                        "type": "string",
+                        "description": "Duration to wait for the poll interval change to take effect; `0` waits indefinitely."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/VfsPollIntervalResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "vfsPollInterval"
+      }
+    },
+    "/vfs/queue": {
+      "post": {
+        "summary": "Inspect upload queue",
+        "description": "Returns the contents of the VFS upload queue.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "type": "string",
+                        "description": "Optional VFS identifier whose upload queue should be inspected."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/VfsQueueResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "vfsQueue"
+      }
+    },
+    "/vfs/queue-set-expiry": {
+      "post": {
+        "summary": "Adjust queue expiry",
+        "description": "Sets the expiry time of a queued VFS upload item, optionally relative to its current value.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "type": "string",
+                        "description": "Optional VFS identifier for the queued item."
+                      },
+                      "id": {
+                        "type": "integer",
+                        "description": "Queue item ID as returned by `vfs/queue`."
+                      },
+                      "expiry": {
+                        "type": "number",
+                        "description": "New eligibility time in seconds (may be negative for immediate upload)."
+                      },
+                      "relative": {
+                        "type": "boolean",
+                        "description": "Set to true to treat `expiry` as relative to the current value."
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "expiry"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "vfsQueueSetExpiry"
+      }
+    },
+    "/vfs/refresh": {
+      "post": {
+        "summary": "Refresh directory cache",
+        "description": "Refreshes one or more directories in the VFS cache, optionally recursively. All values must be strings.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "type": "string",
+                        "description": "Optional VFS identifier whose directory cache should be refreshed."
+                      },
+                      "recursive": {
+                        "type": "string",
+                        "enum": [
+                          "true",
+                          "false"
+                        ],
+                        "description": "Must be the string `true` or `false`, not a JSON boolean."
+                      },
+                      "dir": {
+                        "type": "string",
+                        "description": "Directory to refresh. Add more with keys that start with `dir`, such as `dir2`."
+                      }
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/VfsRefreshResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "vfsRefresh"
+      }
+    },
+    "/vfs/stats": {
+      "post": {
+        "summary": "Show VFS stats",
+        "description": "Returns VFS statistics including disk cache usage and metadata cache counters.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "type": "string",
+                        "description": "Optional VFS identifier whose statistics should be returned."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/VfsStatsResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "vfsStats"
+      }
+    },
+    "/pluginsctl/addPlugin": {
+      "post": {
+        "summary": "Install plugin",
+        "description": "Downloads and installs a plugin into the WebUI from the provided repository URL.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "description": "Repository URL of the plugin to install."
+                      },
+                      "branch": {
+                        "type": "string"
+                      },
+                      "version": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "url"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "pluginsctlAddPlugin"
+      }
+    },
+    "/pluginsctl/getPluginsForType": {
+      "post": {
+        "summary": "Filter plugins by MIME type",
+        "description": "Returns plugins matching the requested MIME type and optional plugin type.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "MIME type to match when listing plugins."
+                      },
+                      "pluginType": {
+                        "type": "string",
+                        "description": "Filter results by plugin type (e.g. `test`)."
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PluginsctlGetPluginsForTypeResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "pluginsctlGetPluginsForType"
+      }
+    },
+    "/pluginsctl/listPlugins": {
+      "post": {
+        "summary": "List installed plugins",
+        "description": "Returns metadata for installed production and test plugins.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PluginsctlListPluginsResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "pluginsctlListPlugins"
+      }
+    },
+    "/pluginsctl/listTestPlugins": {
+      "post": {
+        "summary": "List installed test plugins",
+        "description": "Returns metadata for installed test plugins.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RcGlobalOptions"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PluginsctlListTestPluginsResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "pluginsctlListTestPlugins"
+      }
+    },
+    "/pluginsctl/removePlugin": {
+      "post": {
+        "summary": "Remove plugin",
+        "description": "Uninstalls a plugin from the WebUI.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Name of the plugin to uninstall."
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "pluginsctlRemovePlugin"
+      }
+    },
+    "/pluginsctl/removeTestPlugin": {
+      "post": {
+        "summary": "Remove test plugin",
+        "description": "Uninstalls a test plugin from the WebUI.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Name of the test plugin to uninstall."
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "pluginsctlRemoveTestPlugin"
+      }
+    },
+    "/config/unset": {
+      "post": {
+        "summary": "Unset keys in a remote",
+        "description": "Removes keys from a remote in the config file.",
+        "tags": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Name of the remote."
+                      },
+                      "keys": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "Key names to remove."
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "keys"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The keys that were removed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "removed": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "The keys that were removed, or null if none were."
+                    }
+                  },
+                  "required": [
+                    "removed"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "x-rclone-jobid": {
+                "$ref": "#/components/headers/RcloneJobId"
+              }
+            }
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "configUnset"
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "PreferAsyncHeader": {
+        "name": "Prefer",
+        "in": "header",
+        "description": "Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "respond-async"
+          ]
+        }
+      },
+      "GlobalGroupParam": {
+        "name": "_group",
+        "in": "query",
+        "description": "Assign the request to a custom stats group.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Operations_UploadfilePostFsParam": {
+        "name": "fs",
+        "in": "query",
+        "description": "Remote name or path where the uploaded file should be stored.",
+        "schema": {
+          "type": "string"
+        },
+        "required": true
+      },
+      "Operations_UploadfilePostRemoteParam": {
+        "name": "remote",
+        "in": "query",
+        "description": "Destination path within `fs` for the uploaded file.",
+        "schema": {
+          "type": "string"
+        },
+        "required": true
+      },
+      "UploadfileConfigParam": {
+        "name": "_config",
+        "in": "query",
+        "description": "JSON encoded config overrides for this call only.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "UploadfileFilterParam": {
+        "name": "_filter",
+        "in": "query",
+        "description": "JSON encoded filter overrides for this call only.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "responses": {
+      "RcError": {
+        "description": "Any error response (HTTP 4xx/5xx)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RcError"
+            }
+          }
+        }
+      },
+      "JobBatchResponse": {
+        "description": "Results of the batch job execution.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "results": {
+                  "type": "array",
+                  "description": "One entry for each input, in order. Each is that command's result, its error, or a job ID if the input set `_async`.",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [
+                "results"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "EmptyObjectResponse": {
+        "description": "Request succeeded returning an empty JSON object.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object"
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "MountMountResponse": {
+        "description": "Mount created successfully.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "mountPoint": {
+                  "type": "string",
+                  "description": "Actual local path where the remote was mounted. May differ from the requested path (e.g. when '*' is used on Windows)."
+                }
+              },
+              "required": [
+                "mountPoint"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "SyncBisyncResponse": {
+        "description": "Bisync completed with session details.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "output": {
+                  "type": "string",
+                  "description": "Captured output from the bisync operation."
+                },
+                "session": {
+                  "type": "string",
+                  "description": "Session name derived from the two filesystems."
+                },
+                "workDir": {
+                  "type": "string",
+                  "description": "Absolute path to the bisync working directory."
+                },
+                "basePath": {
+                  "type": "string",
+                  "description": "Base path for listing files."
+                },
+                "listing1": {
+                  "type": "string",
+                  "description": "Path to the Path1 listing file."
+                },
+                "listing2": {
+                  "type": "string",
+                  "description": "Path to the Path2 listing file."
+                },
+                "logFile": {
+                  "type": "string",
+                  "description": "Path to the log file."
+                }
+              },
+              "required": [
+                "output",
+                "session",
+                "workDir",
+                "basePath",
+                "listing1",
+                "listing2",
+                "logFile"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "AsyncJobResponse": {
+        "description": "The call is running in the background, because the request sent `Prefer: respond-async`. Poll `job/status` with the job ID. A job can be queried for up to 1 minute after it finishes.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "executeId": {
+                  "type": "string",
+                  "description": "Identifier for this rclone process."
+                },
+                "jobid": {
+                  "type": "integer",
+                  "description": "Job identifier. Pass to /job/status to track progress."
+                }
+              },
+              "required": [
+                "executeId",
+                "jobid"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          },
+          "Preference-Applied": {
+            "$ref": "#/components/headers/PreferenceApplied"
+          }
+        }
+      },
+      "ServeTypesResponse": {
+        "description": "Supported rclone serve protocols.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "types"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "RcNoopResponse": {
+        "description": "Echoes any supplied parameters, useful for testing RC connectivity.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": {}
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "OperationsFsinfoResponse": {
+        "description": "Capabilities, supported hashes, and metadata for the specified remote.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "Features": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "boolean"
+                  }
+                },
+                "Hashes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "MetadataInfo": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ConfigProviderMetadataInfo"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "Name": {
+                  "type": "string"
+                },
+                "Precision": {
+                  "type": "number"
+                },
+                "Root": {
+                  "type": "string"
+                },
+                "String": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "Features",
+                "Hashes",
+                "Name",
+                "Precision",
+                "Root",
+                "String"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "OperationsHashsumResponse": {
+        "description": "Hash algorithm used and the ordered hash lines emitted by `operations/hashsum`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "hashType": {
+                  "type": "string"
+                },
+                "hashsum": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "hashType",
+                "hashsum"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "OperationsHashsumfileResponse": {
+        "description": "Hash algorithm used and the hash value for a single file from `operations/hashsumfile`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "hashType": {
+                  "type": "string",
+                  "description": "The hash algorithm that was used."
+                },
+                "hash": {
+                  "type": "string",
+                  "description": "The hash value of the file."
+                }
+              },
+              "required": [
+                "hashType",
+                "hash"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "OperationsPubliclinkResponse": {
+        "description": "Public sharing URL returned by `operations/publiclink`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              },
+              "required": [
+                "url"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "OperationsSizeResponse": {
+        "description": "Aggregate object counts and total size from `operations/size`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "bytes": {
+                  "type": "number"
+                },
+                "count": {
+                  "type": "integer"
+                },
+                "sizeless": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "bytes",
+                "count",
+                "sizeless"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "CoreBwlimitResponse": {
+        "description": "Effective bandwidth limits in bytes per second and human readable form.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "bytesPerSecond": {
+                  "type": "integer"
+                },
+                "bytesPerSecondRx": {
+                  "type": "integer"
+                },
+                "bytesPerSecondTx": {
+                  "type": "integer"
+                },
+                "rate": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "bytesPerSecond",
+                "bytesPerSecondRx",
+                "bytesPerSecondTx",
+                "rate"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "CoreCommandResponse": {
+        "description": "Outcome of a command run with `core/command`. With the default `returnType` this is JSON. The `STREAM` return types write the output to the body as plain text.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "error"
+              ]
+            }
+          },
+          "text/plain": {
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "CoreDisksResponse": {
+        "description": "Locally accessible paths including mount points, user directories, and removable volumes.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "disks": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Accessible local paths such as disk mount points, user home folders, and removable volumes."
+                }
+              },
+              "required": [
+                "disks"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "CoreDuResponse": {
+        "description": "Disk usage summary for the requested directory.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "dir": {
+                  "type": "string"
+                },
+                "info": {
+                  "type": "object",
+                  "properties": {
+                    "Free": {
+                      "type": "integer"
+                    },
+                    "Available": {
+                      "type": "integer"
+                    },
+                    "Total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "Free",
+                    "Available",
+                    "Total"
+                  ]
+                }
+              },
+              "required": [
+                "dir",
+                "info"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "CoreTransferredResponse": {
+        "description": "Completed transfer records including size, status, and timestamps.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "transferred": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "group": {
+                        "type": "string",
+                        "description": "Stats group identifier this transfer belonged to."
+                      },
+                      "srcFs": {
+                        "type": "string",
+                        "description": "Source remote or filesystem used for the transfer."
+                      },
+                      "dstFs": {
+                        "type": "string",
+                        "description": "Destination remote or filesystem used for the transfer."
+                      },
+                      "srcRemote": {
+                        "type": "string",
+                        "description": "Source path within `srcFs`, when provided."
+                      },
+                      "dstRemote": {
+                        "type": "string",
+                        "description": "Destination path within `dstFs`, when provided."
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "size": {
+                        "type": "integer"
+                      },
+                      "bytes": {
+                        "type": "integer"
+                      },
+                      "checked": {
+                        "type": "boolean"
+                      },
+                      "what": {
+                        "type": "string",
+                        "description": "What the transfer was doing, such as `transferring` or `checking`. Bisync adds values such as `listing file - Path1`, so this is free text."
+                      },
+                      "started_at": {
+                        "type": "string",
+                        "description": "ISO8601 timestamp when the transfer started."
+                      },
+                      "completed_at": {
+                        "type": "string",
+                        "description": "ISO8601 timestamp when the transfer completed."
+                      },
+                      "timestamp": {
+                        "type": "integer"
+                      },
+                      "error": {
+                        "type": "string"
+                      },
+                      "jobid": {
+                        "type": "integer"
+                      }
+                    },
+                    "additionalProperties": true,
+                    "required": [
+                      "group",
+                      "name",
+                      "size",
+                      "bytes",
+                      "checked",
+                      "what",
+                      "started_at",
+                      "completed_at",
+                      "error"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "transferred"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "DebugSetGcPercentResponse": {
+        "description": "Previous garbage collection target percentage returned after update.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "existing-gc-percent": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "existing-gc-percent"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "DebugSetMutexProfileFractionResponse": {
+        "description": "Previous mutex profiling sampling rate.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "previousRate": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "previousRate"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "DebugSetSoftMemoryLimitResponse": {
+        "description": "Previous soft memory limit before the change.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "existing-mem-limit": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "existing-mem-limit"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "FscacheEntriesResponse": {
+        "description": "Number of entries currently cached by the file system cache.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "entries": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "entries"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "MountListmountsResponse": {
+        "description": "Active mount points with source remote and mount time.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "mountPoints": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Fs": {
+                        "type": "string"
+                      },
+                      "MountPoint": {
+                        "type": "string"
+                      },
+                      "MountedOn": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "Fs",
+                      "MountPoint",
+                      "MountedOn"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "mountPoints"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "MountTypesResponse": {
+        "description": "List of mount backends available on this platform.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "mountTypes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "mountTypes"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "RcListResponse": {
+        "description": "Metadata for every available RC command, including auth requirements.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "commands": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Path": {
+                        "type": "string"
+                      },
+                      "Title": {
+                        "type": "string"
+                      },
+                      "Help": {
+                        "type": "string"
+                      },
+                      "NeedsRequest": {
+                        "type": "boolean"
+                      },
+                      "NeedsResponse": {
+                        "type": "boolean"
+                      },
+                      "NoAuth": {
+                        "type": "boolean",
+                        "description": "True if the call works without authentication."
+                      }
+                    },
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [
+                "commands"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "BackendCommandResponse": {
+        "description": "Backend command output and any additional returned fields.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "description": "Backend command result payload"
+                }
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "ConfigDumpResponse": {
+        "description": "Entire rclone configuration grouped by remote.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "ConfigGetResponse": {
+        "description": "Configuration key/value pairs for the requested remote.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "type"
+              ],
+              "properties": {
+                "type": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "ConfigListremotesResponse": {
+        "description": "Names of configured remotes.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "remotes"
+              ],
+              "properties": {
+                "remotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "ConfigOauthstatusResponse": {
+        "description": "Status of the interactive OAuth authentication server.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "running",
+                    "stopped"
+                  ],
+                  "description": "Whether the OAuth authentication server is currently running."
+                },
+                "authUrl": {
+                  "type": "string",
+                  "description": "Authorization URL to open in a browser. Present only when status is \"running\"."
+                }
+              },
+              "required": [
+                "status"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "ConfigPathsResponse": {
+        "description": "Paths to the config file, cache directory, and temporary directory.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "cache": {
+                  "type": "string"
+                },
+                "config": {
+                  "type": "string"
+                },
+                "temp": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "cache",
+                "config",
+                "temp"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "ConfigProvidersResponse": {
+        "description": "Available backend providers and their metadata.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "providers": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConfigProvider"
+                  }
+                }
+              },
+              "additionalProperties": true,
+              "required": [
+                "providers"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "CoreVersionResponse": {
+        "description": "rclone version, build information, and runtime details.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "description": "Full semantic version string (e.g. 1.67.0)."
+                },
+                "os": {
+                  "type": "string",
+                  "description": "Operating system rclone is running on (e.g. linux, darwin)."
+                },
+                "arch": {
+                  "type": "string",
+                  "description": "CPU architecture (e.g. amd64, arm64)."
+                },
+                "decomposed": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "description": "Version number broken into components."
+                },
+                "isGit": {
+                  "type": "boolean",
+                  "description": "True when built directly from a git checkout."
+                },
+                "isBeta": {
+                  "type": "boolean",
+                  "description": "Indicates whether this build is a beta version."
+                },
+                "goVersion": {
+                  "type": "string",
+                  "description": "Go toolchain version used to build rclone."
+                },
+                "osVersion": {
+                  "type": "string",
+                  "description": "OS Version (e.g. ubuntu 24.04 (64 bit))."
+                },
+                "osKernel": {
+                  "type": "string",
+                  "description": "OS Kernel version (e.g. 6.8.0-86-generic (x86_64))."
+                },
+                "osArch": {
+                  "type": "string",
+                  "description": "CPU architecture in use (e.g. arm64 (ARMv8 compatible))."
+                },
+                "linking": {
+                  "type": "string",
+                  "description": "Linking mode for the binary (static or dynamic)."
+                },
+                "goTags": {
+                  "type": "string",
+                  "description": "Space separated Go build tags, if any."
+                }
+              },
+              "required": [
+                "version",
+                "os",
+                "arch",
+                "decomposed",
+                "isGit",
+                "isBeta",
+                "goVersion",
+                "linking",
+                "goTags"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "CoreStatsResponse": {
+        "description": "Current transfer statistics including totals, rates, and recent activity.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "bytes": {
+                  "type": "number"
+                },
+                "checks": {
+                  "type": "number"
+                },
+                "deletedDirs": {
+                  "type": "number"
+                },
+                "deletes": {
+                  "type": "number"
+                },
+                "elapsedTime": {
+                  "type": "number"
+                },
+                "errors": {
+                  "type": "number"
+                },
+                "eta": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "fatalError": {
+                  "type": "boolean"
+                },
+                "lastError": {
+                  "type": "string"
+                },
+                "retryError": {
+                  "type": "boolean"
+                },
+                "renames": {
+                  "type": "number"
+                },
+                "listed": {
+                  "type": "number"
+                },
+                "serverSideCopies": {
+                  "type": "number"
+                },
+                "serverSideCopyBytes": {
+                  "type": "number"
+                },
+                "serverSideMoveBytes": {
+                  "type": "number"
+                },
+                "serverSideMoves": {
+                  "type": "number"
+                },
+                "speed": {
+                  "type": "number"
+                },
+                "totalBytes": {
+                  "type": "number"
+                },
+                "totalChecks": {
+                  "type": "number"
+                },
+                "totalTransfers": {
+                  "type": "number"
+                },
+                "transferTime": {
+                  "type": "number"
+                },
+                "transfers": {
+                  "type": "number"
+                },
+                "transferring": {
+                  "type": "array",
+                  "description": "Active transfers currently in progress grouped by stats group.",
+                  "items": {
+                    "$ref": "#/components/schemas/CoreStatsTransfer"
+                  }
+                },
+                "checking": {
+                  "type": "array",
+                  "description": "Objects currently undergoing verification operations.",
+                  "items": {
+                    "$ref": "#/components/schemas/CoreStatsChecking"
+                  }
+                }
+              },
+              "required": [
+                "bytes",
+                "checks",
+                "deletedDirs",
+                "deletes",
+                "elapsedTime",
+                "errors",
+                "fatalError",
+                "retryError",
+                "renames",
+                "serverSideCopies",
+                "serverSideCopyBytes",
+                "serverSideMoveBytes",
+                "serverSideMoves",
+                "speed",
+                "totalBytes",
+                "totalChecks",
+                "totalTransfers",
+                "transferTime",
+                "transfers"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "JobListResponse": {
+        "description": "Identifiers of active and recently completed async jobs.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "executeId": {
+                  "type": "string",
+                  "description": "Identifier for this rclone process."
+                },
+                "jobids": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "description": "Job IDs suitable for use with `job/status` and `job/stop`."
+                },
+                "runningIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  },
+                  "description": "Array of integer job ids that are running."
+                },
+                "finishedIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  },
+                  "description": "Array of integer job ids that are finished."
+                }
+              },
+              "required": [
+                "executeId",
+                "jobids",
+                "runningIds",
+                "finishedIds"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "JobStatusResponse": {
+        "description": "Detailed status for a background job, including timing, success flag, and optional output.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "executeId": {
+                  "type": "string",
+                  "description": "Identifier for this rclone process."
+                },
+                "finished": {
+                  "type": "boolean",
+                  "description": "True once the job has completed."
+                },
+                "duration": {
+                  "type": "number",
+                  "description": "Execution time in seconds."
+                },
+                "endTime": {
+                  "type": "string",
+                  "description": "Timestamp when the job finished. (e.g. '2025-12-26T18:50:20.528746884+01:00')"
+                },
+                "error": {
+                  "type": "string",
+                  "description": "Error message, or empty string on success."
+                },
+                "id": {
+                  "type": "number",
+                  "description": "Job identifier."
+                },
+                "startTime": {
+                  "type": "string",
+                  "description": "Timestamp when the job started. (e.g. '2025-12-24T18:50:20.5281314+01:00')"
+                },
+                "success": {
+                  "type": "boolean",
+                  "description": "True if the job completed successfully."
+                },
+                "output": {
+                  "description": "Synchronous-style output payload when available."
+                },
+                "progress": {
+                  "description": "Progress measurements supplied by the underlying command."
+                },
+                "group": {
+                  "type": "string",
+                  "description": "Stats group of the job."
+                }
+              },
+              "required": [
+                "executeId",
+                "finished",
+                "duration",
+                "endTime",
+                "error",
+                "id",
+                "startTime",
+                "success",
+                "group"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "OperationsAboutResponse": {
+        "description": "Quota and usage information from `operations/about`, including total, used, and free space.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "number"
+                },
+                "used": {
+                  "type": "number"
+                },
+                "free": {
+                  "type": "number"
+                },
+                "trashed": {
+                  "type": "number"
+                },
+                "other": {
+                  "type": "number"
+                },
+                "objects": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "OperationsCheckResponse": {
+        "description": "Comparison summary from `operations/check`, including missing, matching, and differing files.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "description": "True when the check completes without differences or errors."
+                },
+                "status": {
+                  "type": "string",
+                  "description": "Human readable status string."
+                },
+                "hashType": {
+                  "type": "string",
+                  "description": "Hash algorithm used for comparisons when applicable."
+                },
+                "combined": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Combined summary lines when `combined=true` is requested."
+                },
+                "missingOnSrc": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Files present on the destination but missing from the source."
+                },
+                "missingOnDst": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Files present on the source but missing from the destination."
+                },
+                "match": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Files that matched on both sides."
+                },
+                "differ": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Files that differed between source and destination."
+                },
+                "error": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Entries that produced errors during the check."
+                }
+              },
+              "required": [
+                "success",
+                "status"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "OperationsListResponse": {
+        "description": "Directory listing entries from `operations/list`, mirroring the `lsjson` format.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "list": {
+                  "type": "array",
+                  "description": "Array of entries equivalent to the items returned by `rclone lsjson`.",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "Path",
+                      "Name",
+                      "IsDir"
+                    ],
+                    "properties": {
+                      "Path": {
+                        "type": "string",
+                        "description": "Path relative to the requested remote root."
+                      },
+                      "Name": {
+                        "type": "string",
+                        "description": "Base name of the entry."
+                      },
+                      "Size": {
+                        "type": "number",
+                        "description": "Object size in bytes."
+                      },
+                      "MimeType": {
+                        "type": "string",
+                        "description": "MIME type where available."
+                      },
+                      "ModTime": {
+                        "type": "string",
+                        "description": "Modification timestamp in RFC3339 format."
+                      },
+                      "IsDir": {
+                        "type": "boolean",
+                        "description": "True if the entry represents a directory."
+                      },
+                      "Hashes": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "string"
+                        },
+                        "description": "Hash digests keyed by algorithm when requested."
+                      },
+                      "ID": {
+                        "type": "string",
+                        "description": "Backend-specific identifier when provided."
+                      },
+                      "OrigID": {
+                        "type": "string",
+                        "description": "Original backend identifier when recorded."
+                      },
+                      "IsBucket": {
+                        "type": "boolean",
+                        "description": "True for bucket/root entries on bucket-based remotes."
+                      },
+                      "Tier": {
+                        "type": "string",
+                        "description": "Storage class or tier, if supplied by the backend."
+                      },
+                      "Encrypted": {
+                        "type": "string",
+                        "description": "Encrypted entry name when using crypt remotes."
+                      },
+                      "EncryptedPath": {
+                        "type": "string",
+                        "description": "Encrypted path when using crypt remotes."
+                      },
+                      "Metadata": {
+                        "type": "object",
+                        "additionalProperties": {},
+                        "description": "Backend-provided metadata map."
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "list"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "OperationsStatResponse": {
+        "description": "Metadata for a single file or directory from `operations/stat`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "item": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "Path": {
+                      "type": "string",
+                      "description": "Path relative to the remote root."
+                    },
+                    "Name": {
+                      "type": "string",
+                      "description": "Base name of the entry."
+                    },
+                    "Size": {
+                      "type": "number",
+                      "description": "Object size in bytes."
+                    },
+                    "MimeType": {
+                      "type": "string",
+                      "description": "MIME type where available."
+                    },
+                    "ModTime": {
+                      "type": "string",
+                      "description": "Modification timestamp in RFC3339 format."
+                    },
+                    "IsDir": {
+                      "type": "boolean",
+                      "description": "True if the entry is a directory."
+                    },
+                    "Hashes": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "Hash digests keyed by algorithm when requested."
+                    },
+                    "ID": {
+                      "type": "string",
+                      "description": "Backend-specific identifier when provided."
+                    },
+                    "OrigID": {
+                      "type": "string",
+                      "description": "Original backend identifier when recorded."
+                    },
+                    "IsBucket": {
+                      "type": "boolean",
+                      "description": "True for bucket/root entries on bucket-based remotes."
+                    },
+                    "Tier": {
+                      "type": "string",
+                      "description": "Storage class or tier, if supplied by the backend."
+                    },
+                    "Encrypted": {
+                      "type": "string",
+                      "description": "Encrypted entry name when using crypt remotes."
+                    },
+                    "EncryptedPath": {
+                      "type": "string",
+                      "description": "Encrypted path when using crypt remotes."
+                    },
+                    "Metadata": {
+                      "type": "object",
+                      "additionalProperties": {},
+                      "description": "Backend-provided metadata map."
+                    }
+                  },
+                  "required": [
+                    "Path",
+                    "Name",
+                    "Size",
+                    "MimeType",
+                    "ModTime",
+                    "IsDir"
+                  ]
+                }
+              },
+              "required": [
+                "item"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "OptionsBlocksResponse": {
+        "description": "Names of option blocks that can be queried with `options/get` or `options/info`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "options"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "OptionsGetResponse": {
+        "description": "Current global option values keyed by block name.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "dlna": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "filter": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "ftp": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "http": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "log": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "main": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "mount": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "nfs": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "proxy": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "rc": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "restic": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "s3": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "sftp": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "vfs": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "webdav": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "OptionsInfoResponse": {
+        "description": "Metadata describing available options, organised by block.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "dlna": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "filter": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "ftp": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "http": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "log": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "main": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "mount": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "nfs": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "proxy": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "rc": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "restic": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "s3": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "sftp": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "vfs": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                },
+                "webdav": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OptionsInfoOption"
+                  }
+                }
+              },
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/OptionsInfoOption"
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "OptionsLocalResponse": {
+        "description": "Effective option values for the current request, separated into config and filter sections.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "config": {
+                  "type": "object",
+                  "properties": {
+                    "AskPassword": {
+                      "type": "boolean"
+                    },
+                    "AutoConfirm": {
+                      "type": "boolean"
+                    },
+                    "BackupDir": {
+                      "type": "string"
+                    },
+                    "BindAddr": {
+                      "type": "string"
+                    },
+                    "BufferSize": {
+                      "type": "number"
+                    },
+                    "BwLimit": {
+                      "type": "string"
+                    },
+                    "BwLimitFile": {
+                      "type": "string"
+                    },
+                    "CaCert": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "CheckFirst": {
+                      "type": "boolean"
+                    },
+                    "CheckSum": {
+                      "type": "boolean"
+                    },
+                    "Checkers": {
+                      "type": "number"
+                    },
+                    "ClientCert": {
+                      "type": "string"
+                    },
+                    "ClientKey": {
+                      "type": "string"
+                    },
+                    "CompareDest": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "ConnectTimeout": {
+                      "type": "number"
+                    },
+                    "Cookie": {
+                      "type": "boolean"
+                    },
+                    "CopyDest": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "CutoffMode": {
+                      "type": "string"
+                    },
+                    "DataRateUnit": {
+                      "type": "string"
+                    },
+                    "DefaultTime": {
+                      "type": "string"
+                    },
+                    "DeleteMode": {
+                      "type": "number"
+                    },
+                    "DisableFeatures": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "DisableHTTP2": {
+                      "type": "boolean"
+                    },
+                    "DisableHTTPKeepAlives": {
+                      "type": "boolean"
+                    },
+                    "DownloadHeaders": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "DryRun": {
+                      "type": "boolean"
+                    },
+                    "Dump": {
+                      "type": "string"
+                    },
+                    "ErrorOnNoTransfer": {
+                      "type": "boolean"
+                    },
+                    "ExpectContinueTimeout": {
+                      "type": "number"
+                    },
+                    "FixCase": {
+                      "type": "boolean"
+                    },
+                    "FsCacheExpireDuration": {
+                      "type": "number"
+                    },
+                    "FsCacheExpireInterval": {
+                      "type": "number"
+                    },
+                    "Headers": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "HumanReadable": {
+                      "type": "boolean"
+                    },
+                    "IgnoreCaseSync": {
+                      "type": "boolean"
+                    },
+                    "IgnoreChecksum": {
+                      "type": "boolean"
+                    },
+                    "IgnoreErrors": {
+                      "type": "boolean"
+                    },
+                    "IgnoreExisting": {
+                      "type": "boolean"
+                    },
+                    "IgnoreSize": {
+                      "type": "boolean"
+                    },
+                    "IgnoreTimes": {
+                      "type": "boolean"
+                    },
+                    "Immutable": {
+                      "type": "boolean"
+                    },
+                    "Inplace": {
+                      "type": "boolean"
+                    },
+                    "InsecureSkipVerify": {
+                      "type": "boolean"
+                    },
+                    "Interactive": {
+                      "type": "boolean"
+                    },
+                    "KvLockTime": {
+                      "type": "number"
+                    },
+                    "Links": {
+                      "type": "boolean"
+                    },
+                    "LogLevel": {
+                      "type": "string"
+                    },
+                    "LowLevelRetries": {
+                      "type": "number"
+                    },
+                    "MaxBacklog": {
+                      "type": "number"
+                    },
+                    "MaxBufferMemory": {
+                      "type": "number"
+                    },
+                    "MaxDelete": {
+                      "type": "number"
+                    },
+                    "MaxDeleteSize": {
+                      "type": "number"
+                    },
+                    "MaxDepth": {
+                      "type": "number"
+                    },
+                    "MaxDuration": {
+                      "type": "number"
+                    },
+                    "MaxStatsGroups": {
+                      "type": "number"
+                    },
+                    "MaxTransfer": {
+                      "type": "number"
+                    },
+                    "Metadata": {
+                      "type": "boolean"
+                    },
+                    "MetadataMapper": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "MetadataSet": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "ModifyWindow": {
+                      "type": "number"
+                    },
+                    "MultiThreadChunkSize": {
+                      "type": "number"
+                    },
+                    "MultiThreadCutoff": {
+                      "type": "number"
+                    },
+                    "MultiThreadSet": {
+                      "type": "boolean"
+                    },
+                    "MultiThreadStreams": {
+                      "type": "number"
+                    },
+                    "MultiThreadWriteBufferSize": {
+                      "type": "number"
+                    },
+                    "NoCheckDest": {
+                      "type": "boolean"
+                    },
+                    "NoConsole": {
+                      "type": "boolean"
+                    },
+                    "NoGzip": {
+                      "type": "boolean"
+                    },
+                    "NoTraverse": {
+                      "type": "boolean"
+                    },
+                    "NoUnicodeNormalization": {
+                      "type": "boolean"
+                    },
+                    "NoUpdateDirModTime": {
+                      "type": "boolean"
+                    },
+                    "NoUpdateModTime": {
+                      "type": "boolean"
+                    },
+                    "OrderBy": {
+                      "type": "string"
+                    },
+                    "PartialSuffix": {
+                      "type": "string"
+                    },
+                    "PasswordCommand": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "Progress": {
+                      "type": "boolean"
+                    },
+                    "ProgressTerminalTitle": {
+                      "type": "boolean"
+                    },
+                    "RefreshTimes": {
+                      "type": "boolean"
+                    },
+                    "Retries": {
+                      "type": "number"
+                    },
+                    "RetriesInterval": {
+                      "type": "number"
+                    },
+                    "ServerSideAcrossConfigs": {
+                      "type": "boolean"
+                    },
+                    "SizeOnly": {
+                      "type": "boolean"
+                    },
+                    "StatsFileNameLength": {
+                      "type": "number"
+                    },
+                    "StatsLogLevel": {
+                      "type": "string"
+                    },
+                    "StatsOneLine": {
+                      "type": "boolean"
+                    },
+                    "StatsOneLineDate": {
+                      "type": "boolean"
+                    },
+                    "StatsOneLineDateFormat": {
+                      "type": "string"
+                    },
+                    "StreamingUploadCutoff": {
+                      "type": "number"
+                    },
+                    "Suffix": {
+                      "type": "string"
+                    },
+                    "SuffixKeepExtension": {
+                      "type": "boolean"
+                    },
+                    "TPSLimit": {
+                      "type": "number"
+                    },
+                    "TPSLimitBurst": {
+                      "type": "number"
+                    },
+                    "TerminalColorMode": {
+                      "type": "string"
+                    },
+                    "Timeout": {
+                      "type": "number"
+                    },
+                    "TrackRenames": {
+                      "type": "boolean"
+                    },
+                    "TrackRenamesStrategy": {
+                      "type": "string"
+                    },
+                    "TrafficClass": {
+                      "type": "number"
+                    },
+                    "Transfers": {
+                      "type": "number"
+                    },
+                    "UpdateOlder": {
+                      "type": "boolean"
+                    },
+                    "UploadHeaders": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "UseJSONLog": {
+                      "type": "boolean"
+                    },
+                    "UseListR": {
+                      "type": "boolean"
+                    },
+                    "UseMmap": {
+                      "type": "boolean"
+                    },
+                    "UseServerModTime": {
+                      "type": "boolean"
+                    },
+                    "UserAgent": {
+                      "type": "string"
+                    },
+                    "ListCutoff": {
+                      "type": "integer"
+                    },
+                    "ClientPass": {
+                      "type": "string"
+                    },
+                    "MaxConnections": {
+                      "type": "integer"
+                    },
+                    "NameTransform": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "HTTPProxy": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "AskPassword",
+                    "AutoConfirm",
+                    "BackupDir",
+                    "BindAddr",
+                    "BufferSize",
+                    "BwLimit",
+                    "BwLimitFile",
+                    "CaCert",
+                    "CheckFirst",
+                    "CheckSum",
+                    "Checkers",
+                    "ClientCert",
+                    "ClientKey",
+                    "CompareDest",
+                    "ConnectTimeout",
+                    "Cookie",
+                    "CopyDest",
+                    "CutoffMode",
+                    "DataRateUnit",
+                    "DefaultTime",
+                    "DeleteMode",
+                    "DisableFeatures",
+                    "DisableHTTP2",
+                    "DisableHTTPKeepAlives",
+                    "DownloadHeaders",
+                    "DryRun",
+                    "Dump",
+                    "ErrorOnNoTransfer",
+                    "ExpectContinueTimeout",
+                    "FixCase",
+                    "FsCacheExpireDuration",
+                    "FsCacheExpireInterval",
+                    "Headers",
+                    "HumanReadable",
+                    "IgnoreCaseSync",
+                    "IgnoreChecksum",
+                    "IgnoreErrors",
+                    "IgnoreExisting",
+                    "IgnoreSize",
+                    "IgnoreTimes",
+                    "Immutable",
+                    "Inplace",
+                    "InsecureSkipVerify",
+                    "Interactive",
+                    "KvLockTime",
+                    "Links",
+                    "LogLevel",
+                    "LowLevelRetries",
+                    "MaxBacklog",
+                    "MaxBufferMemory",
+                    "MaxDelete",
+                    "MaxDeleteSize",
+                    "MaxDepth",
+                    "MaxDuration",
+                    "MaxStatsGroups",
+                    "MaxTransfer",
+                    "Metadata",
+                    "MetadataMapper",
+                    "MetadataSet",
+                    "ModifyWindow",
+                    "MultiThreadChunkSize",
+                    "MultiThreadCutoff",
+                    "MultiThreadSet",
+                    "MultiThreadStreams",
+                    "MultiThreadWriteBufferSize",
+                    "NoCheckDest",
+                    "NoConsole",
+                    "NoGzip",
+                    "NoTraverse",
+                    "NoUnicodeNormalization",
+                    "NoUpdateDirModTime",
+                    "NoUpdateModTime",
+                    "OrderBy",
+                    "PartialSuffix",
+                    "PasswordCommand",
+                    "Progress",
+                    "ProgressTerminalTitle",
+                    "RefreshTimes",
+                    "Retries",
+                    "RetriesInterval",
+                    "ServerSideAcrossConfigs",
+                    "SizeOnly",
+                    "StatsFileNameLength",
+                    "StatsLogLevel",
+                    "StatsOneLine",
+                    "StatsOneLineDate",
+                    "StatsOneLineDateFormat",
+                    "StreamingUploadCutoff",
+                    "Suffix",
+                    "SuffixKeepExtension",
+                    "TPSLimit",
+                    "TPSLimitBurst",
+                    "TerminalColorMode",
+                    "Timeout",
+                    "TrackRenames",
+                    "TrackRenamesStrategy",
+                    "TrafficClass",
+                    "Transfers",
+                    "UpdateOlder",
+                    "UploadHeaders",
+                    "UseJSONLog",
+                    "UseListR",
+                    "UseMmap",
+                    "UseServerModTime",
+                    "UserAgent",
+                    "ListCutoff",
+                    "ClientPass",
+                    "MaxConnections",
+                    "NameTransform",
+                    "HTTPProxy"
+                  ]
+                },
+                "filter": {
+                  "type": "object",
+                  "properties": {
+                    "DeleteExcluded": {
+                      "type": "boolean"
+                    },
+                    "ExcludeFile": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "ExcludeFrom": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "ExcludeRule": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "FilesFrom": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "FilesFromRaw": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "FilterFrom": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "FilterRule": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "HashFilter": {
+                      "type": "string"
+                    },
+                    "IgnoreCase": {
+                      "type": "boolean"
+                    },
+                    "IncludeFrom": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "IncludeRule": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "MaxAge": {
+                      "type": "number"
+                    },
+                    "MaxSize": {
+                      "type": "number"
+                    },
+                    "MetaRules": {
+                      "type": "object",
+                      "properties": {
+                        "ExcludeFrom": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "ExcludeRule": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "FilterFrom": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "FilterRule": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "IncludeFrom": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "IncludeRule": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "ExcludeFrom",
+                        "ExcludeRule",
+                        "FilterFrom",
+                        "FilterRule",
+                        "IncludeFrom",
+                        "IncludeRule"
+                      ]
+                    },
+                    "MinAge": {
+                      "type": "number"
+                    },
+                    "MinSize": {
+                      "type": "number"
+                    },
+                    "FilesFrom0": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "DeleteExcluded",
+                    "ExcludeFile",
+                    "ExcludeFrom",
+                    "ExcludeRule",
+                    "FilesFrom",
+                    "FilesFromRaw",
+                    "FilterFrom",
+                    "FilterRule",
+                    "HashFilter",
+                    "IgnoreCase",
+                    "IncludeFrom",
+                    "IncludeRule",
+                    "MaxAge",
+                    "MaxSize",
+                    "MetaRules",
+                    "MinAge",
+                    "MinSize",
+                    "FilesFrom0"
+                  ]
+                }
+              },
+              "required": [
+                "config",
+                "filter"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "ServeListResponse": {
+        "description": "List of active `serve` instances, including their IDs, bind addresses, and parameters.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "list": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Identifier returned by `serve/start`."
+                      },
+                      "addr": {
+                        "type": "string",
+                        "description": "Address and port the server is listening on."
+                      },
+                      "params": {
+                        "type": "object",
+                        "required": [
+                          "fs",
+                          "type"
+                        ],
+                        "properties": {
+                          "fs": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/components/schemas/RemoteDefinition"
+                              }
+                            ]
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "opt": {
+                            "type": "object",
+                            "additionalProperties": true
+                          },
+                          "vfsOpt": {
+                            "type": "object",
+                            "additionalProperties": true
+                          }
+                        },
+                        "additionalProperties": true,
+                        "description": "Serve configuration parameters supplied at startup."
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "addr",
+                      "params"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "list"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "ServeStartResponse": {
+        "description": "Confirmation of a newly started server, including ID and bound address.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "addr": {
+                  "type": "string",
+                  "description": "Address and port the server is listening on."
+                },
+                "id": {
+                  "type": "string",
+                  "description": "Identifier to pass to `serve/stop`."
+                }
+              },
+              "required": [
+                "addr",
+                "id"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "VfsForgetResponse": {
+        "description": "Paths evicted from the VFS directory cache.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "forgotten": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Paths that were successfully forgotten."
+                }
+              },
+              "required": [
+                "forgotten"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "VfsListResponse": {
+        "description": "Identifiers for the VFS instances currently in use.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "vfses": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "VFS name that can be used with other VFS endpoints."
+                }
+              },
+              "required": [
+                "vfses"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "VfsPollIntervalResponse": {
+        "description": "Status of the poll-interval setting, possibly including the new interval.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "True if polling is on."
+                },
+                "supported": {
+                  "type": "boolean",
+                  "description": "True if the remote supports polling."
+                },
+                "interval": {
+                  "type": "object",
+                  "description": "The polling interval.",
+                  "properties": {
+                    "raw": {
+                      "type": "integer",
+                      "description": "Interval in nanoseconds."
+                    },
+                    "seconds": {
+                      "type": "integer",
+                      "description": "Interval in whole seconds."
+                    },
+                    "string": {
+                      "type": "string",
+                      "description": "Interval as text, such as `1m0s`."
+                    }
+                  },
+                  "required": [
+                    "raw",
+                    "seconds",
+                    "string"
+                  ]
+                },
+                "timeout": {
+                  "type": "boolean",
+                  "description": "True if setting the interval timed out. Only present when setting it."
+                }
+              },
+              "required": [
+                "enabled",
+                "supported",
+                "interval"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "VfsQueueResponse": {
+        "description": "Upload queue entries for the selected VFS.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "queue": {
+                  "type": "array",
+                  "description": "Files waiting to upload. Absent when the VFS has no cache.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Full path of the file."
+                      },
+                      "id": {
+                        "type": "integer",
+                        "description": "Queue item ID, for `vfs/queue-set-expiry`."
+                      },
+                      "size": {
+                        "type": "integer",
+                        "description": "Size in bytes."
+                      },
+                      "expiry": {
+                        "type": "number",
+                        "description": "Seconds until the file is eligible for transfer."
+                      },
+                      "tries": {
+                        "type": "integer",
+                        "description": "Upload attempts so far."
+                      },
+                      "delay": {
+                        "type": "number",
+                        "description": "Delay between upload attempts in seconds."
+                      },
+                      "uploading": {
+                        "type": "boolean",
+                        "description": "True if the file is uploading now."
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "id",
+                      "size",
+                      "expiry",
+                      "tries",
+                      "delay",
+                      "uploading"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "VfsRefreshResponse": {
+        "description": "Acknowledgement of directories refreshed in the VFS cache.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "Map of refreshed directories to status messages."
+                }
+              },
+              "required": [
+                "result"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "VfsStatsResponse": {
+        "description": "Runtime statistics for a VFS, including disk cache and metadata cache state.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fs": {
+                  "type": "string",
+                  "description": "Name of the VFS."
+                },
+                "inUse": {
+                  "type": "integer",
+                  "description": "Number of active references to the VFS."
+                },
+                "diskCache": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "description": "Disk cache metrics when caching is enabled.",
+                  "properties": {
+                    "bytesUsed": {
+                      "type": "integer",
+                      "description": "Bytes used by the cache."
+                    },
+                    "erroredFiles": {
+                      "type": "integer",
+                      "description": "Files with errors."
+                    },
+                    "files": {
+                      "type": "integer",
+                      "description": "Files in the cache."
+                    },
+                    "hashType": {
+                      "type": "integer",
+                      "description": "Internal number of the hash the cache uses."
+                    },
+                    "outOfSpace": {
+                      "type": "boolean",
+                      "description": "True if the cache has run out of space."
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "Directory of the cached data."
+                    },
+                    "pathMeta": {
+                      "type": "string",
+                      "description": "Directory of the cached metadata."
+                    },
+                    "uploadsInProgress": {
+                      "type": "integer",
+                      "description": "Uploads running now."
+                    },
+                    "uploadsQueued": {
+                      "type": "integer",
+                      "description": "Uploads waiting to run."
+                    }
+                  }
+                },
+                "metadataCache": {
+                  "type": "object",
+                  "description": "In-memory metadata cache counters.",
+                  "properties": {
+                    "dirs": {
+                      "type": "integer",
+                      "description": "Directories cached."
+                    },
+                    "files": {
+                      "type": "integer",
+                      "description": "Files cached."
+                    }
+                  }
+                },
+                "opt": {
+                  "type": "object",
+                  "description": "Effective options of the VFS. Durations are in nanoseconds, and sizes are in bytes.",
+                  "properties": {
+                    "NoSeek": {
+                      "type": "boolean"
+                    },
+                    "NoChecksum": {
+                      "type": "boolean"
+                    },
+                    "ReadOnly": {
+                      "type": "boolean"
+                    },
+                    "Links": {
+                      "type": "boolean"
+                    },
+                    "NoModTime": {
+                      "type": "boolean"
+                    },
+                    "DirCacheTime": {
+                      "type": "integer"
+                    },
+                    "Refresh": {
+                      "type": "boolean"
+                    },
+                    "PollInterval": {
+                      "type": "integer"
+                    },
+                    "Umask": {
+                      "type": "integer"
+                    },
+                    "UID": {
+                      "type": "integer"
+                    },
+                    "GID": {
+                      "type": "integer"
+                    },
+                    "DirPerms": {
+                      "type": "integer"
+                    },
+                    "FilePerms": {
+                      "type": "integer"
+                    },
+                    "LinkPerms": {
+                      "type": "integer"
+                    },
+                    "ChunkSize": {
+                      "type": "integer"
+                    },
+                    "ChunkSizeLimit": {
+                      "type": "integer"
+                    },
+                    "ChunkStreams": {
+                      "type": "integer"
+                    },
+                    "CacheMode": {
+                      "type": "integer"
+                    },
+                    "CacheMaxAge": {
+                      "type": "integer"
+                    },
+                    "CacheMaxSize": {
+                      "type": "integer"
+                    },
+                    "CacheMinFreeSpace": {
+                      "type": "integer"
+                    },
+                    "CachePollInterval": {
+                      "type": "integer"
+                    },
+                    "CaseInsensitive": {
+                      "type": "boolean"
+                    },
+                    "BlockNormDupes": {
+                      "type": "boolean"
+                    },
+                    "WriteWait": {
+                      "type": "integer"
+                    },
+                    "ReadWait": {
+                      "type": "integer"
+                    },
+                    "WriteBack": {
+                      "type": "integer"
+                    },
+                    "ReadAhead": {
+                      "type": "integer"
+                    },
+                    "UsedIsSize": {
+                      "type": "boolean"
+                    },
+                    "FastFingerprint": {
+                      "type": "boolean"
+                    },
+                    "DiskSpaceTotalSize": {
+                      "type": "integer"
+                    },
+                    "HandleCaching": {
+                      "type": "integer"
+                    },
+                    "MetadataExtension": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "required": [
+                "fs",
+                "inUse",
+                "metadataCache",
+                "opt"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "PluginsctlGetPluginsForTypeResponse": {
+        "description": "Loaded plugin metadata for the requested MIME type.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "loadedPlugins": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "description": "Installed plugins keyed by repository name."
+                },
+                "loadedTestPlugins": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "description": "Installed test plugins keyed by repository name."
+                }
+              },
+              "required": [
+                "loadedPlugins",
+                "loadedTestPlugins"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "PluginsctlListPluginsResponse": {
+        "description": "Lists installed production and test plugins with their metadata.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "loadedPlugins": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "description": "Metadata entries for installed plugins."
+                },
+                "loadedTestPlugins": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "description": "Metadata entries for installed test plugins."
+                }
+              },
+              "required": [
+                "loadedPlugins",
+                "loadedTestPlugins"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "PluginsctlListTestPluginsResponse": {
+        "description": "Metadata for installed test plugins keyed by repository name.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "loadedTestPlugins": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "description": "Installed test plugin metadata keyed by repository."
+                }
+              },
+              "required": [
+                "loadedTestPlugins"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "CacheStatsResponse": {
+        "description": "Statistics for the cache remote.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "description": "Always `ok`."
+                },
+                "stats": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "description": "Cache statistics."
+                }
+              },
+              "required": [
+                "status",
+                "stats"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "CacheExpireResponse": {
+        "description": "Confirmation that the path was cleared.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "description": "Always `ok`."
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Describes what was cleared."
+                }
+              },
+              "required": [
+                "status",
+                "message"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "CacheFetchResponse": {
+        "description": "What was fetched for each file.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "object",
+                  "description": "Results keyed by file name.",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "Error": {
+                        "type": "string",
+                        "description": "Error message, or an empty string."
+                      },
+                      "FetchedChunks": {
+                        "type": "integer",
+                        "description": "Number of chunks fetched."
+                      }
+                    },
+                    "required": [
+                      "Error",
+                      "FetchedChunks"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "status"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "ConfigStepResponse": {
+        "description": "An empty object, unless `opt.nonInteractive` is set. Then it describes the next step of the configuration.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "State": {
+                  "type": "string",
+                  "description": "State to send back to continue."
+                },
+                "Option": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ConfigProviderOption"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The next question, if there is one."
+                },
+                "Error": {
+                  "type": "string",
+                  "description": "Error to show to the user."
+                },
+                "Result": {
+                  "type": "string",
+                  "description": "Result to send back to continue."
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "UnauthorizedResponse": {
+        "description": "Missing or wrong credentials. The auth layer sends this as plain text, before rclone's JSON errors apply.",
+        "content": {
+          "text/plain": {
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "RcError": {
+        "type": "object",
+        "required": [
+          "error",
+          "status",
+          "path",
+          "input"
+        ],
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "path": {
+            "type": "string"
+          },
+          "input": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {},
+            "description": "Original request parameters echoed for debugging."
+          }
+        }
+      },
+      "ConfigProvider": {
+        "type": "object",
+        "properties": {
+          "Aliases": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "CommandHelp": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ConfigProviderCommandHelp"
+            }
+          },
+          "Description": {
+            "type": "string"
+          },
+          "Hide": {
+            "type": "boolean"
+          },
+          "MetadataInfo": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConfigProviderMetadataInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConfigProviderOption"
+            }
+          },
+          "Prefix": {
+            "type": "string"
+          },
+          "Overview": {
+            "$ref": "#/components/schemas/ConfigProviderOverview"
+          }
+        },
+        "required": [
+          "Name",
+          "Description",
+          "Options",
+          "Prefix"
+        ],
+        "additionalProperties": true
+      },
+      "ConfigProviderCommandHelp": {
+        "type": "object",
+        "properties": {
+          "Long": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Opts": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "Short": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      },
+      "ConfigProviderMetadataInfo": {
+        "type": "object",
+        "properties": {
+          "Help": {
+            "type": "string"
+          },
+          "System": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ConfigProviderMetadataSystemEntry"
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "ConfigProviderMetadataSystemEntry": {
+        "type": "object",
+        "properties": {
+          "Example": {
+            "type": "string"
+          },
+          "Help": {
+            "type": "string"
+          },
+          "ReadOnly": {
+            "type": "boolean"
+          },
+          "Type": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      },
+      "OptionsInfoOptionExample": {
+        "type": "object",
+        "properties": {
+          "Value": {
+            "type": "string"
+          },
+          "Help": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "Value",
+          "Help"
+        ],
+        "additionalProperties": true
+      },
+      "OptionsInfoOption": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string"
+          },
+          "FieldName": {
+            "type": "string"
+          },
+          "Help": {
+            "type": "string"
+          },
+          "Default": {
+            "description": "Default value for this option.",
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "Value": {
+                    "type": "boolean"
+                  },
+                  "Valid": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "Value",
+                  "Valid"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "Value": {
+            "description": "Current value of this option.",
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "Value": {
+                    "type": "boolean"
+                  },
+                  "Valid": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "Value",
+                  "Valid"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "Hide": {
+            "type": "integer"
+          },
+          "Required": {
+            "type": "boolean"
+          },
+          "IsPassword": {
+            "type": "boolean"
+          },
+          "NoPrefix": {
+            "type": "boolean"
+          },
+          "Advanced": {
+            "type": "boolean"
+          },
+          "Exclusive": {
+            "type": "boolean"
+          },
+          "Sensitive": {
+            "type": "boolean"
+          },
+          "DefaultStr": {
+            "type": "string"
+          },
+          "ValueStr": {
+            "type": "string"
+          },
+          "Type": {
+            "type": "string"
+          },
+          "Groups": {
+            "type": "string"
+          },
+          "ShortOpt": {
+            "type": "string"
+          },
+          "Examples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptionsInfoOptionExample"
+            }
+          }
+        },
+        "required": [
+          "Name",
+          "FieldName",
+          "Help",
+          "Default",
+          "Value",
+          "Hide",
+          "Required",
+          "IsPassword",
+          "NoPrefix",
+          "Advanced",
+          "Exclusive",
+          "Sensitive",
+          "DefaultStr",
+          "ValueStr",
+          "Type"
+        ],
+        "additionalProperties": true
+      },
+      "ConfigProviderOption": {
+        "type": "object",
+        "properties": {
+          "Advanced": {
+            "type": "boolean"
+          },
+          "Default": {
+            "$ref": "#/components/schemas/ConfigProviderOptionAny"
+          },
+          "DefaultStr": {
+            "type": "string"
+          },
+          "Exclusive": {
+            "type": "boolean"
+          },
+          "FieldName": {
+            "type": "string"
+          },
+          "Help": {
+            "type": "string"
+          },
+          "Hide": {
+            "type": "number"
+          },
+          "IsPassword": {
+            "type": "boolean"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "NoPrefix": {
+            "type": "boolean"
+          },
+          "Required": {
+            "type": "boolean"
+          },
+          "Sensitive": {
+            "type": "boolean"
+          },
+          "Type": {
+            "$ref": "#/components/schemas/ConfigProviderOptionType"
+          },
+          "Value": {
+            "$ref": "#/components/schemas/ConfigProviderOptionAny"
+          },
+          "ValueStr": {
+            "type": "string"
+          },
+          "Examples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConfigProviderOptionExample"
+            }
+          },
+          "ShortOpt": {
+            "type": "string"
+          },
+          "Provider": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "Name",
+          "FieldName",
+          "Help",
+          "Default",
+          "Value",
+          "Hide",
+          "Required",
+          "IsPassword",
+          "NoPrefix",
+          "Advanced",
+          "Exclusive",
+          "Sensitive",
+          "DefaultStr",
+          "ValueStr",
+          "Type"
+        ]
+      },
+      "ConfigProviderOptionExample": {
+        "type": "object",
+        "properties": {
+          "Help": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          },
+          "Provider": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "Help",
+          "Value"
+        ]
+      },
+      "ConfigProviderOptionAny": {
+        "description": "Value of the option, in whichever type the option uses. A tristate option is an object.",
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "array",
+            "items": {}
+          },
+          {
+            "type": "object",
+            "properties": {
+              "Value": {
+                "type": "boolean"
+              },
+              "Valid": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "Value",
+              "Valid"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "ConfigProviderOptionType": {
+        "type": "string",
+        "enum": [
+          "Bits",
+          "bool",
+          "CommaSepList",
+          "Duration",
+          "Encoding",
+          "int",
+          "mtime|atime|btime|ctime",
+          "SizeSuffix",
+          "SpaceSepList",
+          "string",
+          "stringArray",
+          "Time",
+          "Tristate",
+          "float64"
+        ]
+      },
+      "CoreStatsTransfer": {
+        "type": "object",
+        "description": "Progress metrics for an in-flight transfer.",
+        "properties": {
+          "bytes": {
+            "type": "number",
+            "description": "Bytes transferred so far for this object."
+          },
+          "eta": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Estimated seconds remaining, when available."
+          },
+          "group": {
+            "type": "string",
+            "description": "Stats group name associated with this transfer."
+          },
+          "name": {
+            "type": "string",
+            "description": "Remote path of the object being transferred."
+          },
+          "percentage": {
+            "type": "number",
+            "description": "Completion percentage from 0-100."
+          },
+          "size": {
+            "type": "number",
+            "description": "Total size in bytes of the object."
+          },
+          "speed": {
+            "type": "number",
+            "description": "Current transfer speed in bytes per second."
+          },
+          "speedAvg": {
+            "type": "number",
+            "description": "Current speed in bytes per second as an exponentially weighted moving average."
+          },
+          "srcFs": {
+            "type": "string",
+            "description": "Source remote or filesystem for this transfer."
+          },
+          "dstFs": {
+            "type": "string",
+            "description": "Destination remote or filesystem for this transfer."
+          },
+          "srcRemote": {
+            "type": "string",
+            "description": "Source path within srcFs."
+          },
+          "dstRemote": {
+            "type": "string",
+            "description": "Destination path within dstFs."
+          }
+        },
+        "additionalProperties": true
+      },
+      "CoreStatsChecking": {
+        "type": "object",
+        "description": "Metadata for an item currently undergoing verification.",
+        "properties": {
+          "group": {
+            "type": "string",
+            "description": "Stats group name associated with this verification."
+          },
+          "name": {
+            "type": "string",
+            "description": "Remote path of the object being verified."
+          },
+          "size": {
+            "type": "number",
+            "description": "Total size in bytes of the object."
+          }
+        },
+        "additionalProperties": true
+      },
+      "RemoteDefinition": {
+        "type": "object",
+        "description": "A remote defined inline. Needs `type` or `_name`. Other keys are backend options and must be strings.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Backend type, such as `s3`."
+          },
+          "_name": {
+            "type": "string",
+            "description": "Name of a configured remote."
+          },
+          "_root": {
+            "type": "string",
+            "description": "Root path within the remote."
+          }
+        },
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "RcGlobalOptions": {
+        "type": "object",
+        "properties": {
+          "_config": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Config overrides for this call only."
+          },
+          "_filter": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Filter overrides for this call only."
+          },
+          "_group": {
+            "type": "string",
+            "description": "Stats group for this call."
+          }
+        }
+      },
+      "ConfigProviderOverview": {
+        "type": "object",
+        "description": "Summary of the backend from rclone's docs. Its fields are empty for backends without one.",
+        "properties": {
+          "Backend": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Tier": {
+            "type": "string"
+          },
+          "Maintainers": {
+            "type": "string"
+          },
+          "FeaturesScore": {
+            "type": "integer"
+          },
+          "IntegrationTests": {
+            "type": "string"
+          },
+          "DataIntegrity": {
+            "type": "string"
+          },
+          "Performance": {
+            "type": "string"
+          },
+          "Adoption": {
+            "type": "string"
+          },
+          "Docs": {
+            "type": "string"
+          },
+          "Security": {
+            "type": "string"
+          },
+          "Virtual": {
+            "type": "boolean"
+          },
+          "Remote": {
+            "type": "string"
+          },
+          "Features": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "Hashes": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "Precision": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "headers": {
+      "RcloneJobId": {
+        "description": "ID of the job that ran this call. Streamed responses may not include it.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "PreferenceApplied": {
+        "description": "Confirms that the `Prefer` header was applied.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "respond-async"
+          ]
+        }
+      }
+    }
+  }
+}

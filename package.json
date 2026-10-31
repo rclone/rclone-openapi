@@ -10,36 +10,52 @@
   "author": "https://github.com/rclone-ui",
   "license": "MIT",
   "description": "OpenAPI specification for the Rclone RC API.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rclone/rclone-openapi.git"
+  },
+  "homepage": "https://github.com/rclone/rclone-openapi#readme",
+  "bugs": {
+    "url": "https://github.com/rclone/rclone-openapi/issues"
+  },
   "main": "openapi.json",
   "types": "types.d.ts",
   "exports": {
     ".": {
-      "types": "./types.d.ts",
-      "import": "./openapi.json",
-      "require": "./openapi.json",
-      "default": "./openapi.json"
+      "import": {
+        "types": "./index.d.mts",
+        "default": "./index.mjs"
+      },
+      "require": {
+        "types": "./index.d.cts",
+        "default": "./openapi.json"
+      }
     },
-    "./openapi.json": {
-      "import": "./openapi.json",
-      "require": "./openapi.json",
-      "default": "./openapi.json"
-    }
+    "./openapi.json": "./openapi.json",
+    "./openapi.yaml": "./openapi.yaml",
+    "./types": {
+      "types": "./types.d.ts"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "openapi.json",
+    "openapi.yaml",
     "types.d.ts",
-    "openapi.yaml"
+    "index.mjs",
+    "index.d.mts",
+    "index.d.cts",
+    "document.d.ts"
   ],
   "scripts": {
-    "gen:json": "npx @redocly/cli bundle openapi.yaml -o openapi.json --ext json",
-    "gen:types": "openapi-typescript openapi.yaml -o types.d.ts",
-    "gen": "npm run gen:json && npm run gen:types",
-    "bump": "npm version patch --no-git-tag-version",
-    "pub": "npm run gen && npm publish",
+    "gen": "node scripts/build.mjs",
+    "bump": "npm version --no-git-tag-version",
+    "pub": "npm run gen && npm run check && npm run check:package && npm publish",
     "check:lint": "redocly lint openapi.yaml",
     "check:types": "tsc --noEmit --strict --skipLibCheck --target es2022 --module esnext --moduleResolution bundler scripts/check-types.ts",
     "check:contract": "node scripts/check-contract.mjs",
     "check:source": "go run scripts/audit-source.go",
+    "check:package": "node scripts/check-package.mjs",
     "check": "npm run check:lint && npm run check:types && npm run check:contract && npm run check:source"
   },
   "devDependencies": {
