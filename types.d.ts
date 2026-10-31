@@ -335,7 +335,7 @@ export interface paths {
         put?: never;
         /**
          * Run an rclone command
-         * @description Executes a standard rclone CLI command remotely and streams or returns its output.
+         * @description Executes a standard rclone CLI command remotely and streams or returns its output. Don't combine the `STREAM` return types with `Prefer: respond-async`, because the 202 is sent before the command runs.
          */
         post: operations["coreCommand"];
         delete?: never;
@@ -685,6 +685,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** @description Mount and VFS options can also be given as top-level keys. Rclone rejects any other key. */
         post: operations["mountMount"];
         delete?: never;
         options?: never;
@@ -1191,7 +1192,7 @@ export interface paths {
         put?: never;
         /**
          * Run batch of commands
-         * @description Run a batch of rclone rc commands concurrently.
+         * @description Run a batch of rclone rc commands concurrently. An input can set `_async` to run in the background, and its entry in `results` is then a job ID. Inputs have no headers, so they can't use `Prefer`.
          */
         post: operations["jobBatch"];
         delete?: never;
@@ -1371,7 +1372,7 @@ export interface paths {
         put?: never;
         /**
          * Purge directory
-         * @description Deletes a directory or container and all of its contents.
+         * @description Deletes a directory or container and all of its contents. This can take a long time, so run it in the background with `Prefer: respond-async` to avoid HTTP timeouts.
          */
         post: operations["operationsPurge"];
         delete?: never;
@@ -1451,7 +1452,7 @@ export interface paths {
         put?: never;
         /**
          * Sync source to destination
-         * @description Synchronises a source remote to a destination remote, making the destination match the source.
+         * @description Synchronises a source remote to a destination remote, making the destination match the source. This can take a long time, so run it in the background with `Prefer: respond-async` to avoid HTTP timeouts.
          */
         post: operations["syncSync"];
         delete?: never;
@@ -1471,7 +1472,7 @@ export interface paths {
         put?: never;
         /**
          * Copy source to destination
-         * @description Copies objects from a source remote to a destination remote without deleting destination files.
+         * @description Copies objects from a source remote to a destination remote without deleting destination files. This can take a long time, so run it in the background with `Prefer: respond-async` to avoid HTTP timeouts.
          */
         post: operations["syncCopy"];
         delete?: never;
@@ -1491,7 +1492,7 @@ export interface paths {
         put?: never;
         /**
          * Move source to destination
-         * @description Moves objects from a source remote to a destination remote, optionally cleaning up empty directories.
+         * @description Moves objects from a source remote to a destination remote, optionally cleaning up empty directories. This can take a long time, so run it in the background with `Prefer: respond-async` to avoid HTTP timeouts.
          */
         post: operations["syncMove"];
         delete?: never;
@@ -1651,7 +1652,7 @@ export interface paths {
         put?: never;
         /**
          * Start serve instance
-         * @description Launches a new `rclone serve` endpoint (http, webdav, ftp, etc.) with the provided parameters.
+         * @description Launches a new `rclone serve` endpoint (http, webdav, ftp, etc.) with the provided parameters. It also takes the options of the chosen server type, using the option names from `options/info`. Rclone rejects any other key.
          */
         post: operations["serveStart"];
         delete?: never;
@@ -1731,7 +1732,7 @@ export interface paths {
         put?: never;
         /**
          * Forget cached paths
-         * @description Evicts specific files or directories from the VFS directory cache.
+         * @description Evicts specific files or directories from the VFS directory cache. All values must be strings.
          */
         post: operations["vfsForget"];
         delete?: never;
@@ -1831,7 +1832,7 @@ export interface paths {
         put?: never;
         /**
          * Refresh directory cache
-         * @description Refreshes one or more directories in the VFS cache, optionally recursively.
+         * @description Refreshes one or more directories in the VFS cache, optionally recursively. All values must be strings.
          */
         post: operations["vfsRefresh"];
         delete?: never;
@@ -2022,6 +2023,7 @@ export interface components {
             Name: string;
             Options: components["schemas"]["ConfigProviderOption"][];
             Prefix: string;
+            Overview?: components["schemas"]["ConfigProviderOverview"];
         } & {
             [key: string]: unknown;
         };
@@ -2029,7 +2031,7 @@ export interface components {
             Long?: string;
             Name?: string;
             Opts?: {
-                [key: string]: unknown;
+                [key: string]: string;
             } | null;
             Short?: string;
         } & {
@@ -2116,12 +2118,13 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
-        /** @description Arbitrary JSON value. */
+        /** @description Value of the option, in whichever type the option uses. A tristate option is an object. */
         ConfigProviderOptionAny: string | number | boolean | unknown[] | {
-            [key: string]: unknown;
+            Value: boolean;
+            Valid: boolean;
         } | null;
         /** @enum {string} */
-        ConfigProviderOptionType: "Bits" | "bool" | "CommaSepList" | "Duration" | "Encoding" | "int" | "mtime|atime|btime|ctime" | "SizeSuffix" | "SpaceSepList" | "string" | "stringArray" | "Time" | "Tristate";
+        ConfigProviderOptionType: "Bits" | "bool" | "CommaSepList" | "Duration" | "Encoding" | "int" | "mtime|atime|btime|ctime" | "SizeSuffix" | "SpaceSepList" | "string" | "stringArray" | "Time" | "Tristate" | "float64";
         /** @description Progress metrics for an in-flight transfer. */
         CoreStatsTransfer: {
             /** @description Bytes transferred so far for this object. */
@@ -2185,6 +2188,25 @@ export interface components {
             /** @description Stats group for this call. */
             _group?: string;
         };
+        /** @description Summary of the backend from rclone's docs. Its fields are empty for backends without one. */
+        ConfigProviderOverview: {
+            Backend?: string;
+            Name?: string;
+            Tier?: string;
+            Maintainers?: string;
+            FeaturesScore?: number;
+            IntegrationTests?: string;
+            DataIntegrity?: string;
+            Performance?: string;
+            Adoption?: string;
+            Docs?: string;
+            Security?: string;
+            Virtual?: boolean;
+            Remote?: string;
+            Features?: string[] | null;
+            Hashes?: string[] | null;
+            Precision?: number;
+        };
     };
     responses: {
         /** @description Any error response (HTTP 4xx/5xx) */
@@ -2199,27 +2221,22 @@ export interface components {
         /** @description Results of the batch job execution. */
         JobBatchResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
                 "application/json": {
-                    /** @description Identifier for this rclone process. */
-                    executeId: string;
-                    /** @description ID of the async job. */
-                    jobid: number;
+                    /** @description One entry for each input, in order. Each is that command's result, its error, or a job ID if the input set `_async`. */
+                    results: {
+                        [key: string]: unknown;
+                    }[];
                 };
             };
-        };
-        /** @description Request succeeded with no response body. */
-        EmptyResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content?: never;
         };
         /** @description Request succeeded returning an empty JSON object. */
         EmptyObjectResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2229,6 +2246,7 @@ export interface components {
         /** @description Mount created successfully. */
         MountMountResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2241,6 +2259,7 @@ export interface components {
         /** @description Bisync completed with session details. */
         SyncBisyncResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2262,9 +2281,11 @@ export interface components {
                 };
             };
         };
-        /** @description Request accepted for async processing. Poll /job/status with the returned jobid. */
+        /** @description The call is running in the background, because the request sent `Prefer: respond-async`. Poll `job/status` with the job ID. A job can be queried for up to 1 minute after it finishes. */
         AsyncJobResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                "Preference-Applied": components["headers"]["PreferenceApplied"];
                 [name: string]: unknown;
             };
             content: {
@@ -2279,6 +2300,7 @@ export interface components {
         /** @description Supported rclone serve protocols. */
         ServeTypesResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2290,6 +2312,7 @@ export interface components {
         /** @description Echoes any supplied parameters, useful for testing RC connectivity. */
         RcNoopResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2301,6 +2324,7 @@ export interface components {
         /** @description Capabilities, supported hashes, and metadata for the specified remote. */
         OperationsFsinfoResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2309,9 +2333,7 @@ export interface components {
                         [key: string]: boolean;
                     };
                     Hashes: string[];
-                    MetadataInfo?: {
-                        [key: string]: unknown;
-                    } | null;
+                    MetadataInfo?: components["schemas"]["ConfigProviderMetadataInfo"] | null;
                     Name: string;
                     Precision: number;
                     Root: string;
@@ -2322,6 +2344,7 @@ export interface components {
         /** @description Hash algorithm used and the ordered hash lines emitted by `operations/hashsum`. */
         OperationsHashsumResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2334,6 +2357,7 @@ export interface components {
         /** @description Hash algorithm used and the hash value for a single file from `operations/hashsumfile`. */
         OperationsHashsumfileResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2348,6 +2372,7 @@ export interface components {
         /** @description Public sharing URL returned by `operations/publiclink`. */
         OperationsPubliclinkResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2360,6 +2385,7 @@ export interface components {
         /** @description Aggregate object counts and total size from `operations/size`. */
         OperationsSizeResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2373,6 +2399,7 @@ export interface components {
         /** @description Effective bandwidth limits in bytes per second and human readable form. */
         CoreBwlimitResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2384,22 +2411,24 @@ export interface components {
                 };
             };
         };
-        /** @description Outcome of a command executed with `core/command`, including streamed result. */
+        /** @description Outcome of a command run with `core/command`. With the default `returnType` this is JSON. The `STREAM` return types write the output to the body as plain text. */
         CoreCommandResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
                 "application/json": {
                     error: boolean;
                     result?: string | null;
-                    returnType?: string | null;
                 };
+                "text/plain": string;
             };
         };
         /** @description Locally accessible paths including mount points, user directories, and removable volumes. */
         CoreDisksResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2412,6 +2441,7 @@ export interface components {
         /** @description Disk usage summary for the requested directory. */
         CoreDuResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2428,6 +2458,7 @@ export interface components {
         /** @description Completed transfer records including size, status, and timestamps. */
         CoreTransferredResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2447,8 +2478,8 @@ export interface components {
                         size: number;
                         bytes: number;
                         checked: boolean;
-                        /** @enum {string} */
-                        what: "transferring" | "deleting" | "checking" | "importing" | "hashing" | "merging" | "listing" | "moving" | "renaming";
+                        /** @description What the transfer was doing, such as `transferring` or `checking`. Bisync adds values such as `listing file - Path1`, so this is free text. */
+                        what: string;
                         /** @description ISO8601 timestamp when the transfer started. */
                         started_at: string;
                         /** @description ISO8601 timestamp when the transfer completed. */
@@ -2465,6 +2496,7 @@ export interface components {
         /** @description Previous garbage collection target percentage returned after update. */
         DebugSetGcPercentResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2476,6 +2508,7 @@ export interface components {
         /** @description Previous mutex profiling sampling rate. */
         DebugSetMutexProfileFractionResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2487,6 +2520,7 @@ export interface components {
         /** @description Previous soft memory limit before the change. */
         DebugSetSoftMemoryLimitResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2498,6 +2532,7 @@ export interface components {
         /** @description Number of entries currently cached by the file system cache. */
         FscacheEntriesResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2509,6 +2544,7 @@ export interface components {
         /** @description Active mount points with source remote and mount time. */
         MountListmountsResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2525,6 +2561,7 @@ export interface components {
         /** @description List of mount backends available on this platform. */
         MountTypesResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2536,6 +2573,7 @@ export interface components {
         /** @description Metadata for every available RC command, including auth requirements. */
         RcListResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2543,10 +2581,11 @@ export interface components {
                     commands: ({
                         Path?: string;
                         Title?: string;
-                        AuthRequired?: boolean;
                         Help?: string;
                         NeedsRequest?: boolean;
                         NeedsResponse?: boolean;
+                        /** @description True if the call works without authentication. */
+                        NoAuth?: boolean;
                     } & {
                         [key: string]: unknown;
                     })[];
@@ -2556,6 +2595,7 @@ export interface components {
         /** @description Backend command output and any additional returned fields. */
         BackendCommandResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2570,6 +2610,7 @@ export interface components {
         /** @description Entire rclone configuration grouped by remote. */
         ConfigDumpResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2583,6 +2624,7 @@ export interface components {
         /** @description Configuration key/value pairs for the requested remote. */
         ConfigGetResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2596,6 +2638,7 @@ export interface components {
         /** @description Names of configured remotes. */
         ConfigListremotesResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2607,6 +2650,7 @@ export interface components {
         /** @description Status of the interactive OAuth authentication server. */
         ConfigOauthstatusResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2624,6 +2668,7 @@ export interface components {
         /** @description Paths to the config file, cache directory, and temporary directory. */
         ConfigPathsResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2637,6 +2682,7 @@ export interface components {
         /** @description Available backend providers and their metadata. */
         ConfigProvidersResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2650,6 +2696,7 @@ export interface components {
         /** @description rclone version, build information, and runtime details. */
         CoreVersionResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2684,6 +2731,7 @@ export interface components {
         /** @description Current transfer statistics including totals, rates, and recent activity. */
         CoreStatsResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2720,6 +2768,7 @@ export interface components {
         /** @description Identifiers of active and recently completed async jobs. */
         JobListResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2738,6 +2787,7 @@ export interface components {
         /** @description Detailed status for a background job, including timing, success flag, and optional output. */
         JobStatusResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2762,19 +2812,22 @@ export interface components {
                     output?: unknown;
                     /** @description Progress measurements supplied by the underlying command. */
                     progress?: unknown;
+                    /** @description Stats group of the job. */
+                    group: string;
                 };
             };
         };
         /** @description Quota and usage information from `operations/about`, including total, used, and free space. */
         OperationsAboutResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
                 "application/json": {
-                    total: number;
-                    used: number;
-                    free: number;
+                    total?: number;
+                    used?: number;
+                    free?: number;
                     trashed?: number;
                     other?: number;
                     objects?: number;
@@ -2784,6 +2837,7 @@ export interface components {
         /** @description Comparison summary from `operations/check`, including missing, matching, and differing files. */
         OperationsCheckResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2812,6 +2866,7 @@ export interface components {
         /** @description Directory listing entries from `operations/list`, mirroring the `lsjson` format. */
         OperationsListResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2857,6 +2912,7 @@ export interface components {
         /** @description Metadata for a single file or directory from `operations/stat`. */
         OperationsStatResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2901,6 +2957,7 @@ export interface components {
         /** @description Names of option blocks that can be queried with `options/get` or `options/info`. */
         OptionsBlocksResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2912,53 +2969,54 @@ export interface components {
         /** @description Current global option values keyed by block name. */
         OptionsGetResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
                 "application/json": {
-                    dlna: {
+                    dlna?: {
                         [key: string]: unknown;
                     };
-                    filter: {
+                    filter?: {
                         [key: string]: unknown;
                     };
-                    ftp: {
+                    ftp?: {
                         [key: string]: unknown;
                     };
-                    http: {
+                    http?: {
                         [key: string]: unknown;
                     };
-                    log: {
+                    log?: {
                         [key: string]: unknown;
                     };
-                    main: {
+                    main?: {
                         [key: string]: unknown;
                     };
-                    mount: {
+                    mount?: {
                         [key: string]: unknown;
                     };
-                    nfs: {
+                    nfs?: {
                         [key: string]: unknown;
                     };
-                    proxy: {
+                    proxy?: {
                         [key: string]: unknown;
                     };
-                    rc: {
+                    rc?: {
                         [key: string]: unknown;
                     };
-                    restic: {
+                    restic?: {
                         [key: string]: unknown;
                     };
-                    s3: {
+                    s3?: {
                         [key: string]: unknown;
                     };
-                    sftp: {
+                    sftp?: {
                         [key: string]: unknown;
                     };
-                    vfs: {
+                    vfs?: {
                         [key: string]: unknown;
                     };
-                    webdav: {
+                    webdav?: {
                         [key: string]: unknown;
                     };
                 } & {
@@ -2969,6 +3027,7 @@ export interface components {
         /** @description Metadata describing available options, organised by block. */
         OptionsInfoResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -2996,6 +3055,7 @@ export interface components {
         /** @description Effective option values for the current request, separated into config and filter sections. */
         OptionsLocalResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -3106,6 +3166,11 @@ export interface components {
                         UseMmap: boolean;
                         UseServerModTime: boolean;
                         UserAgent: string;
+                        ListCutoff: number;
+                        ClientPass: string;
+                        MaxConnections: number;
+                        NameTransform: string[] | null;
+                        HTTPProxy: string;
                     };
                     filter: {
                         DeleteExcluded: boolean;
@@ -3132,6 +3197,7 @@ export interface components {
                         };
                         MinAge: number;
                         MinSize: number;
+                        FilesFrom0: string[] | null;
                     };
                 };
             };
@@ -3139,6 +3205,7 @@ export interface components {
         /** @description List of active `serve` instances, including their IDs, bind addresses, and parameters. */
         ServeListResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -3149,8 +3216,8 @@ export interface components {
                         /** @description Address and port the server is listening on. */
                         addr: string;
                         /** @description Serve configuration parameters supplied at startup. */
-                        params?: {
-                            fs: string;
+                        params: {
+                            fs: string | components["schemas"]["RemoteDefinition"];
                             type: string;
                             opt?: {
                                 [key: string]: unknown;
@@ -3168,6 +3235,7 @@ export interface components {
         /** @description Confirmation of a newly started server, including ID and bound address. */
         ServeStartResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -3182,6 +3250,7 @@ export interface components {
         /** @description Paths evicted from the VFS directory cache. */
         VfsForgetResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -3194,6 +3263,7 @@ export interface components {
         /** @description Identifiers for the VFS instances currently in use. */
         VfsListResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -3206,23 +3276,53 @@ export interface components {
         /** @description Status of the poll-interval setting, possibly including the new interval. */
         VfsPollIntervalResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
                 "application/json": {
-                    [key: string]: unknown;
+                    /** @description True if polling is on. */
+                    enabled: boolean;
+                    /** @description True if the remote supports polling. */
+                    supported: boolean;
+                    /** @description The polling interval. */
+                    interval: {
+                        /** @description Interval in nanoseconds. */
+                        raw: number;
+                        /** @description Interval in whole seconds. */
+                        seconds: number;
+                        /** @description Interval as text, such as `1m0s`. */
+                        string: string;
+                    };
+                    /** @description True if setting the interval timed out. Only present when setting it. */
+                    timeout?: boolean;
                 };
             };
         };
         /** @description Upload queue entries for the selected VFS. */
         VfsQueueResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
                 "application/json": {
-                    queued?: {
-                        [key: string]: unknown;
+                    /** @description Files waiting to upload. Absent when the VFS has no cache. */
+                    queue?: {
+                        /** @description Full path of the file. */
+                        name: string;
+                        /** @description Queue item ID, for `vfs/queue-set-expiry`. */
+                        id: number;
+                        /** @description Size in bytes. */
+                        size: number;
+                        /** @description Seconds until the file is eligible for transfer. */
+                        expiry: number;
+                        /** @description Upload attempts so far. */
+                        tries: number;
+                        /** @description Delay between upload attempts in seconds. */
+                        delay: number;
+                        /** @description True if the file is uploading now. */
+                        uploading: boolean;
                     }[];
                 };
             };
@@ -3230,6 +3330,7 @@ export interface components {
         /** @description Acknowledgement of directories refreshed in the VFS cache. */
         VfsRefreshResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -3244,6 +3345,7 @@ export interface components {
         /** @description Runtime statistics for a VFS, including disk cache and metadata cache state. */
         VfsStatsResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -3254,15 +3356,67 @@ export interface components {
                     inUse: number;
                     /** @description Disk cache metrics when caching is enabled. */
                     diskCache?: {
-                        [key: string]: unknown;
+                        /** @description Bytes used by the cache. */
+                        bytesUsed?: number;
+                        /** @description Files with errors. */
+                        erroredFiles?: number;
+                        /** @description Files in the cache. */
+                        files?: number;
+                        /** @description Internal number of the hash the cache uses. */
+                        hashType?: number;
+                        /** @description True if the cache has run out of space. */
+                        outOfSpace?: boolean;
+                        /** @description Directory of the cached data. */
+                        path?: string;
+                        /** @description Directory of the cached metadata. */
+                        pathMeta?: string;
+                        /** @description Uploads running now. */
+                        uploadsInProgress?: number;
+                        /** @description Uploads waiting to run. */
+                        uploadsQueued?: number;
                     } | null;
                     /** @description In-memory metadata cache counters. */
                     metadataCache: {
-                        [key: string]: number;
+                        /** @description Directories cached. */
+                        dirs?: number;
+                        /** @description Files cached. */
+                        files?: number;
                     };
-                    /** @description Effective options applied to the VFS. */
+                    /** @description Effective options of the VFS. Durations are in nanoseconds, and sizes are in bytes. */
                     opt: {
-                        [key: string]: unknown;
+                        NoSeek?: boolean;
+                        NoChecksum?: boolean;
+                        ReadOnly?: boolean;
+                        Links?: boolean;
+                        NoModTime?: boolean;
+                        DirCacheTime?: number;
+                        Refresh?: boolean;
+                        PollInterval?: number;
+                        Umask?: number;
+                        UID?: number;
+                        GID?: number;
+                        DirPerms?: number;
+                        FilePerms?: number;
+                        LinkPerms?: number;
+                        ChunkSize?: number;
+                        ChunkSizeLimit?: number;
+                        ChunkStreams?: number;
+                        CacheMode?: number;
+                        CacheMaxAge?: number;
+                        CacheMaxSize?: number;
+                        CacheMinFreeSpace?: number;
+                        CachePollInterval?: number;
+                        CaseInsensitive?: boolean;
+                        BlockNormDupes?: boolean;
+                        WriteWait?: number;
+                        ReadWait?: number;
+                        WriteBack?: number;
+                        ReadAhead?: number;
+                        UsedIsSize?: boolean;
+                        FastFingerprint?: boolean;
+                        DiskSpaceTotalSize?: number;
+                        HandleCaching?: number;
+                        MetadataExtension?: string;
                     };
                 };
             };
@@ -3270,6 +3424,7 @@ export interface components {
         /** @description Loaded plugin metadata for the requested MIME type. */
         PluginsctlGetPluginsForTypeResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -3292,6 +3447,7 @@ export interface components {
         /** @description Lists installed production and test plugins with their metadata. */
         PluginsctlListPluginsResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -3301,7 +3457,7 @@ export interface components {
                         [key: string]: unknown;
                     }[];
                     /** @description Metadata entries for installed test plugins. */
-                    testPlugins: {
+                    loadedTestPlugins: {
                         [key: string]: unknown;
                     }[];
                 };
@@ -3310,6 +3466,7 @@ export interface components {
         /** @description Metadata for installed test plugins keyed by repository name. */
         PluginsctlListTestPluginsResponse: {
             headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
                 [name: string]: unknown;
             };
             content: {
@@ -3323,9 +3480,89 @@ export interface components {
                 };
             };
         };
+        /** @description Statistics for the cache remote. */
+        CacheStatsResponse: {
+            headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    /** @description Always `ok`. */
+                    status: string;
+                    /** @description Cache statistics. */
+                    stats: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        /** @description Confirmation that the path was cleared. */
+        CacheExpireResponse: {
+            headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    /** @description Always `ok`. */
+                    status: string;
+                    /** @description Describes what was cleared. */
+                    message: string;
+                };
+            };
+        };
+        /** @description What was fetched for each file. */
+        CacheFetchResponse: {
+            headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    /** @description Results keyed by file name. */
+                    status: {
+                        [key: string]: {
+                            /** @description Error message, or an empty string. */
+                            Error: string;
+                            /** @description Number of chunks fetched. */
+                            FetchedChunks: number;
+                        };
+                    };
+                };
+            };
+        };
+        /** @description An empty object, unless `opt.nonInteractive` is set. Then it describes the next step of the configuration. */
+        ConfigStepResponse: {
+            headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    /** @description State to send back to continue. */
+                    State?: string;
+                    /** @description The next question, if there is one. */
+                    Option?: components["schemas"]["ConfigProviderOption"] | null;
+                    /** @description Error to show to the user. */
+                    Error?: string;
+                    /** @description Result to send back to continue. */
+                    Result?: string;
+                };
+            };
+        };
+        /** @description Missing or wrong credentials. The auth layer sends this as plain text, before rclone's JSON errors apply. */
+        UnauthorizedResponse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "text/plain": string;
+            };
+        };
     };
     parameters: {
-        /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+        /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
         PreferAsyncHeader: "respond-async";
         /** @description Assign the request to a custom stats group. */
         GlobalGroupParam: string;
@@ -3339,7 +3576,12 @@ export interface components {
         UploadfileFilterParam: string;
     };
     requestBodies: never;
-    headers: never;
+    headers: {
+        /** @description ID of the job that ran this call. Streamed responses may not include it. */
+        RcloneJobId: string;
+        /** @description Confirms that the `Prefer` header was applied. */
+        PreferenceApplied: "respond-async";
+    };
     pathItems: never;
 }
 export type $defs = Record<string, never>;
@@ -3348,7 +3590,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3364,6 +3606,7 @@ export interface operations {
         responses: {
             200: components["responses"]["RcNoopResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3372,7 +3615,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3389,6 +3632,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3397,7 +3641,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3420,6 +3664,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3428,7 +3673,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3453,6 +3698,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3461,7 +3707,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3478,6 +3724,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3486,7 +3733,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3505,6 +3752,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3513,7 +3761,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3530,6 +3778,7 @@ export interface operations {
         responses: {
             200: components["responses"]["OperationsFsinfoResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3538,7 +3787,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3561,6 +3810,7 @@ export interface operations {
         responses: {
             200: components["responses"]["OperationsHashsumResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3569,7 +3819,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3594,6 +3844,7 @@ export interface operations {
         responses: {
             200: components["responses"]["OperationsHashsumfileResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3602,7 +3853,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3625,6 +3876,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3633,7 +3885,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3656,6 +3908,7 @@ export interface operations {
         responses: {
             200: components["responses"]["OperationsPubliclinkResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3664,7 +3917,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3685,6 +3938,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3693,7 +3947,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3712,6 +3966,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3720,7 +3975,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3741,6 +3996,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3749,7 +4005,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3766,6 +4022,7 @@ export interface operations {
         responses: {
             200: components["responses"]["OperationsSizeResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3774,7 +4031,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3791,6 +4048,7 @@ export interface operations {
         responses: {
             200: components["responses"]["CoreBwlimitResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3799,7 +4057,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3824,6 +4082,7 @@ export interface operations {
         responses: {
             200: components["responses"]["CoreCommandResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3832,7 +4091,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3846,6 +4105,7 @@ export interface operations {
         responses: {
             200: components["responses"]["CoreDisksResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3854,7 +4114,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3871,6 +4131,7 @@ export interface operations {
         responses: {
             200: components["responses"]["CoreDuResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3879,7 +4140,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3893,6 +4154,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3901,7 +4163,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3916,15 +4178,18 @@ export interface operations {
             /** @description Names of stats groups. */
             200: {
                 headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        groups: string[];
+                        /** @description Names of the stats groups, or null when there are none. */
+                        groups: string[] | null;
                     };
                 };
             };
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3933,7 +4198,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3948,15 +4213,36 @@ export interface operations {
             /** @description Memory statistics fields from the Go runtime. */
             200: {
                 headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        [key: string]: number;
+                        Alloc: number;
+                        BuckHashSys: number;
+                        Frees: number;
+                        GCSys: number;
+                        HeapAlloc: number;
+                        HeapIdle: number;
+                        HeapInuse: number;
+                        HeapObjects: number;
+                        HeapReleased: number;
+                        HeapSys: number;
+                        MCacheInuse: number;
+                        MCacheSys: number;
+                        MSpanInuse: number;
+                        MSpanSys: number;
+                        Mallocs: number;
+                        OtherSys: number;
+                        StackInuse: number;
+                        StackSys: number;
+                        Sys: number;
+                        TotalAlloc: number;
                     };
                 };
             };
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -3965,7 +4251,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -3983,6 +4269,7 @@ export interface operations {
             /** @description Obscured string result. */
             200: {
                 headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -3992,6 +4279,7 @@ export interface operations {
                 };
             };
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4000,7 +4288,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4015,6 +4303,7 @@ export interface operations {
             /** @description Process ID payload. */
             200: {
                 headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
                     [name: string]: unknown;
                 };
                 content: {
@@ -4024,6 +4313,7 @@ export interface operations {
                 };
             };
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4032,7 +4322,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4049,6 +4339,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4057,7 +4348,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4074,6 +4365,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4082,7 +4374,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4099,6 +4391,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4107,7 +4400,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4124,6 +4417,7 @@ export interface operations {
         responses: {
             200: components["responses"]["CoreTransferredResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4132,7 +4426,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4149,6 +4443,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4157,7 +4452,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4174,6 +4469,7 @@ export interface operations {
         responses: {
             200: components["responses"]["DebugSetGcPercentResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4182,7 +4478,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4199,6 +4495,7 @@ export interface operations {
         responses: {
             200: components["responses"]["DebugSetMutexProfileFractionResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4207,7 +4504,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4224,6 +4521,7 @@ export interface operations {
         responses: {
             200: components["responses"]["DebugSetSoftMemoryLimitResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4232,7 +4530,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4246,6 +4544,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4254,7 +4553,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4268,6 +4567,7 @@ export interface operations {
         responses: {
             200: components["responses"]["FscacheEntriesResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4276,7 +4576,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4290,6 +4590,7 @@ export interface operations {
         responses: {
             200: components["responses"]["MountListmountsResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4298,7 +4599,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4306,23 +4607,30 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                "application/json": components["schemas"]["RcGlobalOptions"] & ({
                     /** @description Remote path to mount, such as `drive:` or `remote:subdir`. */
                     fs: string | components["schemas"]["RemoteDefinition"];
                     /** @description Absolute local path where the remote should be mounted. */
                     mountPoint: string;
                     /** @description Optional mount implementation to use (`mount`, `cmount`, or `mount2`). */
                     mountType?: string;
-                    /** @description Mount options encoded as JSON, matching flags accepted by `rclone mount`. */
-                    mountOpt?: string;
-                    /** @description VFS options encoded as JSON, matching flags accepted by `rclone mount`. */
-                    vfsOpt?: string;
-                };
+                    /** @description Mount options, using the option names from `options/info`. */
+                    mountOpt?: {
+                        [key: string]: unknown;
+                    };
+                    /** @description VFS options, using the option names from `options/info`. */
+                    vfsOpt?: {
+                        [key: string]: unknown;
+                    };
+                } & {
+                    [key: string]: unknown;
+                });
             };
         };
         responses: {
             200: components["responses"]["MountMountResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4331,7 +4639,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4345,6 +4653,7 @@ export interface operations {
         responses: {
             200: components["responses"]["MountTypesResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4353,7 +4662,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4370,6 +4679,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4378,7 +4688,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4392,6 +4702,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4400,7 +4711,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4416,6 +4727,7 @@ export interface operations {
         responses: {
             200: components["responses"]["RcNoopResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4424,7 +4736,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4438,8 +4750,8 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4448,7 +4760,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4462,6 +4774,7 @@ export interface operations {
         responses: {
             200: components["responses"]["RcListResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4470,7 +4783,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4495,6 +4808,7 @@ export interface operations {
         responses: {
             200: components["responses"]["BackendCommandResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4503,7 +4817,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4514,14 +4828,15 @@ export interface operations {
                 "application/json": components["schemas"]["RcGlobalOptions"] & {
                     /** @description Remote path to expire from the cache, e.g. `remote:path/to/dir`. */
                     remote: string;
-                    /** @description Set to true to drop cached chunk data along with directory entries. */
+                    /** @description Set this to drop cached chunk data along with directory entries. Rclone only checks whether the key is present, so any value turns it on, including `false`. */
                     withData?: boolean;
                 };
             };
         };
         responses: {
-            200: components["responses"]["EmptyResponse"];
+            200: components["responses"]["CacheExpireResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4530,25 +4845,28 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
                 "application/json": components["schemas"]["RcGlobalOptions"] & ({
                     /** @description Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch. */
-                    chunks?: string;
+                    chunks: string;
+                    /** @description File to fetch chunks of. Add more with keys that start with `file`, such as `file2`. */
+                    file?: string;
                 } & {
-                    [key: string]: unknown;
+                    [key: string]: string;
                 });
             };
         };
         responses: {
-            200: components["responses"]["EmptyResponse"];
+            200: components["responses"]["CacheFetchResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4557,7 +4875,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4569,8 +4887,9 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyResponse"];
+            200: components["responses"]["CacheStatsResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4579,7 +4898,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4611,8 +4930,9 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyObjectResponse"];
+            200: components["responses"]["ConfigStepResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4621,7 +4941,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4636,8 +4956,9 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyResponse"];
+            200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4646,7 +4967,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4660,6 +4981,7 @@ export interface operations {
         responses: {
             200: components["responses"]["ConfigDumpResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4668,7 +4990,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4685,6 +5007,7 @@ export interface operations {
         responses: {
             200: components["responses"]["ConfigGetResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4693,7 +5016,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4707,6 +5030,7 @@ export interface operations {
         responses: {
             200: components["responses"]["ConfigListremotesResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4715,7 +5039,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4729,6 +5053,7 @@ export interface operations {
         responses: {
             200: components["responses"]["ConfigOauthstatusResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4737,7 +5062,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4751,6 +5076,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4759,7 +5085,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4778,8 +5104,9 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyResponse"];
+            200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4788,7 +5115,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4802,6 +5129,7 @@ export interface operations {
         responses: {
             200: components["responses"]["ConfigPathsResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4810,7 +5138,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4824,6 +5152,7 @@ export interface operations {
         responses: {
             200: components["responses"]["ConfigProvidersResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4832,7 +5161,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4847,8 +5176,9 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyResponse"];
+            200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4857,7 +5187,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4872,8 +5202,9 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyResponse"];
+            200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4882,7 +5213,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4912,8 +5243,9 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyObjectResponse"];
+            200: components["responses"]["ConfigStepResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4922,7 +5254,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4936,6 +5268,7 @@ export interface operations {
         responses: {
             200: components["responses"]["CoreVersionResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4944,7 +5277,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4963,6 +5296,7 @@ export interface operations {
         responses: {
             200: components["responses"]["CoreStatsResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -4971,7 +5305,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -4999,6 +5333,7 @@ export interface operations {
         responses: {
             200: components["responses"]["JobBatchResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5007,7 +5342,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5021,6 +5356,7 @@ export interface operations {
         responses: {
             200: components["responses"]["JobListResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5029,7 +5365,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5046,6 +5382,7 @@ export interface operations {
         responses: {
             200: components["responses"]["JobStatusResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5054,7 +5391,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5071,6 +5408,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5079,7 +5417,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5096,6 +5434,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5104,7 +5443,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5136,6 +5475,7 @@ export interface operations {
         responses: {
             200: components["responses"]["OperationsListResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5144,7 +5484,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5176,6 +5516,7 @@ export interface operations {
         responses: {
             200: components["responses"]["OperationsStatResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5184,7 +5525,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5201,6 +5542,7 @@ export interface operations {
         responses: {
             200: components["responses"]["OperationsAboutResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5231,6 +5573,7 @@ export interface operations {
         };
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5239,7 +5582,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5258,6 +5601,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5266,7 +5610,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5285,6 +5629,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5293,7 +5638,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5312,6 +5657,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5320,7 +5666,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5329,7 +5675,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["RcGlobalOptions"] & {
-                    /** @description Source remote name or path to verify, e.g. `drive:`. */
+                    /** @description Source remote name or path to verify, e.g. `drive:`. Required unless `checkFileHash` is set. */
                     srcFs?: string | components["schemas"]["RemoteDefinition"];
                     /** @description Destination remote name or path that should match the source. */
                     dstFs: string | components["schemas"]["RemoteDefinition"];
@@ -5361,6 +5707,7 @@ export interface operations {
         responses: {
             200: components["responses"]["OperationsCheckResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5369,7 +5716,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5390,6 +5737,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5398,7 +5746,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5419,6 +5767,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5427,7 +5776,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5450,6 +5799,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5458,7 +5808,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5516,6 +5866,7 @@ export interface operations {
         responses: {
             200: components["responses"]["SyncBisyncResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5524,7 +5875,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5538,6 +5889,7 @@ export interface operations {
         responses: {
             200: components["responses"]["OptionsBlocksResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5546,7 +5898,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5563,6 +5915,7 @@ export interface operations {
         responses: {
             200: components["responses"]["OptionsGetResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5571,7 +5924,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5588,6 +5941,7 @@ export interface operations {
         responses: {
             200: components["responses"]["OptionsInfoResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5596,7 +5950,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5675,6 +6029,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5683,7 +6038,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5697,6 +6052,7 @@ export interface operations {
         responses: {
             200: components["responses"]["OptionsLocalResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5705,7 +6061,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5719,6 +6075,7 @@ export interface operations {
         responses: {
             200: components["responses"]["ServeListResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5727,7 +6084,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5750,6 +6107,7 @@ export interface operations {
         responses: {
             200: components["responses"]["ServeStartResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5758,7 +6116,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5775,6 +6133,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5783,7 +6142,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5797,6 +6156,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5805,7 +6165,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5819,6 +6179,7 @@ export interface operations {
         responses: {
             200: components["responses"]["ServeTypesResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5827,7 +6188,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5838,14 +6199,19 @@ export interface operations {
                 "application/json": components["schemas"]["RcGlobalOptions"] & ({
                     /** @description Optional VFS identifier to target; required when more than one VFS is active. */
                     fs?: string;
+                    /** @description File to forget. Add more with keys that start with `file`, such as `file2`. */
+                    file?: string;
+                    /** @description Directory to forget. Add more with keys that start with `dir`, such as `dir2`. */
+                    dir?: string;
                 } & {
-                    [key: string]: unknown;
+                    [key: string]: string;
                 });
             };
         };
         responses: {
             200: components["responses"]["VfsForgetResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5854,7 +6220,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5868,6 +6234,7 @@ export interface operations {
         responses: {
             200: components["responses"]["VfsListResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5876,7 +6243,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5897,6 +6264,7 @@ export interface operations {
         responses: {
             200: components["responses"]["VfsPollIntervalResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5905,7 +6273,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5922,6 +6290,7 @@ export interface operations {
         responses: {
             200: components["responses"]["VfsQueueResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5930,7 +6299,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5953,6 +6322,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5961,7 +6331,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -5977,14 +6347,17 @@ export interface operations {
                      * @enum {string}
                      */
                     recursive?: "true" | "false";
+                    /** @description Directory to refresh. Add more with keys that start with `dir`, such as `dir2`. */
+                    dir?: string;
                 } & {
-                    [key: string]: unknown;
+                    [key: string]: string;
                 });
             };
         };
         responses: {
             200: components["responses"]["VfsRefreshResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -5993,7 +6366,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -6010,6 +6383,7 @@ export interface operations {
         responses: {
             200: components["responses"]["VfsStatsResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6018,7 +6392,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -6037,6 +6411,7 @@ export interface operations {
         responses: {
             200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6045,7 +6420,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -6064,6 +6439,7 @@ export interface operations {
         responses: {
             200: components["responses"]["PluginsctlGetPluginsForTypeResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6072,7 +6448,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -6086,6 +6462,7 @@ export interface operations {
         responses: {
             200: components["responses"]["PluginsctlListPluginsResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6094,7 +6471,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -6108,6 +6485,7 @@ export interface operations {
         responses: {
             200: components["responses"]["PluginsctlListTestPluginsResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6116,7 +6494,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -6131,8 +6509,9 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyResponse"];
+            200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6141,7 +6520,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -6156,8 +6535,9 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyResponse"];
+            200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };
@@ -6166,7 +6546,7 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
-                /** @description Set to "respond-async" with _async=true to receive HTTP 202 instead of 200. */
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
                 Prefer?: components["parameters"]["PreferAsyncHeader"];
             };
             path?: never;
@@ -6186,15 +6566,18 @@ export interface operations {
             /** @description The keys that were removed. */
             200: {
                 headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        removed?: string[];
+                        /** @description The keys that were removed, or null if none were. */
+                        removed: string[] | null;
                     };
                 };
             };
             202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
             "5XX": components["responses"]["RcError"];
         };

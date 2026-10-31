@@ -63,6 +63,7 @@ const OPEN_MAPS = {
     'job/status': ['.output'],
     'backend/command': ['.result'],
     'job/batch': ['.results[]'],
+    'cache/stats': ['.stats'],
 }
 
 // --- Getting rclone -----------------------------------------------------------
@@ -326,6 +327,8 @@ await hit('config/get', { name: 't' })
 await hit('config/update', { name: 't', parameters: { remote: DST } })
 await hit('config/update', { name: 't', parameters: { remote: SRC }, opt: { nonInteractive: true } }, 'config/update nonInteractive')
 await hit('config/create', { name: 't2', type: 'alias', parameters: { remote: SRC }, opt: { nonInteractive: true } }, 'config/create nonInteractive')
+await hit('config/create', { name: 't3', type: 'drive', parameters: {}, opt: { nonInteractive: true } }, 'config/create with a question')
+await call('config/delete', { name: 't3' })
 await hit('config/password', { name: 't', parameters: {} })
 await hit('config/unset', { name: 't', keys: ['nope'] })
 await hit('config/delete', { name: 't' })
@@ -439,6 +442,7 @@ if (unknownOption.status < 400) problem('serve/start: it accepted an unknown opt
 const CACHED = join(work, 'cached')
 mkdirSync(CACHED)
 const webdav = await hit('serve/start', { type: 'webdav', fs: CACHED, addr: '127.0.0.1:0', vfs_cache_mode: 'full', vfs_write_back: '1h' }, 'serve/start webdav')
+await hit('vfs/queue', { fs: CACHED }, 'vfs/queue empty')
 if (webdav.json?.addr) {
     await fetch(`http://${webdav.json.addr}/queued.txt`, { method: 'PUT', body: 'queued' })
     await sleep(300)
@@ -639,3 +643,4 @@ if (problems.length) {
     process.exit(1)
 }
 console.log('The spec matches rclone.')
+process.exit(0)

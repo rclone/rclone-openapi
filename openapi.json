@@ -3,10 +3,10 @@
   "info": {
     "title": "Rclone RC API",
     "version": "1.75.0",
-    "description": "Full OpenAPI specification for the Rclone RC API.",
+    "description": "OpenAPI specification for the rclone RC API. Each release describes exactly one rclone version, shown in `info.version`.\n\n## Scope\n\nThis covers the `POST` RC commands with JSON bodies. It doesn't cover rclone's file serving, `/metrics` or the web GUI.\n\nRclone also accepts these params in the query string or a form-encoded body, and an `_async` param. This spec leaves those out on purpose, so that each field has one documented form and `required` can be enforced. The exception is `operations/uploadfile`, whose params can only go in the query string.\n\nA request with `Content-Type: application/json` and an empty body returns a 400. Send `{}`, or leave the header out. JSON bodies always cause a browser preflight, which rclone answers when `--rc-allow-origin` is set.\n\n## Running calls in the background\n\nSend `Prefer: respond-async` to run a call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. Rclone's `_async` param has the same effect, but on its own it returns a 200 with the job ID rather than the route's normal body. That can't be described here, so routes don't list it. The exception is `job/batch` inputs, which have no headers and use `_async` instead.\n\n## What depends on the server\n\n- `cache/*` only exists after a cache remote is created.\n- `pluginsctl/*` only works with the web GUI.\n- `mount/*` and the option blocks depend on how rclone was built.\n- `backend/command` results depend on the backend.\n",
     "contact": {
       "name": "GitHub Repository",
-      "url": "https://github.com/rclone-ui/rclone-openapi"
+      "url": "https://github.com/rclone/rclone-openapi"
     },
     "license": {
       "name": "MIT",
@@ -53,6 +53,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -113,6 +116,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -196,6 +202,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -276,6 +285,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -335,6 +347,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -401,6 +416,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -460,6 +478,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -533,6 +554,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -611,6 +635,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -694,6 +721,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -767,6 +797,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -836,6 +869,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -900,6 +936,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -971,6 +1010,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -1031,6 +1073,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -1080,6 +1125,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -1093,7 +1141,7 @@
     "/core/command": {
       "post": {
         "summary": "Run an rclone command",
-        "description": "Executes a standard rclone CLI command remotely and streams or returns its output.",
+        "description": "Executes a standard rclone CLI command remotely and streams or returns its output. Don't combine the `STREAM` return types with `Prefer: respond-async`, because the 202 is sent before the command runs.",
         "tags": [],
         "parameters": [
           {
@@ -1152,6 +1200,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -1187,6 +1238,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -1237,6 +1291,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -1272,6 +1329,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -1311,10 +1371,14 @@
                   "type": "object",
                   "properties": {
                     "groups": {
-                      "type": "array",
+                      "type": [
+                        "array",
+                        "null"
+                      ],
                       "items": {
                         "type": "string"
-                      }
+                      },
+                      "description": "Names of the stats groups, or null when there are none."
                     }
                   },
                   "required": [
@@ -1322,10 +1386,18 @@
                   ]
                 }
               }
+            },
+            "headers": {
+              "x-rclone-jobid": {
+                "$ref": "#/components/headers/RcloneJobId"
+              }
             }
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -1363,15 +1435,104 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "additionalProperties": {
-                    "type": "number"
-                  }
+                  "properties": {
+                    "Alloc": {
+                      "type": "integer"
+                    },
+                    "BuckHashSys": {
+                      "type": "integer"
+                    },
+                    "Frees": {
+                      "type": "integer"
+                    },
+                    "GCSys": {
+                      "type": "integer"
+                    },
+                    "HeapAlloc": {
+                      "type": "integer"
+                    },
+                    "HeapIdle": {
+                      "type": "integer"
+                    },
+                    "HeapInuse": {
+                      "type": "integer"
+                    },
+                    "HeapObjects": {
+                      "type": "integer"
+                    },
+                    "HeapReleased": {
+                      "type": "integer"
+                    },
+                    "HeapSys": {
+                      "type": "integer"
+                    },
+                    "MCacheInuse": {
+                      "type": "integer"
+                    },
+                    "MCacheSys": {
+                      "type": "integer"
+                    },
+                    "MSpanInuse": {
+                      "type": "integer"
+                    },
+                    "MSpanSys": {
+                      "type": "integer"
+                    },
+                    "Mallocs": {
+                      "type": "integer"
+                    },
+                    "OtherSys": {
+                      "type": "integer"
+                    },
+                    "StackInuse": {
+                      "type": "integer"
+                    },
+                    "StackSys": {
+                      "type": "integer"
+                    },
+                    "Sys": {
+                      "type": "integer"
+                    },
+                    "TotalAlloc": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "Alloc",
+                    "BuckHashSys",
+                    "Frees",
+                    "GCSys",
+                    "HeapAlloc",
+                    "HeapIdle",
+                    "HeapInuse",
+                    "HeapObjects",
+                    "HeapReleased",
+                    "HeapSys",
+                    "MCacheInuse",
+                    "MCacheSys",
+                    "MSpanInuse",
+                    "MSpanSys",
+                    "Mallocs",
+                    "OtherSys",
+                    "StackInuse",
+                    "StackSys",
+                    "Sys",
+                    "TotalAlloc"
+                  ]
                 }
+              }
+            },
+            "headers": {
+              "x-rclone-jobid": {
+                "$ref": "#/components/headers/RcloneJobId"
               }
             }
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -1436,10 +1597,18 @@
                   ]
                 }
               }
+            },
+            "headers": {
+              "x-rclone-jobid": {
+                "$ref": "#/components/headers/RcloneJobId"
+              }
             }
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -1487,10 +1656,18 @@
                   ]
                 }
               }
+            },
+            "headers": {
+              "x-rclone-jobid": {
+                "$ref": "#/components/headers/RcloneJobId"
+              }
             }
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -1541,6 +1718,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -1589,6 +1769,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -1639,6 +1822,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -1687,6 +1873,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -1739,6 +1928,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -1790,6 +1982,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -1840,6 +2035,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -1899,6 +2097,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -1932,6 +2133,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -1967,6 +2171,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -2000,6 +2207,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2050,18 +2260,21 @@
                         "description": "Optional mount implementation to use (`mount`, `cmount`, or `mount2`)."
                       },
                       "mountOpt": {
-                        "type": "string",
-                        "description": "Mount options encoded as JSON, matching flags accepted by `rclone mount`."
+                        "type": "object",
+                        "additionalProperties": true,
+                        "description": "Mount options, using the option names from `options/info`."
                       },
                       "vfsOpt": {
-                        "type": "string",
-                        "description": "VFS options encoded as JSON, matching flags accepted by `rclone mount`."
+                        "type": "object",
+                        "additionalProperties": true,
+                        "description": "VFS options, using the option names from `options/info`."
                       }
                     },
                     "required": [
                       "fs",
                       "mountPoint"
-                    ]
+                    ],
+                    "additionalProperties": true
                   }
                 ]
               }
@@ -2076,6 +2289,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -2083,7 +2299,8 @@
             "$ref": "#/components/responses/RcError"
           }
         },
-        "operationId": "mountMount"
+        "operationId": "mountMount",
+        "description": " Mount and VFS options can also be given as top-level keys. Rclone rejects any other key."
       }
     },
     "/mount/types": {
@@ -2109,6 +2326,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2161,6 +2381,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -2194,6 +2417,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2239,6 +2465,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -2277,11 +2506,11 @@
           }
         },
         "responses": {
-          "200": {
-            "$ref": "#/components/responses/EmptyResponse"
-          },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2318,6 +2547,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2398,6 +2630,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -2435,7 +2670,7 @@
                       },
                       "withData": {
                         "type": "boolean",
-                        "description": "Set to true to drop cached chunk data along with directory entries."
+                        "description": "Set this to drop cached chunk data along with directory entries. Rclone only checks whether the key is present, so any value turns it on, including `false`."
                       }
                     },
                     "required": [
@@ -2450,10 +2685,13 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyResponse"
+            "$ref": "#/components/responses/CacheExpireResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2489,21 +2727,34 @@
                       "chunks": {
                         "type": "string",
                         "description": "Comma-separated chunk specifier list (e.g. `0:10,25:30`) describing file pieces to prefetch."
+                      },
+                      "file": {
+                        "type": "string",
+                        "description": "File to fetch chunks of. Add more with keys that start with `file`, such as `file2`."
                       }
                     },
-                    "additionalProperties": true
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "required": [
+                      "chunks"
+                    ]
                   }
                 ]
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyResponse"
+            "$ref": "#/components/responses/CacheFetchResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2536,10 +2787,13 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyResponse"
+            "$ref": "#/components/responses/CacheStatsResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2630,10 +2884,13 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyObjectResponse"
+            "$ref": "#/components/responses/ConfigStepResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2683,10 +2940,13 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyResponse"
+            "$ref": "#/components/responses/EmptyObjectResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2723,6 +2983,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2777,6 +3040,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -2812,6 +3078,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2849,6 +3118,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -2884,6 +3156,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2939,10 +3214,13 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyResponse"
+            "$ref": "#/components/responses/EmptyObjectResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -2980,6 +3258,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -3015,6 +3296,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -3064,10 +3348,13 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyResponse"
+            "$ref": "#/components/responses/EmptyObjectResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -3117,10 +3404,13 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyResponse"
+            "$ref": "#/components/responses/EmptyObjectResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -3206,10 +3496,13 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyObjectResponse"
+            "$ref": "#/components/responses/ConfigStepResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -3246,6 +3539,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -3300,6 +3596,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -3313,7 +3612,7 @@
     "/job/batch": {
       "post": {
         "summary": "Run batch of commands",
-        "description": "Run a batch of rclone rc commands concurrently.",
+        "description": "Run a batch of rclone rc commands concurrently. An input can set `_async` to run in the background, and its entry in `results` is then a job ID. Inputs have no headers, so they can't use `Prefer`.",
         "tags": [],
         "parameters": [
           {
@@ -3378,6 +3677,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -3413,6 +3715,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -3467,6 +3772,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -3520,6 +3828,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -3572,6 +3883,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -3677,6 +3991,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -3781,6 +4098,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -3841,6 +4161,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -3885,6 +4208,9 @@
           "200": {
             "$ref": "#/components/responses/EmptyObjectResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -3898,7 +4224,7 @@
     "/operations/purge": {
       "post": {
         "summary": "Purge directory",
-        "description": "Deletes a directory or container and all of its contents.",
+        "description": "Deletes a directory or container and all of its contents. This can take a long time, so run it in the background with `Prefer: respond-async` to avoid HTTP timeouts.",
         "tags": [],
         "parameters": [
           {
@@ -3949,6 +4275,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -4015,6 +4344,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -4080,6 +4412,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -4120,7 +4455,7 @@
                             "$ref": "#/components/schemas/RemoteDefinition"
                           }
                         ],
-                        "description": "Source remote name or path to verify, e.g. `drive:`."
+                        "description": "Source remote name or path to verify, e.g. `drive:`. Required unless `checkFileHash` is set."
                       },
                       "dstFs": {
                         "anyOf": [
@@ -4202,6 +4537,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -4215,7 +4553,7 @@
     "/sync/sync": {
       "post": {
         "summary": "Sync source to destination",
-        "description": "Synchronises a source remote to a destination remote, making the destination match the source.",
+        "description": "Synchronises a source remote to a destination remote, making the destination match the source. This can take a long time, so run it in the background with `Prefer: respond-async` to avoid HTTP timeouts.",
         "tags": [],
         "parameters": [
           {
@@ -4278,6 +4616,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -4291,7 +4632,7 @@
     "/sync/copy": {
       "post": {
         "summary": "Copy source to destination",
-        "description": "Copies objects from a source remote to a destination remote without deleting destination files.",
+        "description": "Copies objects from a source remote to a destination remote without deleting destination files. This can take a long time, so run it in the background with `Prefer: respond-async` to avoid HTTP timeouts.",
         "tags": [],
         "parameters": [
           {
@@ -4354,6 +4695,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -4367,7 +4711,7 @@
     "/sync/move": {
       "post": {
         "summary": "Move source to destination",
-        "description": "Moves objects from a source remote to a destination remote, optionally cleaning up empty directories.",
+        "description": "Moves objects from a source remote to a destination remote, optionally cleaning up empty directories. This can take a long time, so run it in the background with `Prefer: respond-async` to avoid HTTP timeouts.",
         "tags": [],
         "parameters": [
           {
@@ -4433,6 +4777,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -4601,6 +4948,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -4636,6 +4986,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -4686,6 +5039,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -4734,6 +5090,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -4853,6 +5212,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -4888,6 +5250,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -4925,6 +5290,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -4938,7 +5306,7 @@
     "/serve/start": {
       "post": {
         "summary": "Start serve instance",
-        "description": "Launches a new `rclone serve` endpoint (http, webdav, ftp, etc.) with the provided parameters.",
+        "description": "Launches a new `rclone serve` endpoint (http, webdav, ftp, etc.) with the provided parameters. It also takes the options of the chosen server type, using the option names from `options/info`. Rclone rejects any other key.",
         "tags": [],
         "parameters": [
           {
@@ -4995,6 +5363,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -5048,6 +5419,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -5083,6 +5457,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -5120,6 +5497,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -5133,7 +5513,7 @@
     "/vfs/forget": {
       "post": {
         "summary": "Forget cached paths",
-        "description": "Evicts specific files or directories from the VFS directory cache.",
+        "description": "Evicts specific files or directories from the VFS directory cache. All values must be strings.",
         "tags": [],
         "parameters": [
           {
@@ -5154,9 +5534,19 @@
                       "fs": {
                         "type": "string",
                         "description": "Optional VFS identifier to target; required when more than one VFS is active."
+                      },
+                      "file": {
+                        "type": "string",
+                        "description": "File to forget. Add more with keys that start with `file`, such as `file2`."
+                      },
+                      "dir": {
+                        "type": "string",
+                        "description": "Directory to forget. Add more with keys that start with `dir`, such as `dir2`."
                       }
                     },
-                    "additionalProperties": true
+                    "additionalProperties": {
+                      "type": "string"
+                    }
                   }
                 ]
               }
@@ -5169,6 +5559,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -5205,6 +5598,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -5263,6 +5659,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -5311,6 +5710,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -5378,6 +5780,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -5391,7 +5796,7 @@
     "/vfs/refresh": {
       "post": {
         "summary": "Refresh directory cache",
-        "description": "Refreshes one or more directories in the VFS cache, optionally recursively.",
+        "description": "Refreshes one or more directories in the VFS cache, optionally recursively. All values must be strings.",
         "tags": [],
         "parameters": [
           {
@@ -5420,9 +5825,15 @@
                           "false"
                         ],
                         "description": "Must be the string `true` or `false`, not a JSON boolean."
+                      },
+                      "dir": {
+                        "type": "string",
+                        "description": "Directory to refresh. Add more with keys that start with `dir`, such as `dir2`."
                       }
                     },
-                    "additionalProperties": true
+                    "additionalProperties": {
+                      "type": "string"
+                    }
                   }
                 ]
               }
@@ -5435,6 +5846,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -5484,6 +5898,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -5544,6 +5961,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -5597,6 +6017,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -5633,6 +6056,9 @@
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
           "4XX": {
             "$ref": "#/components/responses/RcError"
           },
@@ -5668,6 +6094,9 @@
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -5717,10 +6146,13 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyResponse"
+            "$ref": "#/components/responses/EmptyObjectResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -5770,10 +6202,13 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyResponse"
+            "$ref": "#/components/responses/EmptyObjectResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -5838,18 +6273,33 @@
                   "type": "object",
                   "properties": {
                     "removed": {
-                      "type": "array",
+                      "type": [
+                        "array",
+                        "null"
+                      ],
                       "items": {
                         "type": "string"
-                      }
+                      },
+                      "description": "The keys that were removed, or null if none were."
                     }
-                  }
+                  },
+                  "required": [
+                    "removed"
+                  ]
                 }
+              }
+            },
+            "headers": {
+              "x-rclone-jobid": {
+                "$ref": "#/components/headers/RcloneJobId"
               }
             }
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
           },
           "4XX": {
             "$ref": "#/components/responses/RcError"
@@ -5867,7 +6317,7 @@
       "PreferAsyncHeader": {
         "name": "Prefer",
         "in": "header",
-        "description": "Set to \"respond-async\" with _async=true to receive HTTP 202 instead of 200.",
+        "description": "Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202.",
         "schema": {
           "type": "string",
           "enum": [
@@ -5936,25 +6386,26 @@
             "schema": {
               "type": "object",
               "properties": {
-                "executeId": {
-                  "type": "string",
-                  "description": "Identifier for this rclone process."
-                },
-                "jobid": {
-                  "type": "integer",
-                  "description": "ID of the async job."
+                "results": {
+                  "type": "array",
+                  "description": "One entry for each input, in order. Each is that command's result, its error, or a job ID if the input set `_async`.",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
                 }
               },
               "required": [
-                "executeId",
-                "jobid"
+                "results"
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
-      },
-      "EmptyResponse": {
-        "description": "Request succeeded with no response body."
       },
       "EmptyObjectResponse": {
         "description": "Request succeeded returning an empty JSON object.",
@@ -5963,6 +6414,11 @@
             "schema": {
               "type": "object"
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -5982,6 +6438,11 @@
                 "mountPoint"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6032,10 +6493,15 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "AsyncJobResponse": {
-        "description": "Request accepted for async processing. Poll /job/status with the returned jobid.",
+        "description": "The call is running in the background, because the request sent `Prefer: respond-async`. Poll `job/status` with the job ID. A job can be queried for up to 1 minute after it finishes.",
         "content": {
           "application/json": {
             "schema": {
@@ -6055,6 +6521,14 @@
                 "jobid"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          },
+          "Preference-Applied": {
+            "$ref": "#/components/headers/PreferenceApplied"
           }
         }
       },
@@ -6077,6 +6551,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "RcNoopResponse": {
@@ -6087,6 +6566,11 @@
               "type": "object",
               "additionalProperties": {}
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6110,11 +6594,14 @@
                   }
                 },
                 "MetadataInfo": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": true
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ConfigProviderMetadataInfo"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "Name": {
                   "type": "string"
@@ -6138,6 +6625,11 @@
                 "String"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6164,6 +6656,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "OperationsHashsumfileResponse": {
@@ -6188,6 +6685,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "OperationsPubliclinkResponse": {
@@ -6206,6 +6708,11 @@
                 "url"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6232,6 +6739,11 @@
                 "sizeless"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6263,10 +6775,15 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "CoreCommandResponse": {
-        "description": "Outcome of a command executed with `core/command`, including streamed result.",
+        "description": "Outcome of a command run with `core/command`. With the default `returnType` this is JSON. The `STREAM` return types write the output to the body as plain text.",
         "content": {
           "application/json": {
             "schema": {
@@ -6280,18 +6797,22 @@
                     "string",
                     "null"
                   ]
-                },
-                "returnType": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
                 }
               },
               "required": [
                 "error"
               ]
             }
+          },
+          "text/plain": {
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6314,6 +6835,11 @@
                 "disks"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6352,6 +6878,11 @@
                 "info"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6401,17 +6932,7 @@
                       },
                       "what": {
                         "type": "string",
-                        "enum": [
-                          "transferring",
-                          "deleting",
-                          "checking",
-                          "importing",
-                          "hashing",
-                          "merging",
-                          "listing",
-                          "moving",
-                          "renaming"
-                        ]
+                        "description": "What the transfer was doing, such as `transferring` or `checking`. Bisync adds values such as `listing file - Path1`, so this is free text."
                       },
                       "started_at": {
                         "type": "string",
@@ -6451,6 +6972,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "DebugSetGcPercentResponse": {
@@ -6468,6 +6994,11 @@
                 "existing-gc-percent"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6487,6 +7018,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "DebugSetSoftMemoryLimitResponse": {
@@ -6505,6 +7041,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "FscacheEntriesResponse": {
@@ -6522,6 +7063,11 @@
                 "entries"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6562,6 +7108,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "MountTypesResponse": {
@@ -6583,6 +7134,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "RcListResponse": {
@@ -6603,9 +7159,6 @@
                       "Title": {
                         "type": "string"
                       },
-                      "AuthRequired": {
-                        "type": "boolean"
-                      },
                       "Help": {
                         "type": "string"
                       },
@@ -6614,6 +7167,10 @@
                       },
                       "NeedsResponse": {
                         "type": "boolean"
+                      },
+                      "NoAuth": {
+                        "type": "boolean",
+                        "description": "True if the call works without authentication."
                       }
                     },
                     "additionalProperties": true
@@ -6624,6 +7181,11 @@
                 "commands"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6641,6 +7203,11 @@
               "additionalProperties": true
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "ConfigDumpResponse": {
@@ -6656,6 +7223,11 @@
                 }
               }
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6678,6 +7250,11 @@
               }
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "ConfigListremotesResponse": {
@@ -6698,6 +7275,11 @@
                 }
               }
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6726,6 +7308,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "ConfigPathsResponse": {
@@ -6752,6 +7339,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "ConfigProvidersResponse": {
@@ -6773,6 +7365,11 @@
                 "providers"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6847,6 +7444,11 @@
                 "goTags"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -6964,6 +7566,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "JobListResponse": {
@@ -7006,6 +7613,11 @@
                 "finishedIds"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -7053,6 +7665,10 @@
                 },
                 "progress": {
                   "description": "Progress measurements supplied by the underlying command."
+                },
+                "group": {
+                  "type": "string",
+                  "description": "Stats group of the job."
                 }
               },
               "required": [
@@ -7063,9 +7679,15 @@
                 "error",
                 "id",
                 "startTime",
-                "success"
+                "success",
+                "group"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -7094,13 +7716,13 @@
                 "objects": {
                   "type": "number"
                 }
-              },
-              "required": [
-                "total",
-                "used",
-                "free"
-              ]
+              }
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -7171,6 +7793,11 @@
                 "status"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -7260,6 +7887,11 @@
                 "list"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -7352,6 +7984,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "OptionsBlocksResponse": {
@@ -7373,6 +8010,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "OptionsGetResponse": {
@@ -7381,23 +8023,6 @@
           "application/json": {
             "schema": {
               "type": "object",
-              "required": [
-                "dlna",
-                "filter",
-                "ftp",
-                "http",
-                "log",
-                "main",
-                "mount",
-                "nfs",
-                "proxy",
-                "rc",
-                "restic",
-                "s3",
-                "sftp",
-                "vfs",
-                "webdav"
-              ],
               "properties": {
                 "dlna": {
                   "type": "object",
@@ -7462,6 +8087,11 @@
               },
               "additionalProperties": true
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -7570,6 +8200,11 @@
                 }
               }
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -7927,6 +8562,27 @@
                     },
                     "UserAgent": {
                       "type": "string"
+                    },
+                    "ListCutoff": {
+                      "type": "integer"
+                    },
+                    "ClientPass": {
+                      "type": "string"
+                    },
+                    "MaxConnections": {
+                      "type": "integer"
+                    },
+                    "NameTransform": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "HTTPProxy": {
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -8034,7 +8690,12 @@
                     "UseListR",
                     "UseMmap",
                     "UseServerModTime",
-                    "UserAgent"
+                    "UserAgent",
+                    "ListCutoff",
+                    "ClientPass",
+                    "MaxConnections",
+                    "NameTransform",
+                    "HTTPProxy"
                   ]
                 },
                 "filter": {
@@ -8163,6 +8824,15 @@
                     },
                     "MinSize": {
                       "type": "number"
+                    },
+                    "FilesFrom0": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": "string"
+                      }
                     }
                   },
                   "required": [
@@ -8182,7 +8852,8 @@
                     "MaxSize",
                     "MetaRules",
                     "MinAge",
-                    "MinSize"
+                    "MinSize",
+                    "FilesFrom0"
                   ]
                 }
               },
@@ -8191,6 +8862,11 @@
                 "filter"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -8217,13 +8893,19 @@
                       "params": {
                         "type": "object",
                         "required": [
-                          "id",
                           "fs",
                           "type"
                         ],
                         "properties": {
                           "fs": {
-                            "type": "string"
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/components/schemas/RemoteDefinition"
+                              }
+                            ]
                           },
                           "type": {
                             "type": "string"
@@ -8244,7 +8926,8 @@
                     "additionalProperties": false,
                     "required": [
                       "id",
-                      "addr"
+                      "addr",
+                      "params"
                     ]
                   }
                 }
@@ -8253,6 +8936,11 @@
                 "list"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -8278,6 +8966,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "VfsForgetResponse": {
@@ -8299,6 +8992,11 @@
                 "forgotten"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -8322,6 +9020,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "VfsPollIntervalResponse": {
@@ -8330,8 +9033,54 @@
           "application/json": {
             "schema": {
               "type": "object",
-              "additionalProperties": true
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "True if polling is on."
+                },
+                "supported": {
+                  "type": "boolean",
+                  "description": "True if the remote supports polling."
+                },
+                "interval": {
+                  "type": "object",
+                  "description": "The polling interval.",
+                  "properties": {
+                    "raw": {
+                      "type": "integer",
+                      "description": "Interval in nanoseconds."
+                    },
+                    "seconds": {
+                      "type": "integer",
+                      "description": "Interval in whole seconds."
+                    },
+                    "string": {
+                      "type": "string",
+                      "description": "Interval as text, such as `1m0s`."
+                    }
+                  },
+                  "required": [
+                    "raw",
+                    "seconds",
+                    "string"
+                  ]
+                },
+                "timeout": {
+                  "type": "boolean",
+                  "description": "True if setting the interval timed out. Only present when setting it."
+                }
+              },
+              "required": [
+                "enabled",
+                "supported",
+                "interval"
+              ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -8342,16 +9091,59 @@
             "schema": {
               "type": "object",
               "properties": {
-                "queued": {
+                "queue": {
                   "type": "array",
+                  "description": "Files waiting to upload. Absent when the VFS has no cache.",
                   "items": {
                     "type": "object",
-                    "additionalProperties": true,
-                    "description": "Queued item metadata such as name, size, expiry, and upload state."
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Full path of the file."
+                      },
+                      "id": {
+                        "type": "integer",
+                        "description": "Queue item ID, for `vfs/queue-set-expiry`."
+                      },
+                      "size": {
+                        "type": "integer",
+                        "description": "Size in bytes."
+                      },
+                      "expiry": {
+                        "type": "number",
+                        "description": "Seconds until the file is eligible for transfer."
+                      },
+                      "tries": {
+                        "type": "integer",
+                        "description": "Upload attempts so far."
+                      },
+                      "delay": {
+                        "type": "number",
+                        "description": "Delay between upload attempts in seconds."
+                      },
+                      "uploading": {
+                        "type": "boolean",
+                        "description": "True if the file is uploading now."
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "id",
+                      "size",
+                      "expiry",
+                      "tries",
+                      "delay",
+                      "uploading"
+                    ]
                   }
                 }
               }
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -8375,6 +9167,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "VfsStatsResponse": {
@@ -8397,20 +9194,164 @@
                     "object",
                     "null"
                   ],
-                  "additionalProperties": true,
-                  "description": "Disk cache metrics when caching is enabled."
+                  "description": "Disk cache metrics when caching is enabled.",
+                  "properties": {
+                    "bytesUsed": {
+                      "type": "integer",
+                      "description": "Bytes used by the cache."
+                    },
+                    "erroredFiles": {
+                      "type": "integer",
+                      "description": "Files with errors."
+                    },
+                    "files": {
+                      "type": "integer",
+                      "description": "Files in the cache."
+                    },
+                    "hashType": {
+                      "type": "integer",
+                      "description": "Internal number of the hash the cache uses."
+                    },
+                    "outOfSpace": {
+                      "type": "boolean",
+                      "description": "True if the cache has run out of space."
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "Directory of the cached data."
+                    },
+                    "pathMeta": {
+                      "type": "string",
+                      "description": "Directory of the cached metadata."
+                    },
+                    "uploadsInProgress": {
+                      "type": "integer",
+                      "description": "Uploads running now."
+                    },
+                    "uploadsQueued": {
+                      "type": "integer",
+                      "description": "Uploads waiting to run."
+                    }
+                  }
                 },
                 "metadataCache": {
                   "type": "object",
-                  "additionalProperties": {
-                    "type": "integer"
-                  },
-                  "description": "In-memory metadata cache counters."
+                  "description": "In-memory metadata cache counters.",
+                  "properties": {
+                    "dirs": {
+                      "type": "integer",
+                      "description": "Directories cached."
+                    },
+                    "files": {
+                      "type": "integer",
+                      "description": "Files cached."
+                    }
+                  }
                 },
                 "opt": {
                   "type": "object",
-                  "additionalProperties": true,
-                  "description": "Effective options applied to the VFS."
+                  "description": "Effective options of the VFS. Durations are in nanoseconds, and sizes are in bytes.",
+                  "properties": {
+                    "NoSeek": {
+                      "type": "boolean"
+                    },
+                    "NoChecksum": {
+                      "type": "boolean"
+                    },
+                    "ReadOnly": {
+                      "type": "boolean"
+                    },
+                    "Links": {
+                      "type": "boolean"
+                    },
+                    "NoModTime": {
+                      "type": "boolean"
+                    },
+                    "DirCacheTime": {
+                      "type": "integer"
+                    },
+                    "Refresh": {
+                      "type": "boolean"
+                    },
+                    "PollInterval": {
+                      "type": "integer"
+                    },
+                    "Umask": {
+                      "type": "integer"
+                    },
+                    "UID": {
+                      "type": "integer"
+                    },
+                    "GID": {
+                      "type": "integer"
+                    },
+                    "DirPerms": {
+                      "type": "integer"
+                    },
+                    "FilePerms": {
+                      "type": "integer"
+                    },
+                    "LinkPerms": {
+                      "type": "integer"
+                    },
+                    "ChunkSize": {
+                      "type": "integer"
+                    },
+                    "ChunkSizeLimit": {
+                      "type": "integer"
+                    },
+                    "ChunkStreams": {
+                      "type": "integer"
+                    },
+                    "CacheMode": {
+                      "type": "integer"
+                    },
+                    "CacheMaxAge": {
+                      "type": "integer"
+                    },
+                    "CacheMaxSize": {
+                      "type": "integer"
+                    },
+                    "CacheMinFreeSpace": {
+                      "type": "integer"
+                    },
+                    "CachePollInterval": {
+                      "type": "integer"
+                    },
+                    "CaseInsensitive": {
+                      "type": "boolean"
+                    },
+                    "BlockNormDupes": {
+                      "type": "boolean"
+                    },
+                    "WriteWait": {
+                      "type": "integer"
+                    },
+                    "ReadWait": {
+                      "type": "integer"
+                    },
+                    "WriteBack": {
+                      "type": "integer"
+                    },
+                    "ReadAhead": {
+                      "type": "integer"
+                    },
+                    "UsedIsSize": {
+                      "type": "boolean"
+                    },
+                    "FastFingerprint": {
+                      "type": "boolean"
+                    },
+                    "DiskSpaceTotalSize": {
+                      "type": "integer"
+                    },
+                    "HandleCaching": {
+                      "type": "integer"
+                    },
+                    "MetadataExtension": {
+                      "type": "string"
+                    }
+                  }
                 }
               },
               "required": [
@@ -8420,6 +9361,11 @@
                 "opt"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -8453,6 +9399,11 @@
               ]
             }
           }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
         }
       },
       "PluginsctlListPluginsResponse": {
@@ -8470,7 +9421,7 @@
                   },
                   "description": "Metadata entries for installed plugins."
                 },
-                "testPlugins": {
+                "loadedTestPlugins": {
                   "type": "array",
                   "items": {
                     "type": "object",
@@ -8481,9 +9432,14 @@
               },
               "required": [
                 "loadedPlugins",
-                "testPlugins"
+                "loadedTestPlugins"
               ]
             }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
           }
         }
       },
@@ -8506,6 +9462,161 @@
               "required": [
                 "loadedTestPlugins"
               ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "CacheStatsResponse": {
+        "description": "Statistics for the cache remote.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "description": "Always `ok`."
+                },
+                "stats": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "description": "Cache statistics."
+                }
+              },
+              "required": [
+                "status",
+                "stats"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "CacheExpireResponse": {
+        "description": "Confirmation that the path was cleared.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "description": "Always `ok`."
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Describes what was cleared."
+                }
+              },
+              "required": [
+                "status",
+                "message"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "CacheFetchResponse": {
+        "description": "What was fetched for each file.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "object",
+                  "description": "Results keyed by file name.",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "Error": {
+                        "type": "string",
+                        "description": "Error message, or an empty string."
+                      },
+                      "FetchedChunks": {
+                        "type": "integer",
+                        "description": "Number of chunks fetched."
+                      }
+                    },
+                    "required": [
+                      "Error",
+                      "FetchedChunks"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "status"
+              ]
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "ConfigStepResponse": {
+        "description": "An empty object, unless `opt.nonInteractive` is set. Then it describes the next step of the configuration.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "State": {
+                  "type": "string",
+                  "description": "State to send back to continue."
+                },
+                "Option": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ConfigProviderOption"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "The next question, if there is one."
+                },
+                "Error": {
+                  "type": "string",
+                  "description": "Error to show to the user."
+                },
+                "Result": {
+                  "type": "string",
+                  "description": "Result to send back to continue."
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "UnauthorizedResponse": {
+        "description": "Missing or wrong credentials. The auth layer sends this as plain text, before rclone's JSON errors apply.",
+        "content": {
+          "text/plain": {
+            "schema": {
+              "type": "string"
             }
           }
         }
@@ -8588,6 +9699,9 @@
           },
           "Prefix": {
             "type": "string"
+          },
+          "Overview": {
+            "$ref": "#/components/schemas/ConfigProviderOverview"
           }
         },
         "required": [
@@ -8612,7 +9726,9 @@
               "object",
               "null"
             ],
-            "additionalProperties": true
+            "additionalProperties": {
+              "type": "string"
+            }
           },
           "Short": {
             "type": "string"
@@ -8921,7 +10037,7 @@
         ]
       },
       "ConfigProviderOptionAny": {
-        "description": "Arbitrary JSON value.",
+        "description": "Value of the option, in whichever type the option uses. A tristate option is an object.",
         "anyOf": [
           {
             "type": "string"
@@ -8938,7 +10054,19 @@
           },
           {
             "type": "object",
-            "additionalProperties": true
+            "properties": {
+              "Value": {
+                "type": "boolean"
+              },
+              "Valid": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "Value",
+              "Valid"
+            ],
+            "additionalProperties": false
           },
           {
             "type": "null"
@@ -8960,7 +10088,8 @@
           "string",
           "stringArray",
           "Time",
-          "Tristate"
+          "Tristate",
+          "float64"
         ]
       },
       "CoreStatsTransfer": {
@@ -9078,6 +10207,89 @@
             "type": "string",
             "description": "Stats group for this call."
           }
+        }
+      },
+      "ConfigProviderOverview": {
+        "type": "object",
+        "description": "Summary of the backend from rclone's docs. Its fields are empty for backends without one.",
+        "properties": {
+          "Backend": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Tier": {
+            "type": "string"
+          },
+          "Maintainers": {
+            "type": "string"
+          },
+          "FeaturesScore": {
+            "type": "integer"
+          },
+          "IntegrationTests": {
+            "type": "string"
+          },
+          "DataIntegrity": {
+            "type": "string"
+          },
+          "Performance": {
+            "type": "string"
+          },
+          "Adoption": {
+            "type": "string"
+          },
+          "Docs": {
+            "type": "string"
+          },
+          "Security": {
+            "type": "string"
+          },
+          "Virtual": {
+            "type": "boolean"
+          },
+          "Remote": {
+            "type": "string"
+          },
+          "Features": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "Hashes": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "Precision": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "headers": {
+      "RcloneJobId": {
+        "description": "ID of the job that ran this call. Streamed responses may not include it.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "PreferenceApplied": {
+        "description": "Confirms that the `Prefer` header was applied.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "respond-async"
+          ]
         }
       }
     }

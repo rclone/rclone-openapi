@@ -98,8 +98,8 @@ var requiredOverride = map[string]string{
 
 // Response keys the parser finds that aren't top-level keys of the 200 response.
 var ignoredResponseKeys = map[string][]string{
-	"job/batch":   {"error", "input", "path", "status"}, // rc.Error, inside results items
-	"vfs/refresh": {""},                                 // result[""], inside the result map
+	"job/batch":   {"error", "input", "path", "status", "executeId", "jobid"}, // inside results items
+	"vfs/refresh": {""},                                                       // result[""], inside the result map
 }
 
 // Response keys in the spec that come from a struct or a closure the parser can't read.
