@@ -1211,7 +1211,7 @@ export interface paths {
         put?: never;
         /**
          * List jobs
-         * @description Returns identifiers of active and recently completed asynchronous jobs.
+         * @description Returns identifiers of active and recently completed asynchronous jobs. Since rclone 1.75.2 this call requires authentication, so a server with no credentials set up returns 403 unless it runs with `--rc-no-auth`.
          */
         post: operations["jobList"];
         delete?: never;
@@ -1231,7 +1231,7 @@ export interface paths {
         put?: never;
         /**
          * Get job status
-         * @description Returns timing, success state, output, and progress for a specific job.
+         * @description Returns timing, success state, output, and progress for a specific job. Since rclone 1.75.2 this call requires authentication, so a server with no credentials set up returns 403 unless it runs with `--rc-no-auth`.
          */
         post: operations["jobStatus"];
         delete?: never;

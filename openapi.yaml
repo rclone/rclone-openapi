@@ -1603,7 +1603,7 @@ paths:
   /job/list:
     post:
       summary: List jobs
-      description: Returns identifiers of active and recently completed asynchronous jobs.
+      description: Returns identifiers of active and recently completed asynchronous jobs. Since rclone 1.75.2 this call requires authentication, so a server with no credentials set up returns 403 unless it runs with `--rc-no-auth`.
       tags: []
       parameters:
         - $ref: "#/components/parameters/GlobalAsyncParam"
@@ -1626,7 +1626,7 @@ paths:
   /job/status:
     post:
       summary: Get job status
-      description: Returns timing, success state, output, and progress for a specific job.
+      description: Returns timing, success state, output, and progress for a specific job. Since rclone 1.75.2 this call requires authentication, so a server with no credentials set up returns 403 unless it runs with `--rc-no-auth`.
       tags: []
       parameters:
         - $ref: "#/components/parameters/Job_StatusPostJobidParam"
