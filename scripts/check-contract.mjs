@@ -33,17 +33,11 @@ const ERROR_ONLY = {
     '/config/oauthstop': 'needs an OAuth flow in progress',
     '/mount/unmount': 'needs a mounted filesystem',
     '/rc/error': 'always returns an error',
-    '/pluginsctl/getPluginsForType': 'needs --rc-web-gui, which downloads the GUI',
-    '/pluginsctl/listPlugins': 'needs --rc-web-gui, which downloads the GUI',
-    '/pluginsctl/listTestPlugins': 'needs --rc-web-gui, which downloads the GUI',
-    '/pluginsctl/removePlugin': 'needs --rc-web-gui, which downloads the GUI',
-    '/pluginsctl/removeTestPlugin': 'needs --rc-web-gui, which downloads the GUI',
 }
 
 // Routes the test never calls, with the reason.
 const NOT_CALLED = {
     '/mount/mount': 'needs FUSE',
-    '/pluginsctl/addPlugin': 'needs --rc-web-gui and network access',
 }
 
 // Routes in rclone that the spec leaves out on purpose.
@@ -256,7 +250,8 @@ const BI2 = join(work, 'bi2')
 const BIG = join(work, 'big')
 const EMPTY = join(work, 'empty')
 const SCRATCH = join(work, 'scratch')
-for (const d of [join(SRC, 'sub'), DST, DIFF, BI1, BI2, BIG, EMPTY, SCRATCH]) mkdirSync(d, { recursive: true })
+const SITE = join(work, 'site')
+for (const d of [join(SRC, 'sub'), DST, DIFF, BI1, BI2, BIG, EMPTY, SCRATCH, join(SITE, 'sub'), join(SITE, 'private')]) mkdirSync(d, { recursive: true })
 writeFileSync(join(SRC, 'a.txt'), 'hello\n')
 writeFileSync(join(SRC, 'sub', 'b.txt'), 'world\n')
 writeFileSync(join(DIFF, 'a.txt'), 'different\n')
@@ -264,6 +259,11 @@ writeFileSync(join(DIFF, 'extra.txt'), 'only here\n')
 writeFileSync(join(BI1, 'x.txt'), 'x\n')
 writeFileSync(join(BI2, 'y.txt'), 'y\n')
 writeFileSync(join(BIG, 'big.bin'), randomBytes(1024 * 1024))
+writeFileSync(join(SITE, 'page.txt'), 'page\n')
+writeFileSync(join(SITE, 'sub', 'c.txt'), 'c\n')
+writeFileSync(join(SITE, 'private', 'secret.txt'), 'secret\n')
+writeFileSync(join(work, 'changed.txt'), 'sub/c.txt\n')
+writeFileSync(join(work, 'combined.txt'), '+ sub/c.txt\n')
 
 async function raw(path, { method = 'POST', headers = {}, body, query = '', base = main.base, auth = true } = {}) {
     const h = { ...headers }
@@ -283,14 +283,19 @@ const hit = async (path, body = {}, label) => {
     return r
 }
 const PREFER = { Prefer: 'respond-async' }
+// For calls that have to succeed, because an error response would also match the spec
+const ok = async (path, body, label) => {
+    const r = await hit(path, body, label)
+    if (r.status !== 200) problem(`${label}: expected a 200, got ${r.status}: ${String(r.json?.error ?? r.text).slice(0, 100)}`)
+    return r
+}
 
 // Simple calls, in the state of a fresh server
 for (const route of [
     'rc/noop', 'rc/noopauth', 'rc/list', 'core/version', 'core/pid', 'core/memstats', 'core/stats', 'core/group-list', 'core/transferred',
     'core/bwlimit', 'core/gc', 'core/disks', 'core/stats-reset', 'config/listremotes', 'config/dump', 'config/providers', 'config/paths',
     'options/blocks', 'options/get', 'options/info', 'options/local', 'serve/list', 'serve/types', 'serve/stopall', 'mount/types', 'mount/listmounts',
-    'mount/unmountall', 'fscache/entries', 'fscache/clear', 'job/list', 'vfs/list', 'pluginsctl/listPlugins', 'pluginsctl/listTestPlugins',
-    'config/oauthstatus', 'config/oauthstop', 'rc/error',
+    'mount/unmountall', 'fscache/entries', 'fscache/clear', 'job/list', 'vfs/list', 'config/oauthstatus', 'config/oauthstop', 'rc/error',
 ]) {
     await hit(route)
 }
@@ -316,9 +321,6 @@ await hit('options/info', { blocks: 'main' }, 'options/info blocks=main')
 await hit('options/set', { main: { Timeout: '5m' } })
 await hit('backend/command', { command: 'noop', fs: SRC, arg: ['a'], opt: { x: 'y' } })
 await hit('backend/command', { command: 'help', fs: SRC }, 'backend/command help')
-await hit('pluginsctl/getPluginsForType', { type: 'text/plain', pluginType: 'FileHandler' })
-await hit('pluginsctl/removePlugin', { name: 'nope' })
-await hit('pluginsctl/removeTestPlugin', { name: 'nope' })
 await hit('mount/unmount', { mountPoint: join(work, 'nope') })
 
 // Config, including the interactive flow
@@ -374,12 +376,59 @@ await hit('operations/mkdir', { fs: DST, remote: 'x/y' }, 'operations/mkdir nest
 await hit('operations/rmdirs', { fs: DST, remote: 'x', leaveRoot: true })
 await hit('operations/purge', { fs: DST, remote: 'x' })
 
+// Reading a file, with each way to pick a range
+const whole = await ok('operations/getfile', { fs: SRC, remote: 'a.txt' }, 'operations/getfile')
+if (whole.json?.result !== 'hello\n') problem('operations/getfile: the contents are wrong')
+const encoded = await ok('operations/getfile', { fs: join(SRC, 'a.txt'), base64: true }, 'operations/getfile base64')
+if (encoded.json?.result !== Buffer.from('hello\n').toString('base64')) problem('operations/getfile: the base64 contents are wrong')
+for (const [range, expected] of [[{ head: 2 }, 'he'], [{ tail: 3 }, 'lo\n'], [{ offset: 1, count: 3 }, 'ell'], [{ offset: -2 }, 'o\n'], [{ maxSize: 6 }, 'hello\n']]) {
+    const part = await ok('operations/getfile', { fs: SRC, remote: 'a.txt', ...range }, `operations/getfile ${Object.keys(range).join(' and ')}`)
+    if (part.json?.result !== expected) problem(`operations/getfile: ${JSON.stringify(range)} returned ${JSON.stringify(part.json?.result)}`)
+}
+await hit('operations/getfile', { fs: SRC, remote: 'missing.txt' }, 'operations/getfile missing')
+await hit('operations/getfile', { fs: BIG, remote: 'big.bin', maxSize: 16 }, 'operations/getfile over the limit')
+const objectFs = await call('operations/getfile', { fs: { type: 'local', _root: SRC }, remote: 'a.txt' })
+if (objectFs.status < 400) problem('operations/getfile: fs worked as a remote object, so the spec should allow it')
+
+// Writing listings, with every option
+await ok('operations/index', { fs: SITE }, 'operations/index')
+if (!existsSync(join(SITE, 'index.html')) || !existsSync(join(SITE, 'sub', 'index.html'))) problem('operations/index: the listings were not written')
+await ok('operations/index', { fs: SITE, opt: { output: ['index.html=html', 'index.json=json'], rules: { ExcludeRule: ['/private/**'], IncludeRule: [], FilterRule: [], ExcludeFrom: [], IncludeFrom: [], FilterFrom: [] }, maxDepth: 2, linkIndex: true, dirTime: 'dir', noModTime: true, rewrite: true, changedMaxDirs: 10 } }, 'operations/index options')
+if (!existsSync(join(SITE, 'index.json'))) problem('operations/index: opt.output did not add a second listing')
+for (const dirTime of ['newest', 'none']) await ok('operations/index', { fs: SITE, opt: { dirTime } }, `operations/index dirTime=${dirTime}`)
+await ok('operations/index', { fs: SITE, opt: { changed: ['sub/'] } }, 'operations/index changed')
+await ok('operations/index', { fs: SITE, opt: { changedFrom: [join(work, 'changed.txt')], changedCombined: [join(work, 'combined.txt')] } }, 'operations/index changed files')
+
 // Sync and bisync
 await hit('sync/copy', { srcFs: SRC, dstFs: DST })
 await hit('sync/sync', { srcFs: SRC, dstFs: DST })
 await hit('operations/delete', { fs: DST })
 await hit('sync/copy', { srcFs: SRC, dstFs: DST }, 'sync/copy again')
 await hit('sync/move', { srcFs: DST, dstFs: join(work, 'moved'), deleteEmptySrcDirs: true })
+
+// Sync reports: every report comes back as a list, and none come back unless asked for
+const REPORTS = ['combined', 'missingOnSrc', 'missingOnDst', 'match', 'differ', 'error', 'destAfter']
+const allReports = Object.fromEntries(REPORTS.map(k => [k, true]))
+for (const route of ['sync/copy', 'sync/sync', 'sync/move']) {
+    const from = join(work, `report-src-${route.slice(5)}`)
+    const to = join(work, `report-dst-${route.slice(5)}`)
+    const plain = join(work, `report-plain-${route.slice(5)}`)
+    for (const d of [from, to, plain]) mkdirSync(d)
+    writeFileSync(join(plain, 'plain.txt'), 'plain\n')
+    writeFileSync(join(from, 'new.txt'), 'new\n')
+    writeFileSync(join(from, 'same.txt'), 'same\n')
+    writeFileSync(join(to, 'same.txt'), 'same\n')
+    writeFileSync(join(from, 'changed.txt'), 'longer contents\n')
+    writeFileSync(join(to, 'changed.txt'), 'short\n')
+    writeFileSync(join(to, 'old.txt'), 'old\n')
+    const none = await ok(route, { srcFs: plain, dstFs: join(work, 'report-none'), combined: false }, `${route} without reports`)
+    if (Object.keys(none.json ?? {}).length) problem(`${route}: it returned ${Object.keys(none.json)} without being asked`)
+    const reports = await ok(route, { srcFs: from, dstFs: to, ...allReports }, `${route} reports`)
+    for (const k of REPORTS) if (!Array.isArray(reports.json?.[k])) problem(`${route}: ${k} was asked for but isn't a list in the response`)
+    for (const [k, file] of [['missingOnDst', 'new.txt'], ['match', 'same.txt'], ['differ', 'changed.txt'], ['missingOnSrc', 'old.txt'], ['combined', '+ new.txt'], ['destAfter', 'new.txt']]) {
+        if (reports.json?.[k] && !reports.json[k].includes(file)) problem(`${route}: ${k} is ${JSON.stringify(reports.json[k])}, which doesn't include ${file}`)
+    }
+}
 await hit('core/stats-reset', {}, 'core/stats-reset before bisync')
 await hit('sync/bisync', { path1: BI1, path2: BI2, resync: true, workdir: join(work, 'biwork') })
 await hit('sync/bisync', { path1: BI1, path2: BI2, dryRun: true, workdir: join(work, 'biwork'), conflictResolve: 'newer', maxLock: '1m', checkSync: 'true' }, 'sync/bisync second run')
@@ -497,6 +546,11 @@ checkResponse('core/version', await raw('core/version', { auth: false, base: noC
 const forbidden = await raw('core/pid', { auth: false, base: noCredentials.base })
 if (forbidden.status !== 403) problem(`403: a server with no credentials returned ${forbidden.status} for core/pid`)
 checkResponse('core/pid', forbidden, 'core/pid 403')
+const tooLarge = await raw('rc/noop', { auth: false, base: noCredentials.base, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ a: 'x'.repeat(65 * 1024) }) })
+if (tooLarge.status !== 413) problem(`413: a 65 KiB body on a server with no credentials returned ${tooLarge.status}`)
+checkResponse('rc/noop', tooLarge, 'rc/noop 413')
+const largeWithAuth = await call('rc/noop', { a: 'x'.repeat(65 * 1024) })
+if (largeWithAuth.status !== 200) problem(`413: a 65 KiB body on a server with credentials returned ${largeWithAuth.status}, so the size limit isn't only for servers with no credentials`)
 const emptyJson = await raw('rc/noop', { headers: { 'Content-Type': 'application/json' } })
 if (emptyJson.status !== 400) problem(`transport: JSON content type with an empty body returned ${emptyJson.status}, not the documented 400`)
 const noBody = await raw('rc/noop')
@@ -559,6 +613,8 @@ const BASES = {
     '/core/stats-delete': { group: 'x' },
     '/vfs/queue-set-expiry': { fs: SCRATCH, id: 1, expiry: 1 },
     '/mount/unmount': { mountPoint: '/nope' },
+    '/operations/getfile': { fs: SRC, remote: 'a.txt' },
+    '/operations/index': { fs: SITE },
     '/operations/hashsum': { fs: SCRATCH, hashType: 'md5' },
     '/operations/hashsumfile': { fs: SCRATCH, remote: 'none.txt', hashType: 'md5' },
     '/operations/check': { srcFs: SCRATCH, dstFs: SCRATCH },
@@ -571,12 +627,9 @@ const BASES = {
     '/debug/set-mutex-profile-fraction': { rate: 0 },
     '/debug/set-soft-memory-limit': { 'mem-limit': 9007199254740991 },
     '/cache/expire': { remote: 'none' },
-    '/pluginsctl/removePlugin': { name: 'x' },
-    '/pluginsctl/removeTestPlugin': { name: 'x' },
-    '/pluginsctl/getPluginsForType': { type: 'x', pluginType: 'y' },
     '/serve/stop': { id: 'x' },
 }
-const SKIP_SWEEP = new Set(['/core/quit', '/mount/mount', '/pluginsctl/addPlugin', '/config/unlock', '/rc/error', '/serve/stopall', '/serve/start', '/core/command'])
+const SKIP_SWEEP = new Set(['/core/quit', '/mount/mount', '/config/unlock', '/rc/error', '/serve/stopall', '/serve/start', '/core/command'])
 const TYPE_ERROR = /expecting|must be string|Reshape|couldn't parse|parse duration|cannot unmarshal|overflows/i
 let sent = 0
 const sweepServer = await call('serve/start', { type: 'http', fs: SCRATCH, addr: '127.0.0.1:0' })

@@ -50,14 +50,6 @@ var undocumentedParams = map[string][]string{
 
 // Params read in ways the parser can't follow, such as through a local closure.
 var extraParams = map[string][]Param{
-	"operations/check": {
-		{Name: "combined", Getter: "GetBool", Req: "no"},
-		{Name: "missingOnSrc", Getter: "GetBool", Req: "no"},
-		{Name: "missingOnDst", Getter: "GetBool", Req: "no"},
-		{Name: "match", Getter: "GetBool", Req: "no"},
-		{Name: "differ", Getter: "GetBool", Req: "no"},
-		{Name: "error", Getter: "GetBool", Req: "no"},
-	},
 	"vfs/refresh": {
 		{Name: "recursive", Getter: "stringAssert", Req: "no"},
 		{Name: "dir", Getter: "stringAssert", Req: "no"},
@@ -77,23 +69,19 @@ var extraParams = map[string][]Param{
 
 // Requiredness the parser gets wrong, because of how the code handles the error.
 var requiredOverride = map[string]string{
-	"cache/expire.remote":                     "yes", // in["remote"] with an explicit check
-	"cache/expire.withData":                   "no",
-	"config/unlock.configPassword":            "yes", // falls back to config_password, then errors
-	"core/bwlimit.rate":                       "no",  // missing means read the current limit
-	"core/command.command":                    "no",  // error replaced by a default
-	"core/command.returnType":                 "no",  // error replaced by a default
-	"core/stats-delete.group":                 "no",  // missing is accepted
-	"operations/check.srcFs":                  "no",  // optional with checkFileHash
-	"operations/check.checkFileFs":            "no",
-	"operations/check.checkFileRemote":        "no",
-	"pluginsctl/addPlugin.branch":             "no",  // error replaced by a default
-	"pluginsctl/addPlugin.version":            "no",  // error replaced by a default
-	"pluginsctl/getPluginsForType.type":       "no",  // error replaced by a default
-	"pluginsctl/getPluginsForType.pluginType": "no",  // error replaced by a default
-	"serve/start.type":                        "yes", // the error is ignored, then an empty type fails
-	"job/batch._path":                         "no",  // belongs to the items, checked by the JSON schema
-	"mount/mount.mountType":                   "no",  // error replaced by a default
+	"cache/expire.remote":              "yes", // in["remote"] with an explicit check
+	"cache/expire.withData":            "no",
+	"config/unlock.configPassword":     "yes", // falls back to config_password, then errors
+	"core/bwlimit.rate":                "no",  // missing means read the current limit
+	"core/command.command":             "no",  // error replaced by a default
+	"core/command.returnType":          "no",  // error replaced by a default
+	"core/stats-delete.group":          "no",  // missing is accepted
+	"operations/check.srcFs":           "no",  // optional with checkFileHash
+	"operations/check.checkFileFs":     "no",
+	"operations/check.checkFileRemote": "no",
+	"serve/start.type":                 "yes", // the error is ignored, then an empty type fails
+	"job/batch._path":                  "no",  // belongs to the items, checked by the JSON schema
+	"mount/mount.mountType":            "no",  // error replaced by a default
 }
 
 // Response keys the parser finds that aren't top-level keys of the 200 response.
@@ -104,7 +92,6 @@ var ignoredResponseKeys = map[string][]string{
 
 // Response keys in the spec that come from a struct or a closure the parser can't read.
 var opaqueResponseKeys = map[string][]string{
-	"operations/check":  {"combined", "missingOnSrc", "missingOnDst", "match", "differ", "error"},
 	"vfs/poll-interval": {},
 }
 
@@ -133,10 +120,18 @@ var dynamicRoutes = map[string]map[string][]Param{
 		"operations/movefile": {reqFs("srcFs"), req("srcRemote"), reqFs("dstFs"), req("dstRemote")},
 	},
 	`"sync/" + name`: {
-		"sync/sync": {reqFs("srcFs"), reqFs("dstFs"), opt("createEmptySrcDirs", "GetBool")},
-		"sync/copy": {reqFs("srcFs"), reqFs("dstFs"), opt("createEmptySrcDirs", "GetBool")},
-		"sync/move": {reqFs("srcFs"), reqFs("dstFs"), opt("createEmptySrcDirs", "GetBool"), opt("deleteEmptySrcDirs", "GetBool")},
+		"sync/sync": withReports(reqFs("srcFs"), reqFs("dstFs"), opt("createEmptySrcDirs", "GetBool")),
+		"sync/copy": withReports(reqFs("srcFs"), reqFs("dstFs"), opt("createEmptySrcDirs", "GetBool")),
+		"sync/move": withReports(reqFs("srcFs"), reqFs("dstFs"), opt("createEmptySrcDirs", "GetBool"), opt("deleteEmptySrcDirs", "GetBool")),
 	},
+}
+
+// Adds the reports that every sync route can return.
+func withReports(params ...Param) []Param {
+	for _, name := range []string{"combined", "missingOnSrc", "missingOnDst", "match", "differ", "error", "destAfter"} {
+		params = append(params, opt(name, "GetBool"))
+	}
+	return params
 }
 
 func req(name string) Param   { return Param{Name: name, Getter: "GetString", Req: "yes"} }
@@ -249,6 +244,8 @@ func helperParams(name string, c *ast.CallExpr) ([]string, string) {
 		return []string{lit(1)}, "GetString"
 	case "ParseOptions":
 		return []string{lit(1)}, "GetStruct"
+	case "RcReportWriter":
+		return []string{lit(2)}, "GetBool"
 	}
 	return nil, ""
 }
@@ -448,12 +445,16 @@ func (w *walker) walkBody(body ast.Node, in map[string]bool, fi *fileInfo) {
 					if r == "" {
 						r = "?"
 					}
-					if name == "setEnum" || name == "ParseOptions" {
+					if name == "setEnum" || name == "ParseOptions" || name == "RcReportWriter" {
 						r = "no"
 					}
 					for _, k := range hp {
 						if !strings.HasPrefix(k, "<") {
 							w.add(Param{Name: k, Getter: getter, Req: r, Pos: pos(t)})
+							// A report comes back under the name of the param that asks for it
+							if name == "RcReportWriter" {
+								w.r.Out = append(w.r.Out, k)
+							}
 						}
 					}
 					return true

@@ -48,6 +48,15 @@ export async function requestTypes() {
     await client.POST('/options/set', { body: { vfs: { CacheMode: 'full' } } })
     await client.POST('/rc/noop', { body: { anything: 1 } })
     await client.POST('/job/batch', { body: { inputs: [{ _path: 'rc/noop', _async: true }] } })
+    await client.POST('/sync/sync', { body: { srcFs: 'a:', dstFs: 'b:', combined: true, destAfter: true } })
+    await client.POST('/sync/bisync', { body: { path1: 'a:', path2: 'b:', maxDelete: 10, maxDeleteRenamesAware: true } })
+    await client.POST('/operations/getfile', { body: { fs: 'a:', remote: 'file.txt', tail: 100, base64: true } })
+    await client.POST('/operations/index', { body: { fs: 'a:', opt: { output: ['index.html=html'], rules: { ExcludeRule: ['/private/**'] }, dirTime: 'dir' } } })
+
+    // @ts-expect-error getfile reads fs as a string only
+    await client.POST('/operations/getfile', { body: { fs: { type: 'local', _root: '/tmp' } } })
+    // @ts-expect-error dirTime is one of newest, dir or none
+    await client.POST('/operations/index', { body: { fs: 'a:', opt: { dirTime: 'oldest' } } })
 
     // @ts-expect-error recursive must be a string
     await client.POST('/vfs/refresh', { body: { recursive: true } })
@@ -81,6 +90,15 @@ export async function asyncCalls() {
     }
     // @ts-expect-error only respond-async is allowed
     await client.POST('/sync/copy', { body: { srcFs: 'a:', dstFs: 'b:' }, params: { header: { Prefer: 'nope' } } })
+}
+
+export async function reports() {
+    const { data } = await client.POST('/sync/copy', { body: { srcFs: 'a:', dstFs: 'b:', combined: true } })
+    // Each report is optional, because it only comes back when the request asks for it
+    if (data && 'combined' in data) {
+        const lines: string[] | undefined = data.combined
+        return lines
+    }
 }
 
 export type AsyncJob = components['responses']['AsyncJobResponse']['content']['application/json']

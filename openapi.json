@@ -3,7 +3,7 @@
   "info": {
     "title": "Rclone RC API",
     "version": "1.76.0",
-    "description": "OpenAPI specification for the rclone RC API. Each release describes exactly one rclone version, shown in `info.version`.\n\n## Scope\n\nThis covers the `POST` RC commands with JSON bodies. It doesn't cover rclone's file serving, `/metrics` or the web GUI.\n\nRclone also accepts these params in the query string or a form-encoded body, and an `_async` param. This spec leaves those out on purpose, so that each field has one documented form and `required` can be enforced. The exception is `operations/uploadfile`, whose params can only go in the query string.\n\nA request with `Content-Type: application/json` and an empty body returns a 400. Send `{}`, or leave the header out. JSON bodies always cause a browser preflight, which rclone answers when `--rc-allow-origin` is set.\n\n## Authentication\n\nRoutes use HTTP basic auth, with credentials from `--rc-user` and `--rc-pass`, or from `--rc-htpasswd`. With `--rc-user-from-header`, rclone takes the user name from an HTTP header instead. A missing or wrong login gets a plain text 401.\n\nA server with no credentials set up answers these routes with a JSON 403, unless it runs with `--rc-no-auth`. Routes with an empty `security` list never need authentication.\n\n## Running calls in the background\n\nSend `Prefer: respond-async` to run a call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. Rclone's `_async` param has the same effect, but on its own it returns a 200 with the job ID rather than the route's normal body. That can't be described here, so routes don't list it. The exception is `job/batch` inputs, which have no headers and use `_async` instead.\n\n## What depends on the server\n\n- `cache/*` only exists after a cache remote is created.\n- `pluginsctl/*` only works with the web GUI.\n- `mount/*` and the option blocks depend on how rclone was built.\n- `backend/command` results depend on the backend.\n",
+    "description": "OpenAPI specification for the rclone RC API. Each release describes exactly one rclone version, shown in `info.version`.\n\n## Scope\n\nThis covers the `POST` RC commands with JSON bodies. It doesn't cover rclone's file serving, `/metrics` or the web GUI.\n\nRclone also accepts these params in the query string or a form-encoded body, and an `_async` param. This spec leaves those out on purpose, so that each field has one documented form and `required` can be enforced. The exception is `operations/uploadfile`, whose params can only go in the query string.\n\nA request with `Content-Type: application/json` and an empty body returns a 400. Send `{}`, or leave the header out. JSON bodies always cause a browser preflight, which rclone answers when `--rc-allow-origin` is set.\n\n## Authentication\n\nRoutes use HTTP basic auth, with credentials from `--rc-user` and `--rc-pass`, or from `--rc-htpasswd`. With `--rc-user-from-header`, rclone takes the user name from an HTTP header instead. A missing or wrong login gets a plain text 401.\n\nA server with no credentials set up answers these routes with a JSON 403, unless it runs with `--rc-no-auth`. Routes with an empty `security` list never need authentication. Such a server also limits request bodies to 64 KiB, and answers a larger one with a JSON 413.\n\n## Running calls in the background\n\nSend `Prefer: respond-async` to run a call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. Rclone's `_async` param has the same effect, but on its own it returns a 200 with the job ID rather than the route's normal body. That can't be described here, so routes don't list it. The exception is `job/batch` inputs, which have no headers and use `_async` instead.\n\n## What depends on the server\n\n- `cache/*` only exists after a cache remote is created.\n- `mount/*` and the option blocks depend on how rclone was built.\n- `backend/command` results depend on the backend.\n",
     "contact": {
       "name": "GitHub Repository",
       "url": "https://github.com/rclone/rclone-openapi"
@@ -569,6 +569,113 @@
         "operationId": "operationsFsinfo"
       }
     },
+    "/operations/getfile": {
+      "post": {
+        "summary": "Read a single file",
+        "description": "Returns the contents of one file in the JSON response. It reads at most 2 MiB, so use `offset` and `count`, `head` or `tail` to read part of a larger file. Only one of those three forms can be used in a call. To stream whole files, use rclone's file serving with `--rc-serve` instead.",
+        "tags": [
+          "operations"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "type": "string",
+                        "description": "Remote name or path of the file, for example `drive:path/to/file`. It can also be a directory, with the file named in `remote`."
+                      },
+                      "remote": {
+                        "type": "string",
+                        "description": "Path to the file within `fs`, for example `file.txt`."
+                      },
+                      "offset": {
+                        "type": "integer",
+                        "description": "Byte offset to start reading at. A negative value counts from the end of the file. Defaults to 0."
+                      },
+                      "count": {
+                        "type": "integer",
+                        "description": "Number of bytes to read. Defaults to -1, which reads to the end of the file."
+                      },
+                      "head": {
+                        "type": "integer",
+                        "description": "Read only the first N bytes."
+                      },
+                      "tail": {
+                        "type": "integer",
+                        "description": "Read only the last N bytes."
+                      },
+                      "maxSize": {
+                        "type": "integer",
+                        "description": "Largest number of bytes the call may return. It can only lower the built-in limit of 2097152 bytes (2 MiB)."
+                      },
+                      "base64": {
+                        "type": "boolean",
+                        "description": "Set to true to return the contents base64 encoded. Binary files need this, because the call fails when the contents aren't valid UTF-8."
+                      }
+                    },
+                    "required": [
+                      "fs"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Contents of the file from `operations/getfile`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "string",
+                      "description": "Contents of the file, as text or as a base64 encoded string when `base64` is set."
+                    }
+                  },
+                  "required": [
+                    "result"
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "x-rclone-jobid": {
+                "$ref": "#/components/headers/RcloneJobId"
+              }
+            }
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsGetfile"
+      }
+    },
     "/operations/hashsum": {
       "post": {
         "summary": "Generate hash sums",
@@ -781,6 +888,176 @@
           }
         },
         "operationId": "operationsHashsumfile"
+      }
+    },
+    "/operations/index": {
+      "post": {
+        "summary": "Write directory listings",
+        "description": "Writes a listing file, such as `index.html`, into every directory of a remote, so that it can be browsed when served as a static website. Listings that haven't changed are left alone.",
+        "tags": [
+          "operations"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PreferAsyncHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "fs": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "$ref": "#/components/schemas/RemoteDefinition"
+                          }
+                        ],
+                        "description": "Remote name or path to write listings into, for example `drive:`."
+                      },
+                      "opt": {
+                        "type": "object",
+                        "description": "Options that control the indexing.",
+                        "properties": {
+                          "output": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Listings to write in each directory, each as `NAME=FORMAT`. The built-in formats are `html`, `json` and `caddy`. Defaults to `[\"index.html=html\"]`."
+                          },
+                          "rules": {
+                            "type": "object",
+                            "description": "Filter rules that choose which directories get listings, for example `{\"ExcludeRule\": [\"/private/**\"]}`.",
+                            "properties": {
+                              "FilterRule": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "FilterFrom": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "ExcludeRule": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "ExcludeFrom": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "IncludeRule": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "IncludeFrom": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "maxDepth": {
+                            "type": "integer",
+                            "description": "Only make listings this many directories deep. Defaults to -1, which means no limit."
+                          },
+                          "linkIndex": {
+                            "type": "boolean",
+                            "description": "Set to true to link to `dir/NAME` rather than `dir/`."
+                          },
+                          "dirTime": {
+                            "type": "string",
+                            "enum": [
+                              "newest",
+                              "dir",
+                              "none"
+                            ],
+                            "description": "How to work out the time shown for a directory. `newest` uses the newest modification time of anything below the directory, and `dir` uses the directory's own modification time. Defaults to `newest`."
+                          },
+                          "noModTime": {
+                            "type": "boolean",
+                            "description": "Set to true to leave modification times out of the listings."
+                          },
+                          "rewrite": {
+                            "type": "boolean",
+                            "description": "Set to true to write every listing, even if it is unchanged."
+                          },
+                          "changed": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Changed paths for a partial run, which only re-indexes the directories they affect. Directories end in `/`."
+                          },
+                          "changedFrom": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Files that list changed paths for a partial run, one path per line."
+                          },
+                          "changedCombined": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Files in the format of the `combined` sync report, used as the changed paths for a partial run."
+                          },
+                          "changedMaxDirs": {
+                            "type": "integer",
+                            "description": "Do a full run if a partial run would list more directories than this. Defaults to 0, which means no limit."
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "fs"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/EmptyObjectResponse"
+          },
+          "202": {
+            "$ref": "#/components/responses/AsyncJobResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedResponse"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/RcError"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/RcError"
+          }
+        },
+        "operationId": "operationsIndex"
       }
     },
     "/operations/movefile": {
@@ -4732,6 +5009,10 @@
                     "transfers": {
                       "type": "integer"
                     },
+                    "updatedDirs": {
+                      "type": "integer",
+                      "description": "Number of directories that had their modification time or metadata updated."
+                    },
                     "transferring": {
                       "type": "array",
                       "description": "Active transfers currently in progress grouped by stats group.",
@@ -4766,7 +5047,8 @@
                     "totalChecks",
                     "totalTransfers",
                     "transferTime",
-                    "transfers"
+                    "transfers",
+                    "updatedDirs"
                   ]
                 }
               }
@@ -6207,6 +6489,9 @@
                     "$ref": "#/components/schemas/RcGlobalOptions"
                   },
                   {
+                    "$ref": "#/components/schemas/SyncReportOptions"
+                  },
+                  {
                     "type": "object",
                     "properties": {
                       "srcFs": {
@@ -6249,7 +6534,7 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyObjectResponse"
+            "$ref": "#/components/responses/SyncReportResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
@@ -6286,6 +6571,9 @@
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SyncReportOptions"
                   },
                   {
                     "type": "object",
@@ -6330,7 +6618,7 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyObjectResponse"
+            "$ref": "#/components/responses/SyncReportResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
@@ -6367,6 +6655,9 @@
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/RcGlobalOptions"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SyncReportOptions"
                   },
                   {
                     "type": "object",
@@ -6415,7 +6706,7 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/EmptyObjectResponse"
+            "$ref": "#/components/responses/SyncReportResponse"
           },
           "202": {
             "$ref": "#/components/responses/AsyncJobResponse"
@@ -6480,7 +6771,7 @@
                       },
                       "dryRun": {
                         "type": "boolean",
-                        "description": "Set to true to simulate the bisync run without making changes."
+                        "description": "Set to true to simulate the bisync run without making changes. Setting it to false doesn't turn off a dry run that the global config asks for."
                       },
                       "resync": {
                         "type": "boolean",
@@ -6495,7 +6786,12 @@
                         "description": "Override the access-check sentinel filename; defaults to `RCLONE_TEST`."
                       },
                       "maxDelete": {
-                        "type": "integer"
+                        "type": "integer",
+                        "description": "Largest percentage of files that may be deleted, from 0 to 100. The bisync run aborts if it would delete more."
+                      },
+                      "maxDeleteRenamesAware": {
+                        "type": "boolean",
+                        "description": "Set to true to leave tracked renames out of the `maxDelete` count. This needs `TrackRenames` set in `_config`."
                       },
                       "force": {
                         "type": "boolean",
@@ -7168,6 +7464,9 @@
                     "config": {
                       "type": "object",
                       "properties": {
+                        "AllowHTTPSDowngrade": {
+                          "type": "boolean"
+                        },
                         "AskPassword": {
                           "type": "boolean"
                         },
@@ -7536,6 +7835,7 @@
                         }
                       },
                       "required": [
+                        "AllowHTTPSDowngrade",
                         "AskPassword",
                         "AutoConfirm",
                         "BackupDir",
@@ -9003,419 +9303,6 @@
         "operationId": "vfsStats"
       }
     },
-    "/pluginsctl/addPlugin": {
-      "post": {
-        "summary": "Install plugin",
-        "description": "Downloads and installs a plugin into the WebUI from the provided repository URL.",
-        "tags": [
-          "pluginsctl"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/PreferAsyncHeader"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/RcGlobalOptions"
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "url": {
-                        "type": "string",
-                        "description": "Repository URL of the plugin to install."
-                      },
-                      "branch": {
-                        "type": "string"
-                      },
-                      "version": {
-                        "type": "string"
-                      }
-                    },
-                    "required": [
-                      "url"
-                    ]
-                  }
-                ]
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/EmptyObjectResponse"
-          },
-          "202": {
-            "$ref": "#/components/responses/AsyncJobResponse"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedResponse"
-          },
-          "4XX": {
-            "$ref": "#/components/responses/RcError"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/RcError"
-          }
-        },
-        "operationId": "pluginsctlAddPlugin"
-      }
-    },
-    "/pluginsctl/getPluginsForType": {
-      "post": {
-        "summary": "Filter plugins by MIME type",
-        "description": "Returns plugins matching the requested MIME type and optional plugin type.",
-        "tags": [
-          "pluginsctl"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/PreferAsyncHeader"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/RcGlobalOptions"
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "type": {
-                        "type": "string",
-                        "description": "MIME type to match when listing plugins."
-                      },
-                      "pluginType": {
-                        "type": "string",
-                        "description": "Filter results by plugin type (e.g. `test`)."
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Loaded plugin metadata for the requested MIME type.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "loadedPlugins": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "object",
-                        "additionalProperties": true
-                      },
-                      "description": "Installed plugins keyed by repository name."
-                    },
-                    "loadedTestPlugins": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "object",
-                        "additionalProperties": true
-                      },
-                      "description": "Installed test plugins keyed by repository name."
-                    }
-                  },
-                  "required": [
-                    "loadedPlugins",
-                    "loadedTestPlugins"
-                  ]
-                }
-              }
-            },
-            "headers": {
-              "x-rclone-jobid": {
-                "$ref": "#/components/headers/RcloneJobId"
-              }
-            }
-          },
-          "202": {
-            "$ref": "#/components/responses/AsyncJobResponse"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedResponse"
-          },
-          "4XX": {
-            "$ref": "#/components/responses/RcError"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/RcError"
-          }
-        },
-        "operationId": "pluginsctlGetPluginsForType"
-      }
-    },
-    "/pluginsctl/listPlugins": {
-      "post": {
-        "summary": "List installed plugins",
-        "description": "Returns metadata for installed production and test plugins.",
-        "tags": [
-          "pluginsctl"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/PreferAsyncHeader"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RcGlobalOptions"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Lists installed production and test plugins with their metadata.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "loadedPlugins": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "additionalProperties": true
-                      },
-                      "description": "Metadata entries for installed plugins."
-                    },
-                    "loadedTestPlugins": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "additionalProperties": true
-                      },
-                      "description": "Metadata entries for installed test plugins."
-                    }
-                  },
-                  "required": [
-                    "loadedPlugins",
-                    "loadedTestPlugins"
-                  ]
-                }
-              }
-            },
-            "headers": {
-              "x-rclone-jobid": {
-                "$ref": "#/components/headers/RcloneJobId"
-              }
-            }
-          },
-          "202": {
-            "$ref": "#/components/responses/AsyncJobResponse"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedResponse"
-          },
-          "4XX": {
-            "$ref": "#/components/responses/RcError"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/RcError"
-          }
-        },
-        "operationId": "pluginsctlListPlugins"
-      }
-    },
-    "/pluginsctl/listTestPlugins": {
-      "post": {
-        "summary": "List installed test plugins",
-        "description": "Returns metadata for installed test plugins.",
-        "tags": [
-          "pluginsctl"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/PreferAsyncHeader"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RcGlobalOptions"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Metadata for installed test plugins keyed by repository name.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "loadedTestPlugins": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "object",
-                        "additionalProperties": true
-                      },
-                      "description": "Installed test plugin metadata keyed by repository."
-                    }
-                  },
-                  "required": [
-                    "loadedTestPlugins"
-                  ]
-                }
-              }
-            },
-            "headers": {
-              "x-rclone-jobid": {
-                "$ref": "#/components/headers/RcloneJobId"
-              }
-            }
-          },
-          "202": {
-            "$ref": "#/components/responses/AsyncJobResponse"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedResponse"
-          },
-          "4XX": {
-            "$ref": "#/components/responses/RcError"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/RcError"
-          }
-        },
-        "operationId": "pluginsctlListTestPlugins"
-      }
-    },
-    "/pluginsctl/removePlugin": {
-      "post": {
-        "summary": "Remove plugin",
-        "description": "Uninstalls a plugin from the WebUI.",
-        "tags": [
-          "pluginsctl"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/PreferAsyncHeader"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/RcGlobalOptions"
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string",
-                        "description": "Name of the plugin to uninstall."
-                      }
-                    },
-                    "required": [
-                      "name"
-                    ]
-                  }
-                ]
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/EmptyObjectResponse"
-          },
-          "202": {
-            "$ref": "#/components/responses/AsyncJobResponse"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedResponse"
-          },
-          "4XX": {
-            "$ref": "#/components/responses/RcError"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/RcError"
-          }
-        },
-        "operationId": "pluginsctlRemovePlugin"
-      }
-    },
-    "/pluginsctl/removeTestPlugin": {
-      "post": {
-        "summary": "Remove test plugin",
-        "description": "Uninstalls a test plugin from the WebUI.",
-        "tags": [
-          "pluginsctl"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/PreferAsyncHeader"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/RcGlobalOptions"
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "type": "string",
-                        "description": "Name of the test plugin to uninstall."
-                      }
-                    },
-                    "required": [
-                      "name"
-                    ]
-                  }
-                ]
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/EmptyObjectResponse"
-          },
-          "202": {
-            "$ref": "#/components/responses/AsyncJobResponse"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedResponse"
-          },
-          "4XX": {
-            "$ref": "#/components/responses/RcError"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/RcError"
-          }
-        },
-        "operationId": "pluginsctlRemoveTestPlugin"
-      }
-    },
     "/config/unset": {
       "post": {
         "summary": "Unset keys in a remote",
@@ -9669,6 +9556,72 @@
                 "Result": {
                   "type": "string",
                   "description": "Result to send back to continue."
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "x-rclone-jobid": {
+            "$ref": "#/components/headers/RcloneJobId"
+          }
+        }
+      },
+      "SyncReportResponse": {
+        "description": "An empty object, unless the request asked for reports. Then it holds one list of file paths for each report. If the call fails, the reports are only available when it ran in the background, in the job output.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "combined": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Combined report lines. Each line is a symbol, a space and a path. `=` means identical, `-` missing on the source, `+` missing on the destination, `*` different and `!` an error."
+                },
+                "missingOnSrc": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Files missing from the source."
+                },
+                "missingOnDst": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Files missing from the destination."
+                },
+                "match": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Files that matched on both sides."
+                },
+                "differ": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Files that differed between source and destination."
+                },
+                "error": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Files that had errors while hashing or reading."
+                },
+                "destAfter": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Files on the destination after the operation."
                 }
               }
             }
@@ -10275,6 +10228,40 @@
           "_group": {
             "type": "string",
             "description": "Stats group for this call."
+          }
+        }
+      },
+      "SyncReportOptions": {
+        "type": "object",
+        "description": "Reports that `sync/sync`, `sync/copy` and `sync/move` can return. Each one is off by default.",
+        "properties": {
+          "combined": {
+            "type": "boolean",
+            "description": "Set to true to return a combined report of the changes."
+          },
+          "missingOnSrc": {
+            "type": "boolean",
+            "description": "Set to true to report files missing from the source."
+          },
+          "missingOnDst": {
+            "type": "boolean",
+            "description": "Set to true to report files missing from the destination."
+          },
+          "match": {
+            "type": "boolean",
+            "description": "Set to true to report matching files."
+          },
+          "differ": {
+            "type": "boolean",
+            "description": "Set to true to report files that differ."
+          },
+          "error": {
+            "type": "boolean",
+            "description": "Set to true to report files that had errors while hashing or reading."
+          },
+          "destAfter": {
+            "type": "boolean",
+            "description": "Set to true to report the files on the destination after the operation."
           }
         }
       },

@@ -144,6 +144,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/operations/getfile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Read a single file
+         * @description Returns the contents of one file in the JSON response. It reads at most 2 MiB, so use `offset` and `count`, `head` or `tail` to read part of a larger file. Only one of those three forms can be used in a call. To stream whole files, use rclone's file serving with `--rc-serve` instead.
+         */
+        post: operations["operationsGetfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/operations/hashsum": {
         parameters: {
             query?: never;
@@ -178,6 +198,26 @@ export interface paths {
          * @description Returns the hash of a single file using the specified hash algorithm.
          */
         post: operations["operationsHashsumfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/operations/index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Write directory listings
+         * @description Writes a listing file, such as `index.html`, into every directory of a remote, so that it can be browsed when served as a static website. Listings that haven't changed are left alone.
+         */
+        post: operations["operationsIndex"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1904,126 +1944,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/pluginsctl/addPlugin": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Install plugin
-         * @description Downloads and installs a plugin into the WebUI from the provided repository URL.
-         */
-        post: operations["pluginsctlAddPlugin"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/pluginsctl/getPluginsForType": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Filter plugins by MIME type
-         * @description Returns plugins matching the requested MIME type and optional plugin type.
-         */
-        post: operations["pluginsctlGetPluginsForType"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/pluginsctl/listPlugins": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * List installed plugins
-         * @description Returns metadata for installed production and test plugins.
-         */
-        post: operations["pluginsctlListPlugins"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/pluginsctl/listTestPlugins": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * List installed test plugins
-         * @description Returns metadata for installed test plugins.
-         */
-        post: operations["pluginsctlListTestPlugins"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/pluginsctl/removePlugin": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Remove plugin
-         * @description Uninstalls a plugin from the WebUI.
-         */
-        post: operations["pluginsctlRemovePlugin"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/pluginsctl/removeTestPlugin": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Remove test plugin
-         * @description Uninstalls a test plugin from the WebUI.
-         */
-        post: operations["pluginsctlRemoveTestPlugin"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/config/unset": {
         parameters: {
             query?: never;
@@ -2231,6 +2151,23 @@ export interface components {
             /** @description Stats group for this call. */
             _group?: string;
         };
+        /** @description Reports that `sync/sync`, `sync/copy` and `sync/move` can return. Each one is off by default. */
+        SyncReportOptions: {
+            /** @description Set to true to return a combined report of the changes. */
+            combined?: boolean;
+            /** @description Set to true to report files missing from the source. */
+            missingOnSrc?: boolean;
+            /** @description Set to true to report files missing from the destination. */
+            missingOnDst?: boolean;
+            /** @description Set to true to report matching files. */
+            match?: boolean;
+            /** @description Set to true to report files that differ. */
+            differ?: boolean;
+            /** @description Set to true to report files that had errors while hashing or reading. */
+            error?: boolean;
+            /** @description Set to true to report the files on the destination after the operation. */
+            destAfter?: boolean;
+        };
         /** @description Summary of the backend from rclone's docs. Its fields are empty for backends without one. */
         ConfigProviderOverview: {
             Backend?: string;
@@ -2315,6 +2252,31 @@ export interface components {
                     Error?: string;
                     /** @description Result to send back to continue. */
                     Result?: string;
+                };
+            };
+        };
+        /** @description An empty object, unless the request asked for reports. Then it holds one list of file paths for each report. If the call fails, the reports are only available when it ran in the background, in the job output. */
+        SyncReportResponse: {
+            headers: {
+                "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": {
+                    /** @description Combined report lines. Each line is a symbol, a space and a path. `=` means identical, `-` missing on the source, `+` missing on the destination, `*` different and `!` an error. */
+                    combined?: string[];
+                    /** @description Files missing from the source. */
+                    missingOnSrc?: string[];
+                    /** @description Files missing from the destination. */
+                    missingOnDst?: string[];
+                    /** @description Files that matched on both sides. */
+                    match?: string[];
+                    /** @description Files that differed between source and destination. */
+                    differ?: string[];
+                    /** @description Files that had errors while hashing or reading. */
+                    error?: string[];
+                    /** @description Files on the destination after the operation. */
+                    destAfter?: string[];
                 };
             };
         };
@@ -2569,6 +2531,58 @@ export interface operations {
             "5XX": components["responses"]["RcError"];
         };
     };
+    operationsGetfile: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path of the file, for example `drive:path/to/file`. It can also be a directory, with the file named in `remote`. */
+                    fs: string;
+                    /** @description Path to the file within `fs`, for example `file.txt`. */
+                    remote?: string;
+                    /** @description Byte offset to start reading at. A negative value counts from the end of the file. Defaults to 0. */
+                    offset?: number;
+                    /** @description Number of bytes to read. Defaults to -1, which reads to the end of the file. */
+                    count?: number;
+                    /** @description Read only the first N bytes. */
+                    head?: number;
+                    /** @description Read only the last N bytes. */
+                    tail?: number;
+                    /** @description Largest number of bytes the call may return. It can only lower the built-in limit of 2097152 bytes (2 MiB). */
+                    maxSize?: number;
+                    /** @description Set to true to return the contents base64 encoded. Binary files need this, because the call fails when the contents aren't valid UTF-8. */
+                    base64?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Contents of the file from `operations/getfile`. */
+            200: {
+                headers: {
+                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Contents of the file, as text or as a base64 encoded string when `base64` is set. */
+                        result: string;
+                    };
+                };
+            };
+            202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
+            "4XX": components["responses"]["RcError"];
+            "5XX": components["responses"]["RcError"];
+        };
+    };
     operationsHashsum: {
         parameters: {
             query?: never;
@@ -2655,6 +2669,67 @@ export interface operations {
                     };
                 };
             };
+            202: components["responses"]["AsyncJobResponse"];
+            401: components["responses"]["UnauthorizedResponse"];
+            "4XX": components["responses"]["RcError"];
+            "5XX": components["responses"]["RcError"];
+        };
+    };
+    operationsIndex: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
+                Prefer?: components["parameters"]["PreferAsyncHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                    /** @description Remote name or path to write listings into, for example `drive:`. */
+                    fs: string | components["schemas"]["RemoteDefinition"];
+                    /** @description Options that control the indexing. */
+                    opt?: {
+                        /** @description Listings to write in each directory, each as `NAME=FORMAT`. The built-in formats are `html`, `json` and `caddy`. Defaults to `["index.html=html"]`. */
+                        output?: string[];
+                        /** @description Filter rules that choose which directories get listings, for example `{"ExcludeRule": ["/private/**"]}`. */
+                        rules?: {
+                            FilterRule?: string[];
+                            FilterFrom?: string[];
+                            ExcludeRule?: string[];
+                            ExcludeFrom?: string[];
+                            IncludeRule?: string[];
+                            IncludeFrom?: string[];
+                        };
+                        /** @description Only make listings this many directories deep. Defaults to -1, which means no limit. */
+                        maxDepth?: number;
+                        /** @description Set to true to link to `dir/NAME` rather than `dir/`. */
+                        linkIndex?: boolean;
+                        /**
+                         * @description How to work out the time shown for a directory. `newest` uses the newest modification time of anything below the directory, and `dir` uses the directory's own modification time. Defaults to `newest`.
+                         * @enum {string}
+                         */
+                        dirTime?: "newest" | "dir" | "none";
+                        /** @description Set to true to leave modification times out of the listings. */
+                        noModTime?: boolean;
+                        /** @description Set to true to write every listing, even if it is unchanged. */
+                        rewrite?: boolean;
+                        /** @description Changed paths for a partial run, which only re-indexes the directories they affect. Directories end in `/`. */
+                        changed?: string[];
+                        /** @description Files that list changed paths for a partial run, one path per line. */
+                        changedFrom?: string[];
+                        /** @description Files in the format of the `combined` sync report, used as the changed paths for a partial run. */
+                        changedCombined?: string[];
+                        /** @description Do a full run if a partial run would list more directories than this. Defaults to 0, which means no limit. */
+                        changedMaxDirs?: number;
+                    };
+                };
+            };
+        };
+        responses: {
+            200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -4536,6 +4611,8 @@ export interface operations {
                         totalTransfers: number;
                         transferTime: number;
                         transfers: number;
+                        /** @description Number of directories that had their modification time or metadata updated. */
+                        updatedDirs: number;
                         /** @description Active transfers currently in progress grouped by stats group. */
                         transferring?: components["schemas"]["CoreStatsTransfer"][];
                         /** @description Objects currently undergoing verification operations. */
@@ -5169,7 +5246,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                "application/json": components["schemas"]["RcGlobalOptions"] & components["schemas"]["SyncReportOptions"] & {
                     /** @description Source remote path to sync from, e.g. `drive:src`. */
                     srcFs: string | components["schemas"]["RemoteDefinition"];
                     /** @description Destination remote path to sync to, e.g. `drive:dst`. */
@@ -5180,7 +5257,7 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyObjectResponse"];
+            200: components["responses"]["SyncReportResponse"];
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5199,7 +5276,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                "application/json": components["schemas"]["RcGlobalOptions"] & components["schemas"]["SyncReportOptions"] & {
                     /** @description Source remote path to copy from. */
                     srcFs: string | components["schemas"]["RemoteDefinition"];
                     /** @description Destination remote path to copy to. */
@@ -5210,7 +5287,7 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyObjectResponse"];
+            200: components["responses"]["SyncReportResponse"];
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5229,7 +5306,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RcGlobalOptions"] & {
+                "application/json": components["schemas"]["RcGlobalOptions"] & components["schemas"]["SyncReportOptions"] & {
                     /** @description Source remote path whose contents will be moved. */
                     srcFs: string | components["schemas"]["RemoteDefinition"];
                     /** @description Destination remote path that will receive moved files. */
@@ -5242,7 +5319,7 @@ export interface operations {
             };
         };
         responses: {
-            200: components["responses"]["EmptyObjectResponse"];
+            200: components["responses"]["SyncReportResponse"];
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
@@ -5266,7 +5343,7 @@ export interface operations {
                     path1: string | components["schemas"]["RemoteDefinition"];
                     /** @description Second remote directory, e.g. `drive:path2`. */
                     path2: string | components["schemas"]["RemoteDefinition"];
-                    /** @description Set to true to simulate the bisync run without making changes. */
+                    /** @description Set to true to simulate the bisync run without making changes. Setting it to false doesn't turn off a dry run that the global config asks for. */
                     dryRun?: boolean;
                     /** @description Set to true to perform a one-time resync, rebuilding bisync history. */
                     resync?: boolean;
@@ -5274,7 +5351,10 @@ export interface operations {
                     checkAccess?: boolean;
                     /** @description Override the access-check sentinel filename; defaults to `RCLONE_TEST`. */
                     checkFilename?: string;
+                    /** @description Largest percentage of files that may be deleted, from 0 to 100. The bisync run aborts if it would delete more. */
                     maxDelete?: number;
+                    /** @description Set to true to leave tracked renames out of the `maxDelete` count. This needs `TrackRenames` set in `_config`. */
+                    maxDeleteRenamesAware?: boolean;
                     /** @description Set to true to bypass the `maxDelete` safety check. */
                     force?: boolean;
                     /** @enum {string} */
@@ -5623,6 +5703,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         config: {
+                            AllowHTTPSDowngrade: boolean;
                             AskPassword: boolean;
                             AutoConfirm: boolean;
                             BackupDir: string;
@@ -6321,216 +6402,6 @@ export interface operations {
                     };
                 };
             };
-            202: components["responses"]["AsyncJobResponse"];
-            401: components["responses"]["UnauthorizedResponse"];
-            "4XX": components["responses"]["RcError"];
-            "5XX": components["responses"]["RcError"];
-        };
-    };
-    pluginsctlAddPlugin: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
-                Prefer?: components["parameters"]["PreferAsyncHeader"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RcGlobalOptions"] & {
-                    /** @description Repository URL of the plugin to install. */
-                    url: string;
-                    branch?: string;
-                    version?: string;
-                };
-            };
-        };
-        responses: {
-            200: components["responses"]["EmptyObjectResponse"];
-            202: components["responses"]["AsyncJobResponse"];
-            401: components["responses"]["UnauthorizedResponse"];
-            "4XX": components["responses"]["RcError"];
-            "5XX": components["responses"]["RcError"];
-        };
-    };
-    pluginsctlGetPluginsForType: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
-                Prefer?: components["parameters"]["PreferAsyncHeader"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["RcGlobalOptions"] & {
-                    /** @description MIME type to match when listing plugins. */
-                    type?: string;
-                    /** @description Filter results by plugin type (e.g. `test`). */
-                    pluginType?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description Loaded plugin metadata for the requested MIME type. */
-            200: {
-                headers: {
-                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @description Installed plugins keyed by repository name. */
-                        loadedPlugins: {
-                            [key: string]: {
-                                [key: string]: unknown;
-                            };
-                        };
-                        /** @description Installed test plugins keyed by repository name. */
-                        loadedTestPlugins: {
-                            [key: string]: {
-                                [key: string]: unknown;
-                            };
-                        };
-                    };
-                };
-            };
-            202: components["responses"]["AsyncJobResponse"];
-            401: components["responses"]["UnauthorizedResponse"];
-            "4XX": components["responses"]["RcError"];
-            "5XX": components["responses"]["RcError"];
-        };
-    };
-    pluginsctlListPlugins: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
-                Prefer?: components["parameters"]["PreferAsyncHeader"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["RcGlobalOptions"];
-            };
-        };
-        responses: {
-            /** @description Lists installed production and test plugins with their metadata. */
-            200: {
-                headers: {
-                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @description Metadata entries for installed plugins. */
-                        loadedPlugins: {
-                            [key: string]: unknown;
-                        }[];
-                        /** @description Metadata entries for installed test plugins. */
-                        loadedTestPlugins: {
-                            [key: string]: unknown;
-                        }[];
-                    };
-                };
-            };
-            202: components["responses"]["AsyncJobResponse"];
-            401: components["responses"]["UnauthorizedResponse"];
-            "4XX": components["responses"]["RcError"];
-            "5XX": components["responses"]["RcError"];
-        };
-    };
-    pluginsctlListTestPlugins: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
-                Prefer?: components["parameters"]["PreferAsyncHeader"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["RcGlobalOptions"];
-            };
-        };
-        responses: {
-            /** @description Metadata for installed test plugins keyed by repository name. */
-            200: {
-                headers: {
-                    "x-rclone-jobid": components["headers"]["RcloneJobId"];
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @description Installed test plugin metadata keyed by repository. */
-                        loadedTestPlugins: {
-                            [key: string]: {
-                                [key: string]: unknown;
-                            };
-                        };
-                    };
-                };
-            };
-            202: components["responses"]["AsyncJobResponse"];
-            401: components["responses"]["UnauthorizedResponse"];
-            "4XX": components["responses"]["RcError"];
-            "5XX": components["responses"]["RcError"];
-        };
-    };
-    pluginsctlRemovePlugin: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
-                Prefer?: components["parameters"]["PreferAsyncHeader"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RcGlobalOptions"] & {
-                    /** @description Name of the plugin to uninstall. */
-                    name: string;
-                };
-            };
-        };
-        responses: {
-            200: components["responses"]["EmptyObjectResponse"];
-            202: components["responses"]["AsyncJobResponse"];
-            401: components["responses"]["UnauthorizedResponse"];
-            "4XX": components["responses"]["RcError"];
-            "5XX": components["responses"]["RcError"];
-        };
-    };
-    pluginsctlRemoveTestPlugin: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Set to `respond-async` to run the call in the background. Rclone returns a 202 with a job ID right away, and `job/status` reports progress. This has the same effect as the `_async` param in rclone's docs, but `_async` alone returns a 200 instead of a 202. */
-                Prefer?: components["parameters"]["PreferAsyncHeader"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RcGlobalOptions"] & {
-                    /** @description Name of the test plugin to uninstall. */
-                    name: string;
-                };
-            };
-        };
-        responses: {
-            200: components["responses"]["EmptyObjectResponse"];
             202: components["responses"]["AsyncJobResponse"];
             401: components["responses"]["UnauthorizedResponse"];
             "4XX": components["responses"]["RcError"];
